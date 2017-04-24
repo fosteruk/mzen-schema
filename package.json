@@ -17,7 +17,6 @@
     "bson-objectid": "^1.1.5",
     "clone": "^1.0.2",
     "mocha": "^2.5.3",
-    "mongodb": "^2.1.20",
     "should": "^11.2.0",
     "sinon": "^1.17.4"
   }
