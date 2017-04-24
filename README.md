@@ -7,7 +7,7 @@ Features:
   - Specify validation rules for each field
   - Populate default values from schema
 
-Initially designed for us with the mZen domain modeling package but has no dependency on mZen.
+Initially designed for use with the mZen domain modeling package but has no dependency on mZen.
 
 
 ```javascript
