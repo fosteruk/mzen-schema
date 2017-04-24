@@ -3,27 +3,6 @@ var Schema = require('../../lib/schema');
 
 describe('Schema', function () {
   describe('validation', function () {
-    /*
-    it('should validate field name', function () {
-      // Valid field names cannot contain '.' or start with '$'
-      var validDataA = {name: 1};
-      var validDataB = {name$: 1};
-      var invalidDataA = {$name: 1};
-      var invalidDataB = {'name.first': 1};
-
-      var schema = new Schema();
-
-      var resultValidA = schema.validate(validDataA);
-      var resultValidB = schema.validate(validDataB);
-      var resultInvalidA = schema.validate(invalidDataA);
-      var resultInvalidB = schema.validate(invalidDataB);
-
-      should(resultValidA.isValid).eql(true);
-      should(resultValidB.isValid).eql(true);
-      should(resultInvalidA.isValid).eql(false);
-      should(resultInvalidB.isValid).eql(false);
-    });
-    */
     it('should validate required field', function () {
       var validData = {house: 1};
       var invalidData = {other: 1};
@@ -327,6 +306,43 @@ describe('Schema', function () {
 
       should(validResult.isValid).eql(true);
       should(invalidResult.isValid).eql(false);
+    });
+    it('should populate errors object on falilure', function () {
+      var invalidData = {other: 1};
+
+      var schema = new Schema({
+        house: {$type: Number, $validate: {required: true}}
+      });
+
+      var resultInvalid = schema.validate(invalidData);
+
+      should(resultInvalid.isValid).eql(false);
+      should(resultInvalid.errors).is.Object();
+      should(resultInvalid.errors.house).is.Array(); // Error messages are returned as an array of strings
+    });
+    it('should populate custom error message on falilure', function () {
+      var invalidData = {other: 1};
+
+      var schema = new Schema({
+        house: {$type: Number, $validate: {required: true}}
+      });
+
+      var resultInvalid = schema.validate(invalidData);
+
+      should(resultInvalid.isValid).eql(false);
+      should(resultInvalid.errors.house[0]).equal('house is required'); // Error messages are returned as an array of strings
+    });
+    it('should use custom name in error message', function () {
+      var invalidData = {other: 1};
+
+      var schema = new Schema({
+        house: {$name: 'House number', $type: Number, $validate: {required: true}}
+      });
+
+      var resultInvalid = schema.validate(invalidData);
+
+      should(resultInvalid.isValid).eql(false);
+      should(resultInvalid.errors.house[0]).equal('House number is required'); // Error messages are returned as an array of strings
     });
   });
 });
