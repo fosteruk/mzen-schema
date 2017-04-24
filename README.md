@@ -15,10 +15,14 @@ var Schema = require('mzen-schema');
 
 var schemaPerson = new Schema({
   _id: 'ObjectID',
-  name: {$type: String, $validate: {
-    required: true,
-    length: {min: 1, max: 50} 
-  }},
+  name: {
+    $type: String, 
+    $validate: {
+      required: true,
+      length: {min: 1, max: 50} 
+    },
+    $filter: {defaultValue: 'Unknown'}
+  },
   created: Date,
   contact: {
     address: String,
