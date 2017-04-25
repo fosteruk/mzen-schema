@@ -16,6 +16,9 @@ var Schema = require('mzen-schema');
 var schemaPerson = new Schema({
   _id: 'ObjectID',
   name: {
+    // This is the name that will be used in any error message 
+    // - defaults to the field name
+    $name: 'Name', 
     $type: String, 
     $validate: {
       required: true,
@@ -28,7 +31,19 @@ var schemaPerson = new Schema({
     address: String,
     tel: {$type: String, $validate: {
       required: true,
-      regex: {pattern: '^[0-9]+$', message: 'Tel does not appear to be valid'} 
+      // You can use the same validator multiple times
+      // - just specify an array of options rather than an object
+      // - The validator will be executed once per options object
+      regex: [
+        {
+          pattern: '[0-9]+', 
+          message: 'Tel does not appear to be valid'
+        },
+        {
+          pattern: '^\+[0-9]{2}', 
+          message: 'Tel must start with your country code (e.g. +44)'
+        }
+      ]
     }
   }
 });
@@ -41,7 +56,8 @@ var paul = {
   }
 };
 
-// Calling Schema.validate() will type-cast and validate the data against the schema
+// Calling Schema.validate() will type-cast and validate 
+// the data against the schema
 // The validate() method returns a result object with meta data
 // Two useful values returned are 'isValid' and 'errors'
 var result = schemaPerson.validate(paul);
