@@ -36,7 +36,7 @@ var schemaPerson = new Schema({
       // - The validator will be executed once per options object
       regex: [
         {
-          pattern: '[0-9]+', 
+          pattern: '[+0-9]+', 
           message: 'Tel does not appear to be valid'
         },
         {
