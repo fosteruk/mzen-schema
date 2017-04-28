@@ -60,10 +60,11 @@ var paul = {
 // the data against the schema
 // The validate() method returns a result object with meta data
 // Two useful values returned are 'isValid' and 'errors'
-var result = schemaPerson.validate(paul);
-if (result.isValid) {
-  // Do something with valid user
-} else {
-  console.log(result.errors);
-}
+var result = schemaPerson.validate(paul).then((result) => {
+  if (result.isValid) {
+    // Do something with valid user
+  } else {
+    console.log(result.errors);
+  }
+});
 ```
