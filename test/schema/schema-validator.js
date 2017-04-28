@@ -17,7 +17,7 @@ describe('Schema', function () {
 
         should(result).be.a.String();
       });
-      it('should allow customer message', function () {
+      it('should allow custom message', function () {
         var value = undefined;
         var result = Validator.required(value, {message: 'Name is required'});
 
@@ -37,7 +37,7 @@ describe('Schema', function () {
 
         should(result).be.a.String();
       });
-      it('should allow customer message', function () {
+      it('should allow custom message', function () {
         var value = null;
         var result = Validator.notNull(value, {message: 'Name can not be null'});
 
@@ -57,7 +57,7 @@ describe('Schema', function () {
 
         should(result).be.a.String();
       });
-      it('should allow customer message', function () {
+      it('should allow custom message', function () {
         var value = '';
         var result = Validator.notEmpty(value, {message: 'Name can not be empty'});
 
@@ -77,7 +77,7 @@ describe('Schema', function () {
 
         should(result).be.a.String();
       });
-      it('should allow customer message', function () {
+      it('should allow custom message', function () {
         var value = '123';
         var result = Validator.regex(value, {pattern: '^[a-zA-Z]+$', message: 'Name does appears to be valid'});
 
@@ -97,7 +97,7 @@ describe('Schema', function () {
 
         should(result).be.a.String();
       });
-      it('should allow customer message', function () {
+      it('should allow custom message', function () {
         var value = 'not an email';
         var result = Validator.email(value, {message: 'Email does appears to be valid'});
 
@@ -117,7 +117,7 @@ describe('Schema', function () {
 
         should(result).be.a.String();
       });
-      it('should allow customer message', function () {
+      it('should allow custom message', function () {
         var value = '456756789';
         var result = Validator.length(value, {min: 20, max: 50, message: 'Code should be between 10 and 50 characters long'});
 
@@ -137,7 +137,7 @@ describe('Schema', function () {
 
         should(result).be.a.String();
       });
-      it('should allow customer message', function () {
+      it('should allow custom message', function () {
         var value = {a: 123, b: 4567};
         var result = Validator.equality(value.a, {path: 'b', message: 'Values do not match'}, 'A', value);
 
