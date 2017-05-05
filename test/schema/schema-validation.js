@@ -1,5 +1,6 @@
 var should = require('should');
 var Schema = require('../../lib/schema');
+var Types = require('../../lib/schema/types');
 
 describe('Schema', function() {
   describe('validation', function() {
@@ -162,7 +163,7 @@ describe('Schema', function() {
         var data = {name: 'Kevin'};
 
         var schema = new Schema({
-          name: {$type: Schema.types.Mixed, $validate: {notEmpty: true}}
+          name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
         schema.validate(data).then((result) => {
@@ -177,7 +178,7 @@ describe('Schema', function() {
         var data = {name: undefined};
 
         var schema = new Schema({
-          name: {$type: Schema.types.Mixed, $validate: {notEmpty: true}}
+          name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
         schema.validate(data).then((result) => {
@@ -191,7 +192,7 @@ describe('Schema', function() {
         var data = {name: null};
 
         var schema = new Schema({
-          name: {$type: Schema.types.Mixed, $validate: {notEmpty: true}}
+          name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
         schema.validate(data).then((result) => {
@@ -205,7 +206,7 @@ describe('Schema', function() {
         var data = {name: false};
 
         var schema = new Schema({
-          name: {$type: Schema.types.Mixed, $validate: {notEmpty: true}}
+          name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
         schema.validate(data).then((result) => {
@@ -219,7 +220,7 @@ describe('Schema', function() {
         var data = {name: 0};
 
         var schema = new Schema({
-          name: {$type: Schema.types.Mixed, $validate: {notEmpty: true}}
+          name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
         schema.validate(data).then((result) => {
@@ -233,7 +234,7 @@ describe('Schema', function() {
         var data = {name: ''};
 
         var schema = new Schema({
-          name: {$type: Schema.types.Mixed, $validate: {notEmpty: true}}
+          name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
         schema.validate(data).then((result) => {
@@ -247,7 +248,7 @@ describe('Schema', function() {
         var data = {name: [1]};
 
         var schema = new Schema({
-          name: {$type: Schema.types.Mixed, $validate: {notEmpty: true}}
+          name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
         schema.validate(data).then((result) => {
@@ -261,7 +262,7 @@ describe('Schema', function() {
         var data = {name: []};
 
         var schema = new Schema({
-          name: {$type: Schema.types.Mixed, $validate: {notEmpty: true}}
+          name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
         schema.validate(data).then((results) => {
@@ -275,7 +276,7 @@ describe('Schema', function() {
         var data = {name: [[]]};
 
         var schema = new Schema({
-          name: {$type: Schema.types.Mixed, $validate: {notEmpty: true}}
+          name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
         schema.validate(data).then((results) => {
@@ -289,7 +290,7 @@ describe('Schema', function() {
         var validDataNotEmptyObject = {name: {test: 1}};
 
         var schema = new Schema({
-          name: {$type: Schema.types.Mixed, $validate: {notEmpty: true}}
+          name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
         schema.validate(validDataNotEmptyObject).then((results) => {
@@ -301,7 +302,7 @@ describe('Schema', function() {
         var data = {name: {}};
 
         var schema = new Schema({
-          name: {$type: Schema.types.Mixed, $validate: {notEmpty: true}}
+          name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
         schema.validate(data).then((results) => {
