@@ -72,137 +72,183 @@
 
 "use strict";
 
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var ObjectID = __webpack_require__(1);
 
-class TypeCaster
-{  
-  /**
-   * Get Type
-   *
-   * If value is a function that will be returned otherwise the values constructor will be returned.
-   */
-  static getType(value)
-  {
-    return typeof value == 'function' ? value : (value).constructor;
-  }
-  
-  static getTypeName(value)
-  {
-    return TypeCaster.getType(value).name;
+var TypeCaster = function () {
+  function TypeCaster() {
+    _classCallCheck(this, TypeCaster);
   }
 
-  static cast(toType, value)
-  {
-    const fromTypeName = TypeCaster.getTypeName(value);
-    const fromTypeCaster = TypeCaster.type[fromTypeName];
-    if (fromTypeCaster == undefined) throw new Error('Can not cast from unknown type "' + fromTypeName + '"');
-    
-    const toTypeName = TypeCaster.getTypeName(toType);
-    const toTypeCaster = TypeCaster.type[TypeCaster.getTypeName(toType)];
-    if (toTypeCaster == undefined) throw new Error('Can not cast to unknown type "' + toTypeName + '"');
+  _createClass(TypeCaster, null, [{
+    key: 'getType',
 
-    var result = value;
-    // If there is a cast function for toType then we cast the value
-    // - otherwise the case is not supported so we simply return the original value
-    const castFunctionName = TypeCaster.getCastFunctionName(fromTypeName);
-    //console.log(toTypeName, toType, castFunctionName);
-    if (typeof toTypeCaster[castFunctionName] == 'function') {
-      result = toTypeCaster[castFunctionName](value);
+    /**
+     * Get Type
+     *
+     * If value is a function that will be returned otherwise the values constructor will be returned.
+     */
+    value: function getType(value) {
+      return typeof value == 'function' ? value : value.constructor;
     }
-    
-    return result;
-  }
-  
-  static getCastFunctionName(typeName) 
-  {
-    return 'cast' + typeName.charAt(0).toUpperCase() + typeName.slice(1);
-  }
-}
-
-class TypeCasterString
-{
-  static castNumber(value)
-  {
-    return (value).toString();
-  }
-  
-  static castBoolean(value)
-  {
-    return (value) ? '1' : '0';
-  }
-  
-  static castObjectID(value)
-  {
-    return value.toString();
-  }
-}
-
-class TypeCasterNumber
-{
-  static castString(value)
-  {
-    return (+value);
-  }
-  
-  static castBoolean(value)
-  {
-    return (value) ? 1 : 0;
-  }
-}
-
-class TypeCasterBoolean
-{
-  static castString(value)
-  {
-    value = value.trim().toLowerCase();
-    return (value == '1' || value == 'true');
-  }
-  
-  static castNumber(value)
-  {
-    return (value > 0);
-  }
-}
-
-class TypeCasterDate
-{
-  static castString(value)
-  {
-    var result = undefined;
-    if (value == '' || value.toLowerCase() == 'now') {
-      result = new Date();
-    } else {
-      result = new Date(value);
+  }, {
+    key: 'getTypeName',
+    value: function getTypeName(value) {
+      return TypeCaster.getType(value).name;
     }
-    return result;
-  }
-  
-  static castNumber(value)
-  {
-    return new Date(value);
-  }
-}
+  }, {
+    key: 'cast',
+    value: function cast(toType, value) {
+      var fromTypeName = TypeCaster.getTypeName(value);
+      var fromTypeCaster = TypeCaster.type[fromTypeName];
+      if (fromTypeCaster == undefined) throw new Error('Can not cast from unknown type "' + fromTypeName + '"');
 
-class TypeCasterObjectID
-{
-  static castString(value)
-  {
-    return ObjectID(value);
+      var toTypeName = TypeCaster.getTypeName(toType);
+      var toTypeCaster = TypeCaster.type[TypeCaster.getTypeName(toType)];
+      if (toTypeCaster == undefined) throw new Error('Can not cast to unknown type "' + toTypeName + '"');
+
+      var result = value;
+      // If there is a cast function for toType then we cast the value
+      // - otherwise the case is not supported so we simply return the original value
+      var castFunctionName = TypeCaster.getCastFunctionName(fromTypeName);
+      //console.log(toTypeName, toType, castFunctionName);
+      if (typeof toTypeCaster[castFunctionName] == 'function') {
+        result = toTypeCaster[castFunctionName](value);
+      }
+
+      return result;
+    }
+  }, {
+    key: 'getCastFunctionName',
+    value: function getCastFunctionName(typeName) {
+      return 'cast' + typeName.charAt(0).toUpperCase() + typeName.slice(1);
+    }
+  }]);
+
+  return TypeCaster;
+}();
+
+var TypeCasterString = function () {
+  function TypeCasterString() {
+    _classCallCheck(this, TypeCasterString);
   }
-}
+
+  _createClass(TypeCasterString, null, [{
+    key: 'castNumber',
+    value: function castNumber(value) {
+      return value.toString();
+    }
+  }, {
+    key: 'castBoolean',
+    value: function castBoolean(value) {
+      return value ? '1' : '0';
+    }
+  }, {
+    key: 'castObjectID',
+    value: function castObjectID(value) {
+      return value.toString();
+    }
+  }]);
+
+  return TypeCasterString;
+}();
+
+var TypeCasterNumber = function () {
+  function TypeCasterNumber() {
+    _classCallCheck(this, TypeCasterNumber);
+  }
+
+  _createClass(TypeCasterNumber, null, [{
+    key: 'castString',
+    value: function castString(value) {
+      return +value;
+    }
+  }, {
+    key: 'castBoolean',
+    value: function castBoolean(value) {
+      return value ? 1 : 0;
+    }
+  }]);
+
+  return TypeCasterNumber;
+}();
+
+var TypeCasterBoolean = function () {
+  function TypeCasterBoolean() {
+    _classCallCheck(this, TypeCasterBoolean);
+  }
+
+  _createClass(TypeCasterBoolean, null, [{
+    key: 'castString',
+    value: function castString(value) {
+      value = value.trim().toLowerCase();
+      return value == '1' || value == 'true';
+    }
+  }, {
+    key: 'castNumber',
+    value: function castNumber(value) {
+      return value > 0;
+    }
+  }]);
+
+  return TypeCasterBoolean;
+}();
+
+var TypeCasterDate = function () {
+  function TypeCasterDate() {
+    _classCallCheck(this, TypeCasterDate);
+  }
+
+  _createClass(TypeCasterDate, null, [{
+    key: 'castString',
+    value: function castString(value) {
+      var result = undefined;
+      if (value == '' || value.toLowerCase() == 'now') {
+        result = new Date();
+      } else {
+        result = new Date(value);
+      }
+      return result;
+    }
+  }, {
+    key: 'castNumber',
+    value: function castNumber(value) {
+      return new Date(value);
+    }
+  }]);
+
+  return TypeCasterDate;
+}();
+
+var TypeCasterObjectID = function () {
+  function TypeCasterObjectID() {
+    _classCallCheck(this, TypeCasterObjectID);
+  }
+
+  _createClass(TypeCasterObjectID, null, [{
+    key: 'castString',
+    value: function castString(value) {
+      return ObjectID(value);
+    }
+  }]);
+
+  return TypeCasterObjectID;
+}();
 
 TypeCaster.type = {
-  String: TypeCasterString, 
+  String: TypeCasterString,
   Number: TypeCasterNumber,
   Boolean: TypeCasterBoolean,
   Object: {}, // Object is a valid type but we can not cast a primitive to an object so it has no cast methods
   Array: {}, // Array is a valid type but we can not cast a primitive to an object so it has no cast methods
   Date: TypeCasterDate,
-  ObjectID: TypeCasterObjectID, // This is a mongodb specific type
-};
+  ObjectID: TypeCasterObjectID };
 
 module.exports = TypeCaster;
-
 
 /***/ }),
 /* 1 */
@@ -398,11 +444,16 @@ ObjectID.test = 1;
 
 "use strict";
 
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var ObjectID = __webpack_require__(1);
 
-class Mixed {}
+var Mixed = function Mixed() {
+  _classCallCheck(this, Mixed);
+};
 
-const Types = {
+var Types = {
   String: String,
   Number: Number,
   Boolean: Boolean,
@@ -414,7 +465,6 @@ const Types = {
 };
 
 module.exports = Types;
-
 
 /***/ }),
 /* 3 */
@@ -589,215 +639,235 @@ if (typeof module === 'object' && module.exports) {
 
 "use strict";
 
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var clone = __webpack_require__(3);
 var ObjectID = __webpack_require__(1);
 var SchemaUtil = __webpack_require__(7);
 var Types = __webpack_require__(2);
 var TypeCaster = __webpack_require__(0);
 
-const queryOperators = [
-  '$eq', 
-  '$gt', 
-  '$gte', 
-  '$lt', 
-  '$lte', 
-  '$ne', 
-  '$in', 
-  '$nin', 
-  '$or', 
-  '$and', 
-  '$not', 
-  '$nor', 
-  '$size', 
-  '$all', 
-  '$elemMatch'
-];
+var queryOperators = ['$eq', '$gt', '$gte', '$lt', '$lte', '$ne', '$in', '$nin', '$or', '$and', '$not', '$nor', '$size', '$all', '$elemMatch'];
 
-class SchemaMapper
-{
-  constructor(spec, options) 
-  {
-    this.spec = (spec == undefined) ? {} : spec;
-    this.options = (options == undefined) ? {} : options;
-  }
-  map(object, callback)
-  {
-    const meta = {path: '', errors: {}};
-    const isArray = Array.isArray(object);
-    const objects = isArray ? object : [object];
-    // Clone the spec as it may be temporarily modified in the process of validation
-    const spec = clone(this.spec);
-    
-    objects.forEach(function(object, x){
-      this.mapField(spec, x, objects, meta, callback);
-    }, this);
-  }
-  mapPaths(paths, callback, meta)
-  {
-    var meta = meta ? meta : {path: '', errors: {}};
-    var objects = Array.isArray(paths) ? paths : [paths];
+var SchemaMapper = function () {
+  function SchemaMapper(spec, options) {
+    _classCallCheck(this, SchemaMapper);
 
-    meta['path'] = meta['path'] ? meta['path'] : '';
-    objects.forEach(function(object){
-      for (let fieldPath in object) {
-        if (!object.hasOwnProperty(fieldPath)) continue;
-        meta['path'] = fieldPath;
-        var spec = SchemaUtil.getSpec(fieldPath, this.spec);
-        this.mapField(spec, fieldPath, object, meta, callback);
-      }
-    }.bind(this));
+    this.spec = spec == undefined ? {} : spec;
+    this.options = options == undefined ? {} : options;
   }
-  mapQueryPaths(query, callback)
-  {
-    const mapRecursive = (query) => {
-      if (TypeCaster.getType(query) == Object) {
-        for (let fieldName in query) {
-          if (!query.hasOwnProperty(fieldName)) continue;
-          if (this.isQueryOperator(fieldName)) {
-            // If this element is an operator - we want to validate is values
-            if (['$or', '$and'].indexOf(fieldName) != -1) {
-              query[fieldName].forEach(function(value, x){
-                mapRecursive(query[fieldName][x]);
-              }.bind(this));
+
+  _createClass(SchemaMapper, [{
+    key: 'map',
+    value: function map(object, callback) {
+      var meta = { path: '', errors: {} };
+      var isArray = Array.isArray(object);
+      var objects = isArray ? object : [object];
+      // Clone the spec as it may be temporarily modified in the process of validation
+      var spec = clone(this.spec);
+
+      objects.forEach(function (object, x) {
+        this.mapField(spec, x, objects, meta, callback);
+      }, this);
+    }
+  }, {
+    key: 'mapPaths',
+    value: function mapPaths(paths, callback, meta) {
+      var meta = meta ? meta : { path: '', errors: {} };
+      var objects = Array.isArray(paths) ? paths : [paths];
+
+      meta['path'] = meta['path'] ? meta['path'] : '';
+      objects.forEach(function (object) {
+        for (var fieldPath in object) {
+          if (!object.hasOwnProperty(fieldPath)) continue;
+          meta['path'] = fieldPath;
+          var spec = SchemaUtil.getSpec(fieldPath, this.spec);
+          this.mapField(spec, fieldPath, object, meta, callback);
+        }
+      }.bind(this));
+    }
+  }, {
+    key: 'mapQueryPaths',
+    value: function mapQueryPaths(query, callback) {
+      var _this = this;
+
+      var mapRecursive = function mapRecursive(query) {
+        if (TypeCaster.getType(query) == Object) {
+          var _loop = function _loop(fieldName) {
+            if (!query.hasOwnProperty(fieldName)) return 'continue';
+            if (_this.isQueryOperator(fieldName)) {
+              // If this element is an operator - we want to validate is values
+              if (['$or', '$and'].indexOf(fieldName) != -1) {
+                query[fieldName].forEach(function (value, x) {
+                  mapRecursive(query[fieldName][x]);
+                }.bind(_this));
+              } else {
+                mapRecursive(query[fieldName]);
+              }
             } else {
-              mapRecursive(query[fieldName]);
-            }
-          } else {
-            // Check if has a query opterator
-            var hasOpertators = false;
-            if (TypeCaster.getType(query[fieldName]) == Object) {
-              for (var childField in query[fieldName]) {
-                hasOpertators = hasOpertators || (queryOperators.indexOf(childField) !== -1);
-                if (hasOpertators) {
-                  if (Array.isArray(query[fieldName][childField])) {
-                    query[fieldName][childField].forEach(function(value, x){
-                      callback(fieldName, x, query[fieldName][childField]);
-                    }.bind(this));
-                  } else {
+              // Check if has a query opterator
+              hasOpertators = false;
+
+              if (TypeCaster.getType(query[fieldName]) == Object) {
+                for (childField in query[fieldName]) {
+                  hasOpertators = hasOpertators || queryOperators.indexOf(childField) !== -1;
+                  if (hasOpertators) {
+                    if (Array.isArray(query[fieldName][childField])) {
+                      query[fieldName][childField].forEach(function (value, x) {
+                        callback(fieldName, x, query[fieldName][childField]);
+                      }.bind(_this));
+                    } else {
                       callback(fieldName, childField, query[fieldName]);
+                    }
                   }
                 }
               }
-            }
-            if (!hasOpertators) {
-              if (Array.isArray(query[fieldName])) {
-                query[fieldName].forEach(function(value, x){
-                  callback(fieldName, x, query[fieldName]);
-                }.bind(this));
-              } else {
-                callback(fieldName, fieldName, query);
+              if (!hasOpertators) {
+                if (Array.isArray(query[fieldName])) {
+                  query[fieldName].forEach(function (value, x) {
+                    callback(fieldName, x, query[fieldName]);
+                  }.bind(_this));
+                } else {
+                  callback(fieldName, fieldName, query);
+                }
               }
             }
+          };
+
+          for (var fieldName in query) {
+            var hasOpertators;
+            var childField;
+
+            var _ret = _loop(fieldName);
+
+            if (_ret === 'continue') continue;
           }
+        } else if (Array.isArray(query)) {
+          query.forEach(function (arrayValue, x) {
+            mapRecursive(query[x], meta);
+          }.bind(_this));
         }
-      } else if (Array.isArray(query)) {
-        query.forEach(function(arrayValue, x){
-          mapRecursive(query[x], meta);
-        }.bind(this));
-      } 
-      return query;
-    };
-    
-    mapRecursive(query);
-  }
-  mapRecursive(spec, object, meta = {}, callback)
-  {
-    meta['path'] = (meta['path'] == undefined) ? '' : meta['path'];
-  
-    // If match all spec is defined, newSpec defaults to an empty object since any spec rules should be replaced by 
-    // - the match-all defaults to original spec
-    const matchAllSpec = (spec && spec['*'] != undefined) ? spec['*'] : undefined;
-    const newSpec = (matchAllSpec != undefined) ? {} :  spec;
-    for (var fieldName in object) {
-      if (!object.hasOwnProperty(fieldName)) continue;
-      
-      if (matchAllSpec !== undefined) {
-        // If match all '*' field spec is set, we generate a new spec object using the match all spec for every field
-        newSpec[fieldName] = matchAllSpec;
-      } else if (spec === undefined || spec[fieldName] === undefined) {
-        // Any properties of the object under validation, that are not defined defined in the spec
-        // - are injected into the spec as "undefined" to allow default validations to be applied
-        // If no spec is specified, all fields are set as undefined. This allows default validations to be applied.
-        newSpec[fieldName] = undefined;
+        return query;
+      };
+
+      mapRecursive(query);
+    }
+  }, {
+    key: 'mapRecursive',
+    value: function mapRecursive(spec, object) {
+      var meta = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var callback = arguments[3];
+
+      meta['path'] = meta['path'] == undefined ? '' : meta['path'];
+
+      // If match all spec is defined, newSpec defaults to an empty object since any spec rules should be replaced by 
+      // - the match-all defaults to original spec
+      var matchAllSpec = spec && spec['*'] != undefined ? spec['*'] : undefined;
+      var newSpec = matchAllSpec != undefined ? {} : spec;
+      for (var fieldName in object) {
+        if (!object.hasOwnProperty(fieldName)) continue;
+
+        if (matchAllSpec !== undefined) {
+          // If match all '*' field spec is set, we generate a new spec object using the match all spec for every field
+          newSpec[fieldName] = matchAllSpec;
+        } else if (spec === undefined || spec[fieldName] === undefined) {
+          // Any properties of the object under validation, that are not defined defined in the spec
+          // - are injected into the spec as "undefined" to allow default validations to be applied
+          // If no spec is specified, all fields are set as undefined. This allows default validations to be applied.
+          newSpec[fieldName] = undefined;
+        }
+      }
+      spec = newSpec;
+
+      var basePath = meta['path'];
+
+      for (var fieldName in spec) {
+        if (!spec.hasOwnProperty(fieldName)) continue;
+        if (fieldName.indexOf('$') === 0) continue; // Descriptor proptery
+        meta['path'] = basePath ? basePath + '.' + fieldName : fieldName;
+        this.mapField(spec[fieldName], fieldName, object, meta, callback);
       }
     }
-    spec = newSpec;
+  }, {
+    key: 'mapArrayElements',
+    value: function mapArrayElements(spec, array) {
+      var meta = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var callback = arguments[3];
 
-    var basePath = meta['path'];
+      meta['path'] = meta['path'] == undefined ? '' : meta['path'];
 
-    for (var fieldName in spec) {
-      if (!spec.hasOwnProperty(fieldName)) continue;
-      if (fieldName.indexOf('$') === 0) continue; // Descriptor proptery
-      meta['path'] = basePath ? basePath + '.' + fieldName : fieldName;
-      this.mapField(spec[fieldName], fieldName, object, meta, callback);
+      var basePath = meta['path'];
+      array.forEach(function (element, x) {
+        meta['path'] = basePath + '[' + x + ']';
+        this.mapField(spec, x, array, meta, callback);
+      }, this);
     }
-  }
-  mapArrayElements(spec, array, meta = {}, callback)
-  {
-    meta['path'] = (meta['path'] == undefined) ? '' : meta['path'];
+  }, {
+    key: 'mapField',
+    value: function mapField(spec, fieldName, container) {
+      var meta = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+      var callback = arguments[4];
 
-    var basePath = meta['path'];
-    array.forEach(function(element, x){
-      meta['path'] = basePath + '[' + x + ']';
-      this.mapField(spec, x, array, meta, callback);
-    }, this);
-  }
-  mapField(spec, fieldName, container, meta = {}, callback)
-  {
-    meta['path'] = (meta['path'] == undefined) ? '' : meta['path'];
-    
-    var fieldType = undefined;
-    // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later). 
-    // - Otherwise we need to find the constructor, if the value is not already a constructor ([] or {}) 
-    if (spec) fieldType = spec.constructor == String ? spec : TypeCaster.getType(spec);
-    if (fieldType == Object && spec['$type'] !== undefined) fieldType = spec['$type'];
-    if (fieldType && fieldType.constructor == String) { 
-      // The fieldType was specified with a string value (not a String constructor)
-      // Attempt to covert the field type to a constructor
-      fieldType = Types[fieldType];
-    }
+      meta['path'] = meta['path'] == undefined ? '' : meta['path'];
 
-    var defaultValue = undefined;
-    if (fieldType == Object) {
-      defaultValue = {};
-    } else if (fieldType == Array) {
-      defaultValue = [];
-    }
-    if (container[fieldName] === undefined && defaultValue !== undefined) {
-      container[fieldName] = defaultValue;
-    }
-  
-    callback(spec, fieldName, container, meta['path']);
+      var fieldType = undefined;
+      // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later). 
+      // - Otherwise we need to find the constructor, if the value is not already a constructor ([] or {}) 
+      if (spec) fieldType = spec.constructor == String ? spec : TypeCaster.getType(spec);
+      if (fieldType == Object && spec['$type'] !== undefined) fieldType = spec['$type'];
+      if (fieldType && fieldType.constructor == String) {
+        // The fieldType was specified with a string value (not a String constructor)
+        // Attempt to covert the field type to a constructor
+        fieldType = Types[fieldType];
+      }
 
-    const path = meta['path'];
-    switch (fieldType) {
-      case Object:
-        this.mapRecursive(spec, container[fieldName], meta, callback);
-      break;
-      case Array:
-        var arraySpec  = undefined;
-        if (Array.isArray(spec) && spec[0]) {
-          // If the field is an array the specification for the array elements shoud be contained in the first element
-          arraySpec = spec[0];
-        } else if (TypeCaster.getType(spec) == Object && spec['$spec']) {
-          // If the field type is an object which specifies type "Array" 
-          // - then the array elements spec should be specified using the "$spec" property 
-          arraySpec = spec['$spec'];
-        }
-        if (arraySpec) {
-          this.mapArrayElements(arraySpec, container[fieldName], meta, callback);
-        }
-      break;
+      var defaultValue = undefined;
+      if (fieldType == Object) {
+        defaultValue = {};
+      } else if (fieldType == Array) {
+        defaultValue = [];
+      }
+      if (container[fieldName] === undefined && defaultValue !== undefined) {
+        container[fieldName] = defaultValue;
+      }
+
+      callback(spec, fieldName, container, meta['path']);
+
+      var path = meta['path'];
+      switch (fieldType) {
+        case Object:
+          this.mapRecursive(spec, container[fieldName], meta, callback);
+          break;
+        case Array:
+          var arraySpec = undefined;
+          if (Array.isArray(spec) && spec[0]) {
+            // If the field is an array the specification for the array elements shoud be contained in the first element
+            arraySpec = spec[0];
+          } else if (TypeCaster.getType(spec) == Object && spec['$spec']) {
+            // If the field type is an object which specifies type "Array" 
+            // - then the array elements spec should be specified using the "$spec" property 
+            arraySpec = spec['$spec'];
+          }
+          if (arraySpec) {
+            this.mapArrayElements(arraySpec, container[fieldName], meta, callback);
+          }
+          break;
+      }
     }
-  }
-  isQueryOperator(value) 
-  {
-    return (typeof value == 'string' && value[0] == '$');
-  }
-}
+  }, {
+    key: 'isQueryOperator',
+    value: function isQueryOperator(value) {
+      return typeof value == 'string' && value[0] == '$';
+    }
+  }]);
+
+  return SchemaMapper;
+}();
 
 module.exports = SchemaMapper;
-
 
 /***/ }),
 /* 5 */
@@ -805,181 +875,188 @@ module.exports = SchemaMapper;
 
 "use strict";
 
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var TypeCaster = __webpack_require__(0);
 
-class Validator
-{
-  static validate(value, validators, name, root) 
-  {
-    var results = true;
-    var promises = [];
+var Validator = function () {
+  function Validator() {
+    _classCallCheck(this, Validator);
+  }
 
-    var promise = Promise.resolve();
-    Object.keys(validators).forEach((validatorName) => {
-      var validator = Validator[validatorName];
-      if (validator == undefined) throw new Error('Uknown validator "' + validatorName + '"');
+  _createClass(Validator, null, [{
+    key: 'validate',
+    value: function validate(value, validators, name, root) {
+      var results = true;
+      var promises = [];
 
-      var options = !validators[validatorName] || (typeof validators[validatorName] == 'boolean') ? {} : validators[validatorName];
-      // If options is an array we run the validator multiple times 
-      // - one for each options object id
-      options = Array.isArray(options) ? options : [options];
+      var promise = Promise.resolve();
+      Object.keys(validators).forEach(function (validatorName) {
+        var validator = Validator[validatorName];
+        if (validator == undefined) throw new Error('Uknown validator "' + validatorName + '"');
 
-      options.forEach((opts) => {
-        promise = promise.then(() => {
-          // We only validate if we dont already have an error 
-          if (results === true) {
-            // Validate fucntion can return a promise but it may also return boolean, string or array
-            // - we must first resolve the return value to ensure we have promise
-            return Promise.resolve(validator(value, opts, name, root)).then((result) => {
-              if (result !== true) {
-                // validator function can return either true, a single message string or an array of error messages
-                // - the main validate() method returns a promise that resolves to true or an array of error messages
-                // - We already know the current results is not true so lets ensure we have an array of errors
-                result = Array.isArray(result) ? result : [result];
+        var options = !validators[validatorName] || typeof validators[validatorName] == 'boolean' ? {} : validators[validatorName];
+        // If options is an array we run the validator multiple times 
+        // - one for each options object id
+        options = Array.isArray(options) ? options : [options];
 
-                if (Array.isArray(results)) {
-                  results = results.concat(result);
-                } else {
-                  results = result;
+        options.forEach(function (opts) {
+          promise = promise.then(function () {
+            // We only validate if we dont already have an error 
+            if (results === true) {
+              // Validate fucntion can return a promise but it may also return boolean, string or array
+              // - we must first resolve the return value to ensure we have promise
+              return Promise.resolve(validator(value, opts, name, root)).then(function (result) {
+                if (result !== true) {
+                  // validator function can return either true, a single message string or an array of error messages
+                  // - the main validate() method returns a promise that resolves to true or an array of error messages
+                  // - We already know the current results is not true so lets ensure we have an array of errors
+                  result = Array.isArray(result) ? result : [result];
+
+                  if (Array.isArray(results)) {
+                    results = results.concat(result);
+                  } else {
+                    results = result;
+                  }
                 }
-              }
-            });
-          }
+              });
+            }
+          });
         });
       });
-    });
 
-    var promise = promise.then(() => {
-      return results;
-    });
+      var promise = promise.then(function () {
+        return results;
+      });
 
-    return promise;
-  }
+      return promise;
+    }
 
-  // Validator function
-  // - returns an error message string or an array of error messages on failure otherweise returns boolean true
-  static required(value, options, name, root)
-  {
-    var isValid = (value !== undefined);
+    // Validator function
+    // - returns an error message string or an array of error messages on failure otherweise returns boolean true
 
-    var name = options && options['name'] ? options['name'] : name;
-    var message = options && options['message'] ? options['message'] : name + ' is required';
-    var result = isValid ? isValid : message;
+  }, {
+    key: 'required',
+    value: function required(value, options, name, root) {
+      var isValid = value !== undefined;
 
-    return result;
-  }
+      var name = options && options['name'] ? options['name'] : name;
+      var message = options && options['message'] ? options['message'] : name + ' is required';
+      var result = isValid ? isValid : message;
 
-  static notNull(value, options, name, root)
-  {
-    var isValid = (value !== null) && !(
-      // The string value NULL or null are treated as a literal null
-      typeof value == 'string' && value.toLowerCase() == 'null'
-    );
-    var name = options && options['name'] ? options['name'] : name;
-    var message = options && options['message'] ? options['message'] : name + ' cannot be null';
-    var result = isValid ? isValid : message;
-    return result;
-  }
-
-  static notEmpty(value, options, name, root)
-  {
-    function isEmpty(value)
-    {
-      var valueType = value ? TypeCaster.getType(value) : undefined;
-      var result = (
-        value == undefined ||
-        // In Javascript [[]] evalulates to false - we dont want this
-        // - an array is only considered empty if it has zero elements
-        (valueType != Array && value == false) || 
-        (valueType == Number && isNaN(value)) ||
-        (valueType == Object && Object.keys(value).length == 0) ||
-        (valueType == Array && value.length == 0)
-      );
       return result;
     }
-    var name = options && options['name'] ? options['name'] : name;
-    var message = options && options['message'] ? options['message'] : name + ' cannot be empty';
-    var result = !isEmpty(value) ? true : message;
-    return result;
-  }
+  }, {
+    key: 'notNull',
+    value: function notNull(value, options, name, root) {
+      var isValid = value !== null && !(
+      // The string value NULL or null are treated as a literal null
+      typeof value == 'string' && value.toLowerCase() == 'null');
+      var name = options && options['name'] ? options['name'] : name;
+      var message = options && options['message'] ? options['message'] : name + ' cannot be null';
+      var result = isValid ? isValid : message;
+      return result;
+    }
+  }, {
+    key: 'notEmpty',
+    value: function notEmpty(value, options, name, root) {
+      function isEmpty(value) {
+        var valueType = value ? TypeCaster.getType(value) : undefined;
+        var result = value == undefined ||
+        // In Javascript [[]] evalulates to false - we dont want this
+        // - an array is only considered empty if it has zero elements
+        valueType != Array && value == false || valueType == Number && isNaN(value) || valueType == Object && Object.keys(value).length == 0 || valueType == Array && value.length == 0;
+        return result;
+      }
+      var name = options && options['name'] ? options['name'] : name;
+      var message = options && options['message'] ? options['message'] : name + ' cannot be empty';
+      var result = !isEmpty(value) ? true : message;
+      return result;
+    }
+  }, {
+    key: 'regex',
+    value: function regex(value, options, name, root) {
+      var regex = options && options['pattern'] ? new RegExp(options['pattern']) : new RegExp();
+      var message = options && options['message'] ? options['message'] : name + ' does not appear to be valid';
+      var result = regex.test(value) ? true : message;
+      return result;
+    }
+  }, {
+    key: 'email',
+    value: function email(value, options, name, root) {
+      var regex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+      var name = options && options['name'] ? options['name'] : name;
+      var message = options && options['message'] ? options['message'] : name + ' does not appear to be a valid email address';
+      var result = regex.test(value) ? true : message;
+      return result;
+    }
+  }, {
+    key: 'length',
+    value: function length(value, options, name, root) {
+      var min = options && options['min'] ? options['min'] : null;
+      var max = options && options['max'] ? options['max'] : null;
+      var name = options && options['name'] ? options['name'] : name;
+      var messageMin = options && options['message'] ? options['message'] : name + ' must be at least ' + min + ' characters long';
+      var messageMax = options && options['message'] ? options['message'] : name + ' must be no more than ' + max + ' characters long';
 
-  static regex(value, options, name, root)
-  {
-    var regex = options && options['pattern'] ? new RegExp(options['pattern']) : new RegExp;
-    var message = options && options['message'] ? options['message'] : name + ' does not appear to be valid';
-    var result = regex.test(value) ? true : message;
-    return result;
-  }
+      var valueType = TypeCaster.getType(value);
 
-  static email(value, options, name, root)
-  {
-    var regex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
-    var name = options && options['name'] ? options['name'] : name;
-    var message = options && options['message'] ? options['message'] : name + ' does not appear to be a valid email address';
-    var result = regex.test(value) ? true : message;
-    return result;
-  }
-
-  static length(value, options, name, root)
-  {
-    var min = options && options['min'] ? options['min'] : null;
-    var max = options && options['max'] ? options['max'] : null;
-    var name = options && options['name'] ? options['name'] : name;
-    var messageMin = options && options['message'] ? options['message'] : name + ' must be at least ' + min + ' characters long';
-    var messageMax = options && options['message'] ? options['message'] : name + ' must be no more than ' + max + ' characters long';
-
-    var valueType = TypeCaster.getType(value);
-
-    var resultMin = !min || (
-      (value != null) &&
+      var resultMin = !min || value != null && (
       // In Javascript [[]] evalulates to false - we dont want this
       // - an array is only considered empty if it has zero elements
-      ((valueType != Array && valueType != String) || value.length >= min) && 
-      (valueType != Number || (isNaN(value) && value >= min)) &&
-      (valueType != Object || Object.keys(value).length >= min)
-    );
+      valueType != Array && valueType != String || value.length >= min) && (valueType != Number || isNaN(value) && value >= min) && (valueType != Object || Object.keys(value).length >= min);
 
-    var resultMax = !max || (
-      (value != null) &&
+      var resultMax = !max || value != null && (
       // In Javascript [[]] evalulates to false - we dont want this
       // - an array is only considered empty if it has zero elements
-      ((valueType != Array && valueType != String) || value.length <= max) && 
-      (valueType != Number || (isNaN(value) && value <= max)) &&
-      (valueType != Object || Object.keys(value).length <= max)
-    );
+      valueType != Array && valueType != String || value.length <= max) && (valueType != Number || isNaN(value) && value <= max) && (valueType != Object || Object.keys(value).length <= max);
 
-    var result = resultMin && resultMax ? true : (!resultMin ? messageMin : messageMax);
+      var result = resultMin && resultMax ? true : !resultMin ? messageMin : messageMax;
 
-    return result;
-  }
+      return result;
+    }
+  }, {
+    key: 'equality',
+    value: function equality(value, options, name, root) {
+      var path = options && options['path'] ? options['path'] : null;
+      var name = options && options['name'] ? options['name'] : name;
+      var message = options && options['message'] ? options['message'] : name + ' does not match';
+      var result = !path || root[path] === value ? true : message;
+      return result;
+    }
 
-  static equality(value, options, name, root)
-  {
-    var path = options && options['path'] ? options['path'] : null;
-    var name = options && options['name'] ? options['name'] : name;
-    var message = options && options['message'] ? options['message'] : name + ' does not match';
-    var result = !path || root[path] === value ? true : message;
-    return result;
-  }
+    // Custom validator allows you to specify your own validator function 
+    // - the function should return boolean true for a valid value
+    // - or return an error message string or an array of error messages
 
-  // Custom validator allows you to specify your own validator function 
-  // - the function should return boolean true for a valid value
-  // - or return an error message string or an array of error messages
-  static custom(value, options, name, root)
-  {
-    var validator = options && options['validator'] ? options['validator'] : () => true;
-    return validator(value, options, name, root);
-  }
-}
+  }, {
+    key: 'custom',
+    value: function custom(value, options, name, root) {
+      var validator = options && options['validator'] ? options['validator'] : function () {
+        return true;
+      };
+      return validator(value, options, name, root);
+    }
+  }]);
+
+  return Validator;
+}();
 
 module.exports = Validator;
-
 
 /***/ }),
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var clone = __webpack_require__(3);
 var ObjectID = __webpack_require__(1);
@@ -988,236 +1065,260 @@ var Validator = __webpack_require__(5);
 var Types = __webpack_require__(2);
 var TypeCaster = __webpack_require__(0);
 
-class Mixed {}
+var Mixed = function Mixed() {
+  _classCallCheck(this, Mixed);
+};
 
-class Schema
-{
-  constructor(spec, options) 
-  {
-    this.spec = (spec == undefined) ? {} : spec;
-    this.options = (options == undefined) ? {} : options;
+var Schema = function () {
+  function Schema(spec, options) {
+    _classCallCheck(this, Schema);
+
+    this.spec = spec == undefined ? {} : spec;
+    this.options = options == undefined ? {} : options;
     this.mapper = new Mapper(this.spec, this.options);
   }
-  validate(object)
-  {
-    var meta = {errors: {}, root: object};
-    var isArray = Array.isArray(object);
-    var objects = isArray ? object : [object];
 
-    var promises = [];
-    this.mapper.map(objects, (fieldSpec, fieldName, fieldContainer, path) => {
-      let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, meta).then((value) => {
-        fieldContainer[fieldName] = value;
-      });
-      promises.push(promise);
-    });
+  _createClass(Schema, [{
+    key: 'validate',
+    value: function validate(object) {
+      var _this = this;
 
-    var promise = Promise.all(promises).then(() => {
-      meta.isValid = (Object.keys(meta.errors).length == 0);
-      return meta;
-    });
+      var meta = { errors: {}, root: object };
+      var isArray = Array.isArray(object);
+      var objects = isArray ? object : [object];
 
-    return promise;
-  }
-  validatePaths(paths, meta)
-  {
-    var meta = meta ? meta : {errors: {}};
-    var objects = Array.isArray(paths) ? paths : [paths];
-
-    var promises = [];
-    this.mapper.mapPaths(objects, (fieldSpec, fieldName, fieldContainer, path) => {
-      meta['root'] = fieldContainer;
-      let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, meta).then((value) => {
-        fieldContainer[fieldName] = value;
-      });
-      promises.push(promise);
-    });
-    
-    var promise = Promise.all(promises).then(() => {
-      meta.isValid = (Object.keys(meta.errors).length == 0);
-      return meta;
-    });
-
-    return promise;
-  }
-  validateQuery(query)
-  {
-    var meta = meta ? meta : {errors: {}};
-
-    var promises = [];
-    this.mapper.mapQueryPaths(query, (path, queryPathFieldName, container) => {
-      var paths = {};
-      paths[path] = container[queryPathFieldName];
-      this.mapper.mapPaths(paths, (fieldSpec, fieldName, fieldContainer, path) => {
-        let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, meta).then((value) => {
-          container[queryPathFieldName] = value;
+      var promises = [];
+      this.mapper.map(objects, function (fieldSpec, fieldName, fieldContainer, path) {
+        var promise = _this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, meta).then(function (value) {
+          fieldContainer[fieldName] = value;
         });
         promises.push(promise);
       });
-    });
 
-    var promise = Promise.all(promises).then(() => {
-      meta.isValid = (Object.keys(meta.errors).length == 0);
-      return meta;
-    });
+      var promise = Promise.all(promises).then(function () {
+        meta.isValid = Object.keys(meta.errors).length == 0;
+        return meta;
+      });
 
-    return promise;
-  }
-  filterPrivate(object, mode)
-  {
-    mode = mode ? mode : true;
-    this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
-      const filters = fieldSpec && fieldSpec['$filter'] ? fieldSpec['$filter'] : {};
-      if (filters['private'] === true || filters['private'] == mode){
-        delete fieldContainer[fieldName];
-      }
-    });
-  }
-  filterPrivatePaths(paths, mode)
-  {
-    mode = mode ? mode : true;
-    var objects = Array.isArray(paths) ? paths : [paths];
-
-    this.mapper.mapPaths(objects, (fieldSpec, fieldName, fieldContainer, path) => {
-      const filters = fieldSpec && fieldSpec['$filter'] ? fieldSpec['$filter'] : {};
-      if (filters['private'] === true || filters['private'] == mode){
-        delete fieldContainer[fieldName];
-      }
-    });
-  }
-  validateField(spec, fieldName, value, path, meta = {})
-  {
-    path = path ? path : fieldName;
-    const validators = spec && spec['$validate'] ? spec['$validate'] : {};
-    const filters = spec && spec['$filter'] ? spec['$filter'] : {};
-    const name = spec && spec['$name'] ? spec['$name'] : fieldName;
-    
-    var fieldType = undefined;
-    // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later). 
-    // - Otherwise we need to find the constructor, if the value is not already a constructor ([] or {}) 
-    if (spec) fieldType = spec.constructor == String ? spec : TypeCaster.getType(spec);
-    if (fieldType == Object && spec['$type'] !== undefined) fieldType = spec['$type'];
-
-    if (fieldType && fieldType.constructor == String) { 
-      // The fieldType was specified with a String value (not a string constructor)
-      // Attempt to covert the field type to a constructor
-      fieldType = Types[fieldType];
+      return promise;
     }
+  }, {
+    key: 'validatePaths',
+    value: function validatePaths(paths, meta) {
+      var _this2 = this;
 
-    // notNull can be defaulted via global option
-    validators['notNull'] = validators['notNull'] !== undefined ? validators['notNull'] : this.options['defaultNotNull'];
-      
-    var defaultValue = filters['defaultValue'];
-    if (defaultValue === undefined) {
+      var meta = meta ? meta : { errors: {} };
+      var objects = Array.isArray(paths) ? paths : [paths];
+
+      var promises = [];
+      this.mapper.mapPaths(objects, function (fieldSpec, fieldName, fieldContainer, path) {
+        meta['root'] = fieldContainer;
+        var promise = _this2.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, meta).then(function (value) {
+          fieldContainer[fieldName] = value;
+        });
+        promises.push(promise);
+      });
+
+      var promise = Promise.all(promises).then(function () {
+        meta.isValid = Object.keys(meta.errors).length == 0;
+        return meta;
+      });
+
+      return promise;
+    }
+  }, {
+    key: 'validateQuery',
+    value: function validateQuery(query) {
+      var _this3 = this;
+
+      var meta = meta ? meta : { errors: {} };
+
+      var promises = [];
+      this.mapper.mapQueryPaths(query, function (path, queryPathFieldName, container) {
+        var paths = {};
+        paths[path] = container[queryPathFieldName];
+        _this3.mapper.mapPaths(paths, function (fieldSpec, fieldName, fieldContainer, path) {
+          var promise = _this3.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, meta).then(function (value) {
+            container[queryPathFieldName] = value;
+          });
+          promises.push(promise);
+        });
+      });
+
+      var promise = Promise.all(promises).then(function () {
+        meta.isValid = Object.keys(meta.errors).length == 0;
+        return meta;
+      });
+
+      return promise;
+    }
+  }, {
+    key: 'filterPrivate',
+    value: function filterPrivate(object, mode) {
+      mode = mode ? mode : true;
+      this.mapper.map(object, function (fieldSpec, fieldName, fieldContainer, path) {
+        var filters = fieldSpec && fieldSpec['$filter'] ? fieldSpec['$filter'] : {};
+        if (filters['private'] === true || filters['private'] == mode) {
+          delete fieldContainer[fieldName];
+        }
+      });
+    }
+  }, {
+    key: 'filterPrivatePaths',
+    value: function filterPrivatePaths(paths, mode) {
+      mode = mode ? mode : true;
+      var objects = Array.isArray(paths) ? paths : [paths];
+
+      this.mapper.mapPaths(objects, function (fieldSpec, fieldName, fieldContainer, path) {
+        var filters = fieldSpec && fieldSpec['$filter'] ? fieldSpec['$filter'] : {};
+        if (filters['private'] === true || filters['private'] == mode) {
+          delete fieldContainer[fieldName];
+        }
+      });
+    }
+  }, {
+    key: 'validateField',
+    value: function validateField(spec, fieldName, value, path) {
+      var meta = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+
+      path = path ? path : fieldName;
+      var validators = spec && spec['$validate'] ? spec['$validate'] : {};
+      var filters = spec && spec['$filter'] ? spec['$filter'] : {};
+      var name = spec && spec['$name'] ? spec['$name'] : fieldName;
+
+      var fieldType = undefined;
+      // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later). 
+      // - Otherwise we need to find the constructor, if the value is not already a constructor ([] or {}) 
+      if (spec) fieldType = spec.constructor == String ? spec : TypeCaster.getType(spec);
+      if (fieldType == Object && spec['$type'] !== undefined) fieldType = spec['$type'];
+
+      if (fieldType && fieldType.constructor == String) {
+        // The fieldType was specified with a String value (not a string constructor)
+        // Attempt to covert the field type to a constructor
+        fieldType = Types[fieldType];
+      }
+
+      // notNull can be defaulted via global option
+      validators['notNull'] = validators['notNull'] !== undefined ? validators['notNull'] : this.options['defaultNotNull'];
+
+      var defaultValue = filters['defaultValue'];
+      if (defaultValue === undefined) {
+        if (fieldType == Object) {
+          defaultValue = {};
+        } else if (fieldType == Array) {
+          defaultValue = [];
+        } else if (fieldType == Types.ObjectID) {
+          defaultValue = function defaultValue() {
+            return new Types.ObjectID();
+          };
+        }
+      }
+
+      if ((value === undefined || Schema.isNull(value)) && defaultValue !== undefined) {
+        value = typeof defaultValue == 'function' ? defaultValue() : defaultValue;
+      }
+
+      if (!Number.isInteger(fieldName) && !Schema.isValidFieldName(fieldName)) {
+        Schema.appendError(meta, path, 'Invalid field name');
+      }
+
+      if (value != undefined) {
+        // We only attempt to type cast if the type was specified, the value is not null and not undefined
+        // - a type cast failure would result in an error which we do not want in the case of undefined or null
+        // - these indicate no-value, and so there is nothing to cast
+        if (fieldType && fieldType != Types.Mixed) value = this.typeCast(fieldType, value, path, meta);
+      }
+
       if (fieldType == Object) {
-        defaultValue = {};
-      } else if (fieldType == Array) {
-        defaultValue = [];
-      } else if (fieldType == Types.ObjectID) {
-        defaultValue = function(){
-          return new Types.ObjectID;
-        };
-      }
-    }
-    
-    if ((value === undefined || Schema.isNull(value)) && defaultValue !== undefined) {
-      value = (typeof defaultValue == 'function') ? defaultValue() : defaultValue;
-    }
-
-    if (!Number.isInteger(fieldName) && !Schema.isValidFieldName(fieldName)) {
-      Schema.appendError(meta, path, 'Invalid field name');
-    }
-
-    if (value != undefined) {
-      // We only attempt to type cast if the type was specified, the value is not null and not undefined
-      // - a type cast failure would result in an error which we do not want in the case of undefined or null
-      // - these indicate no-value, and so there is nothing to cast
-      if (fieldType && fieldType != Types.Mixed) value = this.typeCast(fieldType, value, path, meta);
-    }
-
-    if (fieldType == Object) {
-      // If in strict mode we must ensure there are no fields which are not defined by the spec
-      if (this.options['strict']) {
-        for (let fieldName in value) {
-          if (spec[fieldName] == undefined) {
-            Schema.appendError(meta, path + '.' + fieldName, 'Field not specified');
+        // If in strict mode we must ensure there are no fields which are not defined by the spec
+        if (this.options['strict']) {
+          for (var _fieldName in value) {
+            if (spec[_fieldName] == undefined) {
+              Schema.appendError(meta, path + '.' + _fieldName, 'Field not specified');
+            }
           }
         }
       }
+
+      var promise = Validator.validate(value, validators, name, meta['root']);
+      return promise.then(function (validateResults) {
+        if (Array.isArray(validateResults)) {
+          validateResults.forEach(function (result) {
+            Schema.appendError(meta, path, result);
+          });
+        }
+        return value;
+      });
     }
+  }, {
+    key: 'typeCast',
+    value: function typeCast(requiredType, value, path) {
+      var meta = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-    var promise = Validator.validate(value, validators, name, meta['root']);
-    return promise.then((validateResults) => {
-      if (Array.isArray(validateResults)) {
-        validateResults.forEach((result) => {
-          Schema.appendError(meta, path, result);
-        });
-      }
-      return value;
-    });
-  }
-  typeCast(requiredType, value, path, meta = {})
-  {
-    var result = value;
-    var requiredTypeName = TypeCaster.getTypeName(requiredType);
-    var valueTypeName = TypeCaster.getTypeName(value);
+      var result = value;
+      var requiredTypeName = TypeCaster.getTypeName(requiredType);
+      var valueTypeName = TypeCaster.getTypeName(value);
 
-    // We compare type names rather than constructors 
-    // - because sometimes we need to treat two different implentations as the same type
-    // - An exmaple of this is ObjectID type. MongoDB has its own implementation which should
-    // - be considered the same type as ObjectID implementation used by Schema (bson-objectid)
-    if (requiredTypeName != valueTypeName) {
-      result = TypeCaster.cast(requiredType, value);
+      // We compare type names rather than constructors 
+      // - because sometimes we need to treat two different implentations as the same type
+      // - An exmaple of this is ObjectID type. MongoDB has its own implementation which should
+      // - be considered the same type as ObjectID implementation used by Schema (bson-objectid)
+      if (requiredTypeName != valueTypeName) {
+        result = TypeCaster.cast(requiredType, value);
 
-      let resultTypeName = TypeCaster.getTypeName(result);
-      if (
+        var resultTypeName = TypeCaster.getTypeName(result);
+        if (
         // We failed to convert to the specified type
-        resultTypeName != requiredTypeName || 
+        resultTypeName != requiredTypeName ||
         // We converted to type 'number' but the result was NaN so its invalid
-        (valueTypeName != 'Number' && resultTypeName == 'Number' && isNaN(result)) 
-      ) {
-        let origValue = (['String', 'Number', 'Boolean'].indexOf(valueTypeName) != -1) ? "'" + value + "'" : '';
-        Schema.appendError(meta, path, origValue + ' of type ' + valueTypeName + ' cannot be cast to type ' + requiredTypeName);
+        valueTypeName != 'Number' && resultTypeName == 'Number' && isNaN(result)) {
+          var origValue = ['String', 'Number', 'Boolean'].indexOf(valueTypeName) != -1 ? "'" + value + "'" : '';
+          Schema.appendError(meta, path, origValue + ' of type ' + valueTypeName + ' cannot be cast to type ' + requiredTypeName);
+        }
       }
-    }
 
-    return result;
-  }
-  static appendError(meta, path, error)
-  {
-    var errors = Array.isArray(meta.errors[path]) ? meta.errors[path] : [];
-    errors.push(error);
-    meta.errors[path] = errors;
-  }
-  static isNull(value)
-  {
-    var result = value === null || (
+      return result;
+    }
+  }], [{
+    key: 'appendError',
+    value: function appendError(meta, path, error) {
+      var errors = Array.isArray(meta.errors[path]) ? meta.errors[path] : [];
+      errors.push(error);
+      meta.errors[path] = errors;
+    }
+  }, {
+    key: 'isNull',
+    value: function isNull(value) {
+      var result = value === null ||
       // The string value NULL or null are treated as a literal null
-      typeof value == 'string' && value.toLowerCase() == 'null'
-    );
-    
-    return result;
-  }
-  static isValidFieldName(fieldName)
-  {
-    var valid = true;
-    if (valid && fieldName.charAt(0) == '$') valid = false;
-    return valid;
-  }
-  static mergeValidationResults(results)
-  {
-    results = Array.isArray(results) ? results : [];
-    var finalResult = {errors: {}};
-    results.forEach(function(result, x){
-      if (result.errors) Object.assign(finalResult.errors, result.errors)
-    });
-    finalResult.isValid = (Object.keys(finalResult.errors).length == 0);
-    return finalResult;
-  }
-}
+      typeof value == 'string' && value.toLowerCase() == 'null';
+
+      return result;
+    }
+  }, {
+    key: 'isValidFieldName',
+    value: function isValidFieldName(fieldName) {
+      var valid = true;
+      if (valid && fieldName.charAt(0) == '$') valid = false;
+      return valid;
+    }
+  }, {
+    key: 'mergeValidationResults',
+    value: function mergeValidationResults(results) {
+      results = Array.isArray(results) ? results : [];
+      var finalResult = { errors: {} };
+      results.forEach(function (result, x) {
+        if (result.errors) Object.assign(finalResult.errors, result.errors);
+      });
+      finalResult.isValid = Object.keys(finalResult.errors).length == 0;
+      return finalResult;
+    }
+  }]);
+
+  return Schema;
+}();
 
 module.exports = Schema;
-
 
 /***/ }),
 /* 7 */
@@ -1225,46 +1326,57 @@ module.exports = Schema;
 
 "use strict";
 
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var TypeCaster = __webpack_require__(0);
 
-class SchemaUtil
-{
-  static getSpec(path, spec)
-  {
-    var spec = spec ? spec : {};
-    var pathParts = path && path ? path.split('.') : [];
-    
-    var currentPathPart = pathParts.shift();
-    if (currentPathPart) {
-      if (spec[currentPathPart]) {
-        spec = spec[currentPathPart];
-      } else {
-        const partAsNumber = TypeCaster.cast(Number, currentPathPart);
-        const partIsNumber = TypeCaster.getType(partAsNumber) == Number && !isNaN(partAsNumber);
-        if (currentPathPart != '*' && partIsNumber == false) {
-          // There is no spec defined for the given path
-          // - and the path is not an array so there is no matching field config
-          return undefined;
-        } 
-      }
-    }
-    
-    if (pathParts.length) {
-      const type =  TypeCaster.getType(spec);
-      if (type == Array && spec.length) {
-        spec = spec[0];
-      } else if (type == Object && spec['$spec']) {
-        spec = spec['$spec'];
-      }
-      spec = SchemaUtil.getSpec(pathParts.join('.'), spec);
-    } 
-
-    return spec;
+var SchemaUtil = function () {
+  function SchemaUtil() {
+    _classCallCheck(this, SchemaUtil);
   }
-}
+
+  _createClass(SchemaUtil, null, [{
+    key: 'getSpec',
+    value: function getSpec(path, spec) {
+      var spec = spec ? spec : {};
+      var pathParts = path && path ? path.split('.') : [];
+
+      var currentPathPart = pathParts.shift();
+      if (currentPathPart) {
+        if (spec[currentPathPart]) {
+          spec = spec[currentPathPart];
+        } else {
+          var partAsNumber = TypeCaster.cast(Number, currentPathPart);
+          var partIsNumber = TypeCaster.getType(partAsNumber) == Number && !isNaN(partAsNumber);
+          if (currentPathPart != '*' && partIsNumber == false) {
+            // There is no spec defined for the given path
+            // - and the path is not an array so there is no matching field config
+            return undefined;
+          }
+        }
+      }
+
+      if (pathParts.length) {
+        var type = TypeCaster.getType(spec);
+        if (type == Array && spec.length) {
+          spec = spec[0];
+        } else if (type == Object && spec['$spec']) {
+          spec = spec['$spec'];
+        }
+        spec = SchemaUtil.getSpec(pathParts.join('.'), spec);
+      }
+
+      return spec;
+    }
+  }]);
+
+  return SchemaUtil;
+}();
 
 module.exports = SchemaUtil;
-
 
 /***/ }),
 /* 8 */
