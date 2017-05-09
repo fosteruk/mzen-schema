@@ -2,7 +2,7 @@
   "name": "mzen-schema",
   "version": "0.0.11",
   "description": "mZen Schema",
-  "main": "./dist/bundle",
+  "main": "./lib/schema",
   "scripts": {
     "test": "mocha ./test/*",
     "build": "webpack"
