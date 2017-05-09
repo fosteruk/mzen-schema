@@ -1,6 +1,6 @@
 {
   "name": "mzen-schema",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "mZen Schema",
   "main": "./lib/schema",
   "scripts": {
@@ -26,6 +26,8 @@
     "sinon": "^1.17.4"
   },
   "babel": {
-    "presets": ["es2015"]
+    "presets": [
+      "es2015"
+    ]
   }
 }
