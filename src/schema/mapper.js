@@ -147,6 +147,7 @@ class SchemaMapper
     meta['path'] = (meta['path'] == undefined) ? '' : meta['path'];
 
     var basePath = meta['path'];
+
     array.forEach(function(element, x){
       meta['path'] = basePath + '[' + x + ']';
       this.mapField(spec, x, array, meta, callback);
@@ -194,7 +195,7 @@ class SchemaMapper
           // - then the array elements spec should be specified using the "$spec" property 
           arraySpec = spec['$spec'];
         }
-        if (arraySpec) {
+        if (arraySpec && container[fieldName]) {
           this.mapArrayElements(arraySpec, container[fieldName], meta, callback);
         }
       break;
