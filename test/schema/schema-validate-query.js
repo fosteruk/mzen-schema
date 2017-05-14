@@ -1,5 +1,5 @@
 var should = require('should');
-var Schema = require('../../lib/schema');
+var Schema = require('../../src/schema');
 
 describe('Schema', function() {
   describe('validateQuery', function() {

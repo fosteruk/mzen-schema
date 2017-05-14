@@ -13,6 +13,8 @@ class Validator
       var validator = Validator[validatorName];
       if (validator == undefined) throw new Error('Uknown validator "' + validatorName + '"');
 
+      if (validators[validatorName] === false || validators[validatorName] == undefined) return; // Falsey value disabled the validator  
+
       var options = !validators[validatorName] || (typeof validators[validatorName] == 'boolean') ? {} : validators[validatorName];
       // If options is an array we run the validator multiple times 
       // - one for each options object id

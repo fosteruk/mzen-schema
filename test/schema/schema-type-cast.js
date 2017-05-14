@@ -1,6 +1,6 @@
 var should = require('should');
-var Schema = require('../../lib/schema');
-var Types = require('../../lib/schema/types');
+var Schema = require('../../src/schema');
+var Types = require('../../src/schema/types');
 
 describe('Schema', function() {
   describe('type cast', function() {

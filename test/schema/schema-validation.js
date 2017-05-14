@@ -1,6 +1,6 @@
 var should = require('should');
-var Schema = require('../../lib/schema');
-var Types = require('../../lib/schema/types');
+var Schema = require('../../src/schema');
+var Types = require('../../src/schema/types');
 
 describe('Schema', function() {
   describe('validation', function() {
@@ -151,6 +151,48 @@ describe('Schema', function() {
 
         schema.validate(data).then((result) => {
           should(result.isValid).eql(false);
+          done();
+        }).catch((error) => {
+          done(error);
+        });
+      });
+      it('falsey value disables validator - false', function(done) {
+        var data = {name: null};
+
+        var schema = new Schema({
+          name: {$type: String, $validate: {notNull: false}}
+        });
+
+        schema.validate(data).then((result) => {
+          should(result.isValid).eql(true);
+          done();
+        }).catch((error) => {
+          done(error);
+        });
+      });
+      it('falsey value disables validator - undefined', function(done) {
+        var data = {name: null};
+
+        var schema = new Schema({
+          name: {$type: String, $validate: {notNull: undefined}}
+        });
+
+        schema.validate(data).then((result) => {
+          should(result.isValid).eql(true);
+          done();
+        }).catch((error) => {
+          done(error);
+        });
+      });
+      it('falsey value disables validator - null', function(done) {
+        var data = {name: null};
+
+        var schema = new Schema({
+          name: {$type: String, $validate: {notNull: null}}
+        });
+
+        schema.validate(data).then((result) => {
+          should(result.isValid).eql(true);
           done();
         }).catch((error) => {
           done(error);

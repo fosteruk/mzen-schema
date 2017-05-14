@@ -1,5 +1,5 @@
 var should = require('should');
-var SchemaMapper = require('../../lib/schema/mapper');
+var SchemaMapper = require('../../src/schema/mapper');
 
 describe('SchemaMapper', function () {
   describe('map', function () {
