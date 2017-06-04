@@ -5,24 +5,6 @@ var SchemaUtil = require('./util');
 var Types = require('./types');
 var TypeCaster = require('../type-caster');
 
-const queryOperators = [
-  '$eq', 
-  '$gt', 
-  '$gte', 
-  '$lt', 
-  '$lte', 
-  '$ne', 
-  '$in', 
-  '$nin', 
-  '$or', 
-  '$and', 
-  '$not', 
-  '$nor', 
-  '$size', 
-  '$all', 
-  '$elemMatch'
-];
-
 class SchemaMapper
 {
   constructor(spec, options) 
@@ -68,7 +50,7 @@ class SchemaMapper
             if (['$or', '$and'].indexOf(fieldName) != -1) {
               query[fieldName].forEach(function(value, x){
                 mapRecursive(query[fieldName][x]);
-              }.bind(this));
+              });
             } else {
               mapRecursive(query[fieldName]);
             }
@@ -77,14 +59,14 @@ class SchemaMapper
             var hasOpertators = false;
             if (TypeCaster.getType(query[fieldName]) == Object) {
               for (var childField in query[fieldName]) {
-                hasOpertators = hasOpertators || (queryOperators.indexOf(childField) !== -1);
+                hasOpertators = hasOpertators || this.isQueryOperator(childField);
                 if (hasOpertators) {
                   if (Array.isArray(query[fieldName][childField])) {
                     query[fieldName][childField].forEach(function(value, x){
                       callback(fieldName, x, query[fieldName][childField]);
-                    }.bind(this));
+                    });
                   } else {
-                      callback(fieldName, childField, query[fieldName]);
+                    callback(fieldName, childField, query[fieldName]);
                   }
                 }
               }
@@ -93,7 +75,7 @@ class SchemaMapper
               if (Array.isArray(query[fieldName])) {
                 query[fieldName].forEach(function(value, x){
                   callback(fieldName, x, query[fieldName]);
-                }.bind(this));
+                });
               } else {
                 callback(fieldName, fieldName, query);
               }
@@ -103,7 +85,7 @@ class SchemaMapper
       } else if (Array.isArray(query)) {
         query.forEach(function(arrayValue, x){
           mapRecursive(query[x], meta);
-        }.bind(this));
+        });
       } 
       return query;
     };
@@ -115,7 +97,7 @@ class SchemaMapper
     meta['path'] = (meta['path'] == undefined) ? '' : meta['path'];
   
     // If match all spec is defined, newSpec defaults to an empty object since any spec rules should be replaced by 
-    // - the match-all defaults to original spec
+    // - the match-all spec (defaults to original spec)
     const matchAllSpec = (spec && spec['*'] != undefined) ? spec['*'] : undefined;
     const newSpec = (matchAllSpec != undefined) ? {} :  spec;
     for (var fieldName in object) {
@@ -137,7 +119,7 @@ class SchemaMapper
 
     for (var fieldName in spec) {
       if (!spec.hasOwnProperty(fieldName)) continue;
-      if (fieldName.indexOf('$') === 0) continue; // Descriptor proptery
+      if (this.isQueryOperator(fieldName)) continue; // Descriptor proptery
       meta['path'] = basePath ? basePath + '.' + fieldName : fieldName;
       this.mapField(spec[fieldName], fieldName, object, meta, callback);
     }
@@ -149,7 +131,7 @@ class SchemaMapper
     var basePath = meta['path'];
 
     array.forEach(function(element, x){
-      meta['path'] = basePath + '[' + x + ']';
+      meta['path'] = basePath + '.' + x;
       this.mapField(spec, x, array, meta, callback);
     }, this);
   }
