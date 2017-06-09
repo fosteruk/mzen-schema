@@ -1,6 +1,7 @@
 'use strict'
 var clone = require('clone');
 var ObjectID = require('bson-objectid');
+var SchemaUtil = require('./schema/util');
 var Mapper = require('./schema/mapper');
 var Validator = require('./schema/validator');
 var Types = require('./schema/types');
@@ -16,15 +17,16 @@ class Schema
     this.options = (options == undefined) ? {} : options;
     this.mapper = new Mapper(this.spec, this.options);
   }
-  validate(object)
+  validate(object, options)
   {
     var meta = {errors: {}, root: object};
     var isArray = Array.isArray(object);
     var objects = isArray ? object : [object];
+    options = options ?  options : {};
 
     var promises = [];
     this.mapper.map(objects, (fieldSpec, fieldName, fieldContainer, path) => {
-      let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, meta).then((value) => {
+      let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, options, meta).then((value) => {
         fieldContainer[fieldName] = value;
       });
       promises.push(promise);
@@ -37,15 +39,16 @@ class Schema
 
     return promise;
   }
-  validatePaths(paths, meta)
+  validatePaths(paths, options, meta)
   {
     var meta = meta ? meta : {errors: {}};
     var objects = Array.isArray(paths) ? paths : [paths];
+    options = options ?  options : {};
 
     var promises = [];
     this.mapper.mapPaths(objects, (fieldSpec, fieldName, fieldContainer, path) => {
       meta['root'] = fieldContainer;
-      let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, meta).then((value) => {
+      let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, options, meta).then((value) => {
         fieldContainer[fieldName] = value;
       });
       promises.push(promise);
@@ -58,16 +61,20 @@ class Schema
 
     return promise;
   }
-  validateQuery(query)
+  validateQuery(query, options)
   {
     var meta = meta ? meta : {errors: {}};
+    options = options ?  options : {};
+    // This is a query - we are expecting fields which are not defined
+    // - We dont want those to trigger an error so disabled strict validation
+    options['strict'] = false; 
 
     var promises = [];
     this.mapper.mapQueryPaths(query, (path, queryPathFieldName, container) => {
       var paths = {};
       paths[path] = container[queryPathFieldName];
       this.mapper.mapPaths(paths, (fieldSpec, fieldName, fieldContainer, path) => {
-        let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, meta).then((value) => {
+        let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, options, meta).then((value) => {
           container[queryPathFieldName] = value;
         });
         promises.push(promise);
@@ -103,12 +110,13 @@ class Schema
       }
     });
   }
-  validateField(spec, fieldName, value, path, meta = {})
+  validateField(spec, fieldName, value, path, options, meta = {})
   {
     path = path ? path : fieldName;
     const validators = spec && spec['$validate'] ? spec['$validate'] : {};
     const filters = spec && spec['$filter'] ? spec['$filter'] : {};
     const name = spec && spec['$name'] ? spec['$name'] : fieldName;
+    options = options ?  options : {};
     
     var fieldType = undefined;
     // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later). 
@@ -142,7 +150,7 @@ class Schema
       value = (typeof defaultValue == 'function') ? defaultValue() : defaultValue;
     }
 
-    if (!Number.isInteger(fieldName) && !Schema.isValidFieldName(fieldName)) {
+    if (!SchemaUtil.isValidFieldName(fieldName)) {
       Schema.appendError(meta, path, 'Invalid field name');
     }
 
@@ -154,8 +162,9 @@ class Schema
     }
 
     if (fieldType == Object) {
+      let strict = (options['strict'] !== undefined) ? options['strict'] : this.options['strict'];
       // If in strict mode we must ensure there are no fields which are not defined by the spec
-      if (this.options['strict']) {
+      if (strict) {
         for (let fieldName in value) {
           if (spec[fieldName] == undefined) {
             Schema.appendError(meta, path + '.' + fieldName, 'Field not specified');
@@ -215,12 +224,6 @@ class Schema
     );
     
     return result;
-  }
-  static isValidFieldName(fieldName)
-  {
-    var valid = true;
-    if (valid && fieldName.charAt(0) == '$') valid = false;
-    return valid;
   }
   static mergeValidationResults(results)
   {

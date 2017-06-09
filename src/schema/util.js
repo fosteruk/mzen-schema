@@ -35,6 +35,19 @@ class SchemaUtil
 
     return spec;
   }
+  static isValidFieldName(fieldName)
+  {
+    return (Number.isInteger(fieldName) || !SchemaUtil.isQueryOperator(fieldName));
+  }
+  static isQueryOperator(fieldName)
+  {
+    return (typeof fieldName == 'string' && fieldName.charAt(0) == '$');
+  }
+  static canValidateQueryOperator(fieldName)
+  {
+    var cantValidateOperators = ['$near'];
+    return (cantValidateOperators.indexOf(fieldName) == -1);
+  }
 }
 
 module.exports = SchemaUtil;

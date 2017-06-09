@@ -45,22 +45,24 @@ class SchemaMapper
       if (TypeCaster.getType(query) == Object) {
         for (let fieldName in query) {
           if (!query.hasOwnProperty(fieldName)) continue;
-          if (this.isQueryOperator(fieldName)) {
-            // If this element is an operator - we want to validate is values
-            if (['$or', '$and'].indexOf(fieldName) != -1) {
-              query[fieldName].forEach(function(value, x){
-                mapRecursive(query[fieldName][x]);
-              });
-            } else {
-              mapRecursive(query[fieldName]);
+          if (SchemaUtil.isQueryOperator(fieldName)) {
+            if (SchemaUtil.canValidateQueryOperator(childField)) {
+              // If this element is an operator - we want to validate is values
+              if (['$or', '$and'].indexOf(fieldName) != -1) {
+                query[fieldName].forEach(function(value, x){
+                  mapRecursive(query[fieldName][x]);
+                });
+              } else {
+                mapRecursive(query[fieldName]);
+              }
             }
           } else {
             // Check if has a query opterator
             var hasOpertators = false;
             if (TypeCaster.getType(query[fieldName]) == Object) {
               for (var childField in query[fieldName]) {
-                hasOpertators = hasOpertators || this.isQueryOperator(childField);
-                if (hasOpertators) {
+                hasOpertators = hasOpertators || SchemaUtil.isQueryOperator(childField);
+                if (hasOpertators && SchemaUtil.canValidateQueryOperator(childField)) {
                   if (Array.isArray(query[fieldName][childField])) {
                     query[fieldName][childField].forEach(function(value, x){
                       callback(fieldName, x, query[fieldName][childField]);
@@ -119,7 +121,7 @@ class SchemaMapper
 
     for (var fieldName in spec) {
       if (!spec.hasOwnProperty(fieldName)) continue;
-      if (this.isQueryOperator(fieldName)) continue; // Descriptor proptery
+      if (SchemaUtil.isQueryOperator(fieldName)) continue; // Descriptor proptery
       meta['path'] = basePath ? basePath + '.' + fieldName : fieldName;
       this.mapField(spec[fieldName], fieldName, object, meta, callback);
     }
@@ -182,10 +184,6 @@ class SchemaMapper
         }
       break;
     }
-  }
-  isQueryOperator(value) 
-  {
-    return (typeof value == 'string' && value[0] == '$');
   }
 }
 
