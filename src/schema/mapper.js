@@ -46,7 +46,7 @@ class SchemaMapper
         for (let fieldName in query) {
           if (!query.hasOwnProperty(fieldName)) continue;
           if (SchemaUtil.isQueryOperator(fieldName)) {
-            if (SchemaUtil.canValidateQueryOperator(childField)) {
+            if (SchemaUtil.canValidateQueryOperator(childFieldName)) {
               // If this element is an operator - we want to validate is values
               if (['$or', '$and'].indexOf(fieldName) != -1) {
                 query[fieldName].forEach(function(value, x){
@@ -57,18 +57,21 @@ class SchemaMapper
               }
             }
           } else {
-            // Check if has a query opterator
+            // This field name is not an operator
+            // Check if the value contains an operator field
+            // - if it does we should callack back with its values: {field: {$eq: value}}
+            // - otherwise we should callback with the field itself {field: value}
             var hasOpertators = false;
             if (TypeCaster.getType(query[fieldName]) == Object) {
-              for (var childField in query[fieldName]) {
-                hasOpertators = hasOpertators || SchemaUtil.isQueryOperator(childField);
-                if (hasOpertators && SchemaUtil.canValidateQueryOperator(childField)) {
-                  if (Array.isArray(query[fieldName][childField])) {
-                    query[fieldName][childField].forEach(function(value, x){
-                      callback(fieldName, x, query[fieldName][childField]);
+              for (var childFieldName in query[fieldName]) {
+                hasOpertators = hasOpertators || SchemaUtil.isQueryOperator(childFieldName);
+                if (hasOpertators && SchemaUtil.canValidateQueryOperator(childFieldName)) {
+                  if (Array.isArray(query[fieldName][childFieldName])) {
+                    query[fieldName][childFieldName].forEach(function(value, x){
+                      callback(fieldName, x, query[fieldName][childFieldName]);
                     });
                   } else {
-                    callback(fieldName, childField, query[fieldName]);
+                    callback(fieldName, childFieldName, query[fieldName]);
                   }
                 }
               }
