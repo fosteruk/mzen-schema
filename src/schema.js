@@ -110,6 +110,33 @@ class Schema
       }
     });
   }
+  specToFieldType(spec, value)
+  {
+    var fieldType = undefined;
+    // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later). 
+    // - Otherwise we need to find the constructor, if the value is not already a constructor ([] or {}) 
+    if (spec) {
+      if (spec.constructor == String) {
+        fieldType = spec;
+      } else {
+        fieldType = TypeCaster.getType(spec);
+        if (fieldType === Object) {
+          if (spec['$type'] !== undefined) {
+            // The type specified in a spec object may be a constructor or a string also so this is recursive
+            fieldType = this.specToFieldType(spec['$type'], value);
+          } 
+        }
+      }
+    }
+
+    if (fieldType && fieldType.constructor == String) { 
+      // The fieldType was specified with a String value (not a string constructor)
+      // Attempt to covert the field type to a constructor
+      fieldType = Types[fieldType];
+    }
+    
+    return fieldType;
+  }
   validateField(spec, fieldName, value, path, options, meta = {})
   {
     path = path ? path : fieldName;
@@ -118,17 +145,7 @@ class Schema
     const name = spec && spec['$name'] ? spec['$name'] : fieldName;
     options = options ?  options : {};
     
-    var fieldType = undefined;
-    // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later). 
-    // - Otherwise we need to find the constructor, if the value is not already a constructor ([] or {}) 
-    if (spec) fieldType = spec.constructor == String ? spec : TypeCaster.getType(spec);
-    if (fieldType == Object && spec['$type'] !== undefined) fieldType = spec['$type'];
-
-    if (fieldType && fieldType.constructor == String) { 
-      // The fieldType was specified with a String value (not a string constructor)
-      // Attempt to covert the field type to a constructor
-      fieldType = Types[fieldType];
-    }
+    var fieldType = this.specToFieldType(spec, value);
 
     // notNull can be defaulted via global option
     validators['notNull'] = validators['notNull'] !== undefined ? validators['notNull'] : this.options['defaultNotNull'];
@@ -185,26 +202,35 @@ class Schema
   }
   typeCast(requiredType, value, path, meta = {})
   {
+    // If the spec specifies the value should be an object and the value is already an object, we do not need to typecast
+    // It is impossible for us to cast an object to any object type other than Object
+    // When we specify a type as Object we only care that it is an Object we dont care about its 
+    // specific type, we dont care if it is MyObject or YourObject
+    var skip = (requiredType === Object && Array.isArray(value) == false && Object(value) === value);
     var result = value;
-    var requiredTypeName = TypeCaster.getTypeName(requiredType);
-    var valueTypeName = TypeCaster.getTypeName(value);
 
-    // We compare type names rather than constructors 
-    // - because sometimes we need to treat two different implentations as the same type
-    // - An exmaple of this is ObjectID type. MongoDB has its own implementation which should
-    // - be considered the same type as ObjectID implementation used by Schema (bson-objectid)
-    if (requiredTypeName != valueTypeName) {
-      result = TypeCaster.cast(requiredType, value);
+    if (!skip) {
+      var result = value;
+      var requiredTypeName = TypeCaster.getTypeName(requiredType);
+      var valueTypeName = TypeCaster.getTypeName(value);
 
-      let resultTypeName = TypeCaster.getTypeName(result);
-      if (
-        // We failed to convert to the specified type
-        resultTypeName != requiredTypeName || 
-        // We converted to type 'number' but the result was NaN so its invalid
-        (valueTypeName != 'Number' && resultTypeName == 'Number' && isNaN(result)) 
-      ) {
-        let origValue = (['String', 'Number', 'Boolean'].indexOf(valueTypeName) != -1) ? "'" + value + "'" : '';
-        Schema.appendError(meta, path, origValue + ' of type ' + valueTypeName + ' cannot be cast to type ' + requiredTypeName);
+      // We compare type names rather than constructors 
+      // - because sometimes we need to treat two different implentations as the same type
+      // - An exmaple of this is ObjectID type. MongoDB has its own implementation which should
+      // - be considered the same type as ObjectID implementation used by Schema (bson-objectid)
+      if (requiredTypeName != valueTypeName) {
+        result = TypeCaster.cast(requiredType, value);
+
+        let resultTypeName = TypeCaster.getTypeName(result);
+        if (
+          // We failed to convert to the specified type
+          resultTypeName != requiredTypeName || 
+          // We converted to type 'number' but the result was NaN so its invalid
+          (valueTypeName != 'Number' && resultTypeName == 'Number' && isNaN(result)) 
+        ) {
+          let origValue = (['String', 'Number', 'Boolean'].indexOf(valueTypeName) != -1) ? "'" + value + "'" : '';
+          Schema.appendError(meta, path, origValue + ' of type ' + valueTypeName + ' cannot be cast to type ' + requiredTypeName);
+        }
       }
     }
 

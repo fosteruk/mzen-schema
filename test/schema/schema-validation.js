@@ -446,6 +446,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(true);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('valid - array of array', function(done) {
@@ -458,6 +460,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(true);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('valid - array of zero', function(done) {
@@ -470,6 +474,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(true);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('valid - array of null', function(done) {
@@ -482,6 +488,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(true);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('valid - array of undefined', function(done) {
@@ -494,6 +502,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(true);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('valid - array of false', function(done) {
@@ -506,6 +516,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(true);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('valid - array of empty array', function(done) {
@@ -518,6 +530,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(true);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('invalid - empty array', function(done) {
@@ -530,6 +544,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(false);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
     });
@@ -545,6 +561,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(true);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('valid - array of array of 1', function(done) {
@@ -558,6 +576,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(true);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('invalid - array of zero', function(done) {
@@ -570,6 +590,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(false);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('invalid - array of null', function(done) {
@@ -582,6 +604,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(false);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('invalid - array of undefined', function(done) {
@@ -606,6 +630,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(false);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('invalid - array of empty array', function(done) {
@@ -618,6 +644,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(false);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
     });
@@ -633,6 +661,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(true);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('valid - valid array of array of 1', function(done) {
@@ -645,6 +675,8 @@ describe('Schema', function() {
         schema.validate(data).then((results) => {
           should(results.isValid).eql(true);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('invalid - array of null', function(done) {
@@ -670,6 +702,8 @@ describe('Schema', function() {
       schema.validate(data).then((results) => {
         should(results.isValid).eql(false);
         done();
+      }).catch((error) => {
+        done(error);
       });
     });
     it('should fail validation in strict mode if unspecified field exists', function(done) {
@@ -682,6 +716,8 @@ describe('Schema', function() {
       schema.validate(data).then((results) => {
         should(results.isValid).eql(false);
         done();
+      }).catch((error) => {
+        done(error);
       });
     });
     it('should honour defaultNotNull value', function(done) {
@@ -702,6 +738,8 @@ describe('Schema', function() {
       schema.validate(data).then((results) => {
         should(results.isValid).eql(false);
         done();
+      }).catch((error) => {
+        done(error);
       });
     });
     it('should populate errors object on failure', function(done) {
@@ -716,6 +754,8 @@ describe('Schema', function() {
         should(results.errors).is.Object();
         should(results.errors.house).is.Array(); // Error messages are returned as an array of strings
         done();
+      }).catch((error) => {
+        done(error);
       });
     });
     it('should populate custom error message on failure', function(done) {
@@ -729,6 +769,8 @@ describe('Schema', function() {
         should(results.isValid).eql(false);
         should(results.errors.house[0]).equal('house is required'); // Error messages are returned as an array of strings
         done();
+      }).catch((error) => {
+        done(error);
       });
     });
     it('should use custom name in error message', function(done) {
@@ -742,6 +784,8 @@ describe('Schema', function() {
         should(results.isValid).eql(false);
         should(results.errors.house[0]).equal('House number is required'); // Error messages are returned as an array of strings
         done();
+      }).catch((error) => {
+        done(error);
       });
     });
   });

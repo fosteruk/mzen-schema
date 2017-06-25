@@ -465,5 +465,20 @@ describe('Schema', function() {
         done();
       });
     });
+    it('should not attempt to cast specific Object type', function(done) {
+      class TestType {};
+
+      var data = new TestType;
+      data.name = 'Kevin';
+
+      var schema = new Schema({
+        name: String
+      });
+
+      schema.validate(data).then(() => {
+        should(data.name).eql('Kevin');
+        done();
+      });
+    });
   });
 });
