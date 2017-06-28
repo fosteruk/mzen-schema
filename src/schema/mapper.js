@@ -12,27 +12,26 @@ class SchemaMapper
     this.spec = (spec == undefined) ? {} : spec;
     this.options = (options == undefined) ? {} : options;
   }
-  map(object, callback)
+  map(data, callback)
   {
     const meta = {path: '', errors: {}};
-    const isArray = Array.isArray(object);
-    const objects = isArray ? object : [object];
     // Clone the spec as it may be temporarily modified in the process of validation
-    const spec = clone(this.spec);
+    // If the data is an array we must present the spec as an array also
+    var spec = Array.isArray(data) ? [clone(this.spec)] : clone(this.spec);
+
+    // We have to pass the data in as a object field as that is the only way to reference data
+    var root = {root: data};
     
-    objects.forEach(function(object, x){
-      this.mapField(spec, x, objects, meta, callback);
-    }, this);
+    this.mapField(spec, 'root', root, meta, callback);
   }
   mapPaths(paths, callback, meta)
   {
     var meta = meta ? meta : {path: '', errors: {}};
     var objects = Array.isArray(paths) ? paths : [paths];
 
-    meta['path'] = meta['path'] ? meta['path'] : '';
+    meta['path'] = this.initPath(meta['path']);
     objects.forEach(function(object){
       for (let fieldPath in object) {
-        if (!object.hasOwnProperty(fieldPath)) continue;
         meta['path'] = fieldPath;
         var spec = SchemaUtil.getSpec(fieldPath, this.spec);
         this.mapField(spec, fieldPath, object, meta, callback);
@@ -108,15 +107,14 @@ class SchemaMapper
   }
   mapRecursive(spec, object, meta = {}, callback)
   {
-    meta['path'] = (meta['path'] == undefined) ? '' : meta['path'];
+    meta['path'] = this.initPath(meta['path']);
   
+    var specTemp = clone(spec);
     // If match all spec is defined, newSpec defaults to an empty object since any spec rules should be replaced by 
     // - the match-all spec (defaults to original spec)
     const matchAllSpec = (spec && spec['*'] != undefined) ? spec['*'] : undefined;
-    const newSpec = (matchAllSpec != undefined) ? {} :  spec;
+    const newSpec = (matchAllSpec != undefined) ? {} :  specTemp;
     for (var fieldName in object) {
-      if (!object.hasOwnProperty(fieldName)) continue;
-      
       if (matchAllSpec !== undefined) {
         // If match all '*' field spec is set, we generate a new spec object using the match all spec for every field
         newSpec[fieldName] = matchAllSpec;
@@ -127,31 +125,30 @@ class SchemaMapper
         newSpec[fieldName] = undefined;
       }
     }
-    spec = newSpec;
+    specTemp = newSpec;
 
     var basePath = meta['path'];
 
-    for (var fieldName in spec) {
-      if (!spec.hasOwnProperty(fieldName)) continue;
+    for (var fieldName in specTemp) {
       if (SchemaUtil.isQueryOperator(fieldName)) continue; // Descriptor proptery
-      meta['path'] = basePath ? basePath + '.' + fieldName : fieldName;
-      this.mapField(spec[fieldName], fieldName, object, meta, callback);
+      meta['path'] = basePath.length ? basePath + '.' + fieldName : fieldName;
+      this.mapField(specTemp[fieldName], fieldName, object, meta, callback);
     }
   }
   mapArrayElements(spec, array, meta = {}, callback)
   {
-    meta['path'] = (meta['path'] == undefined) ? '' : meta['path'];
+    meta['path'] = this.initPath(meta['path']);
 
     var basePath = meta['path'];
 
     array.forEach(function(element, x){
-      meta['path'] = basePath + '.' + x;
+      meta['path'] = basePath.length ? basePath + '.' + x :  '' + x;
       this.mapField(spec, x, array, meta, callback);
     }, this);
   }
   mapField(spec, fieldName, container, meta = {}, callback)
   {
-    meta['path'] = (meta['path'] == undefined) ? '' : meta['path'];
+    meta['path'] = this.initPath(meta['path']);
     
     var fieldType = undefined;
     // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later). 
@@ -175,14 +172,12 @@ class SchemaMapper
     }
   
     callback(spec, fieldName, container, meta['path']);
-
-    const path = meta['path'];
     switch (fieldType) {
       case Object:
         this.mapRecursive(spec, container[fieldName], meta, callback);
       break;
       case Array:
-        var arraySpec  = undefined;
+        var arraySpec = undefined;
         if (Array.isArray(spec) && spec[0]) {
           // If the field is an array the specification for the array elements shoud be contained in the first element
           arraySpec = spec[0];
@@ -196,6 +191,10 @@ class SchemaMapper
         }
       break;
     }
+  }
+  initPath(path)
+  {
+    return path !== undefined && path.length ? path : '';
   }
 }
 

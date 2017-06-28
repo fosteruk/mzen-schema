@@ -21,11 +21,10 @@ class Schema
   {
     var meta = {errors: {}, root: object};
     var isArray = Array.isArray(object);
-    var objects = isArray ? object : [object];
     options = options ?  options : {};
 
     var promises = [];
-    this.mapper.map(objects, (fieldSpec, fieldName, fieldContainer, path) => {
+    this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
       let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, options, meta).then((value) => {
         fieldContainer[fieldName] = value;
       });
@@ -143,7 +142,7 @@ class Schema
     const validators = spec && spec['$validate'] ? spec['$validate'] : {};
     const filters = spec && spec['$filter'] ? spec['$filter'] : {};
     const name = spec && spec['$name'] ? spec['$name'] : fieldName;
-    options = options ?  options : {};
+    options = options ? options : {};
     
     var fieldType = this.specToFieldType(spec, value);
 
@@ -157,7 +156,7 @@ class Schema
       } else if (fieldType == Array) {
         defaultValue = [];
       } else if (fieldType == Types.ObjectID) {
-        defaultValue = function(){
+        defaultValue = function() {
           return new Types.ObjectID;
         };
       }
