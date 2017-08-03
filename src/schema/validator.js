@@ -116,14 +116,14 @@ class Validator
     return result;
   }
 
-  static length(value, options, name, root)
+  static valueLength(value, options, name, root)
   {
     var min = options && options['min'] ? options['min'] : null;
     var max = options && options['max'] ? options['max'] : null;
     var name = options && options['name'] ? options['name'] : name;
     var messageMin = options && options['message'] ? options['message'] : name + ' must be at least ' + min + ' characters long';
     var messageMax = options && options['message'] ? options['message'] : name + ' must be no more than ' + max + ' characters long';
-
+    
     var valueType = TypeCaster.getType(value);
 
     var resultMin = !min || (

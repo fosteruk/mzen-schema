@@ -104,22 +104,22 @@ describe('Schema', function () {
         should(result).equal('Email does appears to be valid');
       });
     });
-    describe('length', function () {
+    describe('valueLength', function () {
       it('should return boolean true on success', function () {
         var value = '456756789';
-        var result = Validator.length(value, {min: 2, max: 9});
+        var result = Validator.valueLength(value, {min: 2, max: 9});
 
         should(result).be.true(result === true);
       });
       it('should return error message on failure', function () {
         var value = '456756789';
-        var result = Validator.length(value, {min: 20, max: 50});
+        var result = Validator.valueLength(value, {min: 20, max: 50});
 
         should(result).be.a.String();
       });
       it('should allow custom message', function () {
         var value = '456756789';
-        var result = Validator.length(value, {min: 20, max: 50, message: 'Code should be between 10 and 50 characters long'});
+        var result = Validator.valueLength(value, {min: 20, max: 50, message: 'Code should be between 10 and 50 characters long'});
 
         should(result).equal('Code should be between 10 and 50 characters long');
       });
