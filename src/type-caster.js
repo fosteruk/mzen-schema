@@ -10,7 +10,7 @@ class TypeCaster
    */
   static getType(value)
   {
-    return typeof value == 'function' ? value : (value).constructor;
+    return typeof value == 'function' ? value : ((value === null || value === undefined) ? value : (value).constructor);
   }
   
   static getTypeName(value)
