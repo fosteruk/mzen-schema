@@ -11,7 +11,7 @@ class Validator
     var promise = Promise.resolve();
     Object.keys(validators).forEach((validatorName) => {
       var validator = Validator[validatorName];
-      if (validator == undefined) throw new Error('Uknown validator "' + validatorName + '"');
+      if (typeof validator != 'function') throw new Error('Uknown validator "' + validatorName + '"');
 
       if (validators[validatorName] === false || validators[validatorName] == undefined) return; // Falsey value disabled the validator  
 
