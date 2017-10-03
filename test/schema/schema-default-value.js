@@ -27,6 +27,18 @@ describe('Schema', function() {
         done();
       });
     });
+    it('should typecast default string to date', function(done) {
+      var data = {};
+
+      var schema = new Schema({
+        created: {$type: Date, $filter: {defaultValue: 'now'}}
+      });
+
+      schema.validate(data).then(() => {
+        should(data.created.constructor.name).eql('Date');
+        done();
+      });
+    });
     it('should inject default value when null', function(done) {
       var data = {house: null};
 
