@@ -3,124 +3,121 @@ var TypeCaster = require('../type-caster');
 
 class Validator
 {
-  static validate(value, validators, name, root) 
+  static async validate(value, validatorsConfig, options) 
   {
     var results = true;
-    var promises = [];
+    var {name, root} = options;
 
-    var promise = Promise.resolve();
-    Object.keys(validators).forEach((validatorName) => {
-      var validator = Validator[validatorName];
+    var configKeys = Object.keys(validatorsConfig);
+    for (let x = 0; x < configKeys.length; x++) {
+      let validatorName = configKeys[x];
+      let validator = Validator[validatorName];
       if (typeof validator != 'function') throw new Error('Uknown validator "' + validatorName + '"');
 
-      if (validators[validatorName] === false || validators[validatorName] == undefined) return; // Falsey value disabled the validator  
+      if (validatorsConfig[validatorName] === false || validatorsConfig[validatorName] == undefined) continue; // Falsey value disables the validator  
 
-      var options = !validators[validatorName] || (typeof validators[validatorName] == 'boolean') ? {} : validators[validatorName];
-      // If options is an array we run the validator multiple times 
-      // - one for each options object id
-      options = Array.isArray(options) ? options : [options];
+      let validatorConfig = !validatorsConfig[validatorName] || (typeof validatorsConfig[validatorName] == 'boolean') 
+                              ? {} : validatorsConfig[validatorName];
+      // If validatorConfig is an array we run the validator multiple times 
+      // - one for each validatorConfig object id
+      validatorConfig = Array.isArray(validatorConfig) ? validatorConfig : [validatorConfig];
 
-      options.forEach((opts) => {
-        promise = promise.then(() => {
-          // We only validate if we dont already have an error 
-          if (results === true) {
-            // Validate fucntion can return a promise but it may also return boolean, string or array
-            // - we must first resolve the return value to ensure we have promise
-            return Promise.resolve(validator(value, opts, name, root)).then((result) => {
-              if (result !== true) {
-                // validator function can return either true, a single message string or an array of error messages
-                // - the main validate() method returns a promise that resolves to true or an array of error messages
-                // - We already know the current results is not true so lets ensure we have an array of errors
-                result = Array.isArray(result) ? result : [result];
+      for (let y = 0; y < validatorConfig.length; y++) {
+        let config = Object.assign({}, options, validatorConfig[y]);
+        // We only validate if we dont already have an error 
+        if (results === true) {
+          // Validate function can return a promise but it may also return boolean, string or array
+          // - we must first resolve the return value to ensure we have promise
+          let result = await Promise.resolve(validator(value, config));
+          if (result !== true) {
+            // validator function can return either true, a single message string or an array of error messages
+            // - the main validate() method returns a promise that resolves to true or an array of error messages
+            // - We already know the current results is not true so lets ensure we have an array of errors
+            result = Array.isArray(result) ? result : [result];
 
-                if (Array.isArray(results)) {
-                  results = results.concat(result);
-                } else {
-                  results = result;
-                }
-              }
-            });
+            if (Array.isArray(results)) {
+              results = results.concat(result);
+            } else {
+              results = result;
+            }
           }
-        });
-      });
-    });
+        }
+      }
+    }
 
-    var promise = promise.then(() => {
-      return results;
-    });
-
-    return promise;
+    return results;
   }
 
   // Validator function
   // - returns an error message string or an array of error messages on failure otherweise returns boolean true
-  static required(value, options, name, root)
+  static required(value, options)
   {
     var isValid = (value !== undefined);
-
-    var name = options && options['name'] ? options['name'] : name;
+    var name = options && options['name'] ? options['name'] : 'field';
     var message = options && options['message'] ? options['message'] : name + ' is required';
     var result = isValid ? isValid : message;
 
     return result;
   }
 
-  static notNull(value, options, name, root)
+  static notNull(value, options)
   {
     var isValid = (value !== null) && !(
       // The string value NULL or null are treated as a literal null
       typeof value == 'string' && value.toLowerCase() == 'null'
     );
-    var name = options && options['name'] ? options['name'] : name;
+    var name = options && options['name'] ? options['name'] : 'field';
     var message = options && options['message'] ? options['message'] : name + ' cannot be null';
     var result = isValid ? isValid : message;
     return result;
   }
 
-  static notEmpty(value, options, name, root)
+  static isEmpty(value)
   {
-    function isEmpty(value)
-    {
-      var valueType = value ? TypeCaster.getType(value) : undefined;
-      var result = (
-        value == undefined ||
-        // In Javascript [[]] evalulates to false - we dont want this
-        // - an array is only considered empty if it has zero elements
-        (valueType != Array && value == false) || 
-        (valueType == Number && isNaN(value)) ||
-        (valueType == Object && Object.keys(value).length == 0) ||
-        (valueType == Array && value.length == 0)
-      );
-      return result;
-    }
-    var name = options && options['name'] ? options['name'] : name;
-    var message = options && options['message'] ? options['message'] : name + ' cannot be empty';
-    var result = !isEmpty(value) ? true : message;
+    var valueType = value ? TypeCaster.getType(value) : undefined;
+    var result = (
+      value == undefined ||
+      // In Javascript [[]] evalulates to false - we dont want this
+      // - an array is only considered empty if it has zero elements
+      (valueType != Array && value == false) || 
+      (valueType == Number && isNaN(value)) ||
+      (valueType == Object && Object.keys(value).length == 0) ||
+      (valueType == Array && value.length == 0)
+    );
     return result;
   }
 
-  static regex(value, options, name, root)
+  static notEmpty(value, options)
   {
+    var name = options && options['name'] ? options['name'] : 'field';
+    var message = options && options['message'] ? options['message'] : name + ' cannot be empty';
+    var result = !Validator.isEmpty(value) ? true : message;
+    return result;
+  }
+
+  static regex(value, options)
+  {
+    var name = options && options['name'] ? options['name'] : 'field';
     var regex = options && options['pattern'] ? new RegExp(options['pattern']) : new RegExp;
     var message = options && options['message'] ? options['message'] : name + ' does not appear to be valid';
     var result = regex.test(value) ? true : message;
     return result;
   }
 
-  static email(value, options, name, root)
+  static email(value, options)
   {
+    var name = options && options['name'] ? options['name'] : 'email';
     var regex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
-    var name = options && options['name'] ? options['name'] : name;
     var message = options && options['message'] ? options['message'] : name + ' does not appear to be a valid email address';
     var result = regex.test(value) ? true : message;
     return result;
   }
 
-  static valueLength(value, options, name, root)
+  static valueLength(value, options)
   {
+    var name = options && options['name'] ? options['name'] : 'field';
     var min = options && options['min'] ? options['min'] : null;
     var max = options && options['max'] ? options['max'] : null;
-    var name = options && options['name'] ? options['name'] : name;
     var messageMin = options && options['message'] ? options['message'] : name + ' must be at least ' + min + ' characters long';
     var messageMax = options && options['message'] ? options['message'] : name + ' must be no more than ' + max + ' characters long';
     
@@ -149,10 +146,11 @@ class Validator
     return result;
   }
 
-  static equality(value, options, name, root)
+  static equality(value, options)
   {
+    var name = options && options['name'] ? options['name'] : 'field';
+    var root = options && options['root'] ? options['root'] : {};
     var path = options && options['path'] ? options['path'] : null;
-    var name = options && options['name'] ? options['name'] : name;
     var message = options && options['message'] ? options['message'] : name + ' does not match';
     var result = !path || root[path] === value ? true : message;
     return result;
@@ -161,10 +159,10 @@ class Validator
   // Custom validator allows you to specify your own validator function 
   // - the function should return boolean true for a valid value
   // - or return an error message string or an array of error messages
-  static custom(value, options, name, root)
+  static custom(value, options)
   {
     var validator = options && options['validator'] ? options['validator'] : () => true;
-    return validator(value, options, name, root);
+    return validator(value, options);
   }
 }
 

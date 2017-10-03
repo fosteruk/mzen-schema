@@ -127,19 +127,19 @@ describe('Schema', function () {
     describe('equality', function () {
       it('should return boolean true on success', function () {
         var value = {a: 123, b: 123};
-        var result = Validator.equality(value.a, {path: 'b'}, 'A', value);
+        var result = Validator.equality(value.a, {path: 'b', name: 'A', root: value});
 
         should(result).be.true(result === true);
       });
       it('should return error message on failure', function () {
         var value = {a: 123, b: 4567};
-        var result = Validator.equality(value.a, {path: 'b'}, 'A', value);
+        var result = Validator.equality(value.a, {path: 'b', name: 'A', root: value});
 
         should(result).be.a.String();
       });
       it('should allow custom message', function () {
         var value = {a: 123, b: 4567};
-        var result = Validator.equality(value.a, {path: 'b', message: 'Values do not match'}, 'A', value);
+        var result = Validator.equality(value.a, {path: 'b', name: 'A', root: value, message: 'Values do not match'});
 
         should(result).equal('Values do not match');
       });

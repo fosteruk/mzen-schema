@@ -189,7 +189,7 @@ class Schema
       }
     }
 
-    var promise = Validator.validate(value, validators, name, meta['root']);
+    var promise = Validator.validate(value, validators, {name, root: meta['root']});
     return promise.then((validateResults) => {
       if (Array.isArray(validateResults)) {
         validateResults.forEach((result) => {
