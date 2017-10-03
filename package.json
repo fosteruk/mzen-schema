@@ -1,6 +1,6 @@
 {
   "name": "mzen-schema",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "mZen Schema",
   "main": "./lib/schema",
   "scripts": {
@@ -28,17 +28,27 @@
   },
   "babel": {
     "presets": [
-      ["env",{
-        "targets": {
-          "browsers": ["> 4%", "ie 11", "safari >= 7"]
+      [
+        "env",
+        {
+          "targets": {
+            "browsers": [
+              "> 4%",
+              "ie 11",
+              "safari >= 7"
+            ]
+          }
         }
-      }]
+      ]
     ],
     "plugins": [
-      ["transform-runtime", {
-        "polyfill": false,
-        "regenerator": true
-      }]
+      [
+        "transform-runtime",
+        {
+          "polyfill": false,
+          "regenerator": true
+        }
+      ]
     ]
   }
 }
