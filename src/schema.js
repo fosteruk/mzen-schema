@@ -4,6 +4,7 @@ var ObjectID = require('bson-objectid');
 var SchemaUtil = require('./schema/util');
 var Mapper = require('./schema/mapper');
 var Validator = require('./schema/validator');
+var Filter = require('./schema/filter');
 var Types = require('./schema/types');
 var TypeCaster = require('./type-caster');
 
@@ -136,7 +137,7 @@ class Schema
     
     return fieldType;
   }
-  validateField(spec, fieldName, value, path, options, meta = {})
+  async validateField(spec, fieldName, value, path, options, meta = {})
   {
     path = path ? path : fieldName;
     const validators = spec && spec['$validate'] ? spec['$validate'] : {};
@@ -144,31 +145,11 @@ class Schema
     const name = spec && spec['$name'] ? spec['$name'] : fieldName;
     options = options ? options : {};
     
-    var fieldType = this.specToFieldType(spec, value);
-
-    // notNull can be defaulted via global option
-    validators['notNull'] = validators['notNull'] !== undefined ? validators['notNull'] : this.options['defaultNotNull'];
-      
-    var defaultValue = filters['defaultValue'];
-    if (defaultValue === undefined) {
-      if (fieldType == Object) {
-        defaultValue = {};
-      } else if (fieldType == Array) {
-        defaultValue = [];
-      } else if (fieldType == Types.ObjectID) {
-        defaultValue = function() {
-          return new Types.ObjectID;
-        };
-      }
-    }
-    
-    if ((value === undefined || Schema.isNull(value)) && defaultValue !== undefined) {
-      value = (typeof defaultValue == 'function') ? defaultValue() : defaultValue;
-    }
-
     if (!SchemaUtil.isValidFieldName(fieldName)) {
       Schema.appendError(meta, path, 'Invalid field name');
     }
+
+    var fieldType = this.specToFieldType(spec, value);
 
     if (value != undefined) {
       // We only attempt to type cast if the type was specified, the value is not null and not undefined
@@ -189,15 +170,33 @@ class Schema
       }
     }
 
-    var promise = Validator.validate(value, validators, {name, root: meta['root']});
-    return promise.then((validateResults) => {
-      if (Array.isArray(validateResults)) {
-        validateResults.forEach((result) => {
-          Schema.appendError(meta, path, result);
-        });
-      }
-      return value;
-    });
+    // Configure default value filter if not already set
+    var defaultValue = undefined;
+    if (fieldType == Object) {
+      defaultValue = {};
+    } else if (fieldType == Array) {
+      defaultValue = [];
+    } else if (fieldType == Types.ObjectID) {
+      defaultValue = function() {
+        return new Types.ObjectID;
+      };
+    }
+    if (defaultValue !== undefined && filters['defaultValue'] === undefined) {
+      filters['defaultValue'] = defaultValue;
+    }
+    value = await Filter.filter(value, filters);
+
+    // notNull can be defaulted via global option
+    validators['notNull'] = validators['notNull'] !== undefined ? validators['notNull'] : this.options['defaultNotNull'];
+
+    var validateResults = await Validator.validate(value, validators, {name, root: meta['root']});
+    if (Array.isArray(validateResults)) {
+      validateResults.forEach((result) => {
+        Schema.appendError(meta, path, result);
+      });
+    }
+
+    return value;
   }
   typeCast(requiredType, value, path, meta = {})
   {

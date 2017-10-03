@@ -19,7 +19,7 @@ class Validator
       let validatorConfig = !validatorsConfig[validatorName] || (typeof validatorsConfig[validatorName] == 'boolean') 
                               ? {} : validatorsConfig[validatorName];
       // If validatorConfig is an array we run the validator multiple times 
-      // - one for each validatorConfig object id
+      // - one for each validatorConfig object
       validatorConfig = Array.isArray(validatorConfig) ? validatorConfig : [validatorConfig];
 
       for (let y = 0; y < validatorConfig.length; y++) {
