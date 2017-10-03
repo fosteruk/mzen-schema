@@ -105,6 +105,20 @@ describe('Schema', function() {
         });
       });
     });
+    it('should inject new ObjectID if field defined as ObjectID but no value is provided', function(done) {
+      var data = {};
+
+      var schema = new Schema({
+        _id: {
+          $type: 'ObjectID'
+        }
+      });
+
+      schema.validate(data).then(() => {
+        should(data._id.constructor.name).eql('ObjectID');
+        done();
+      });
+    });
     it('should inject empty object if no default object value is provided', function(done) {
       var data = {};
 

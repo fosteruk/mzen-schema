@@ -149,6 +149,8 @@ class Schema
       Schema.appendError(meta, path, 'Invalid field name');
     }
 
+    var fieldType = this.specToFieldType(spec, value);
+
     // Configure default value filter if not already set
     var defaultValue = filters['defaultValue'];
     if (fieldType == Object) {
@@ -165,8 +167,6 @@ class Schema
     if (defaultValue !== undefined) {
       value = await Filter.filter(value, {defaultValue});
     }
-
-    var fieldType = this.specToFieldType(spec, value);
 
     if (value != undefined) {
       // We only attempt to type cast if the type was specified, the value is not null and not undefined
