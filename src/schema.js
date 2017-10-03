@@ -149,6 +149,24 @@ class Schema
       Schema.appendError(meta, path, 'Invalid field name');
     }
 
+    // Configure default value filter if not already set
+    var defaultValue = undefined;
+    if (fieldType == Object) {
+      defaultValue = {};
+    } else if (fieldType == Array) {
+      defaultValue = [];
+    } else if (fieldType == Types.ObjectID) {
+      defaultValue = function() {
+        return new Types.ObjectID;
+      };
+    }
+    // Default value must come before type-casting - because the default value maye need to be type-casted 
+    // for exmaple converting default value 'now' to type DateTime
+    if (defaultValue !== undefined && filters['defaultValue'] === undefined) {
+      filters['defaultValue'] = defaultValue;
+    }
+    value = await Filter.filter(value, filters);
+
     var fieldType = this.specToFieldType(spec, value);
 
     if (value != undefined) {
@@ -169,22 +187,6 @@ class Schema
         }
       }
     }
-
-    // Configure default value filter if not already set
-    var defaultValue = undefined;
-    if (fieldType == Object) {
-      defaultValue = {};
-    } else if (fieldType == Array) {
-      defaultValue = [];
-    } else if (fieldType == Types.ObjectID) {
-      defaultValue = function() {
-        return new Types.ObjectID;
-      };
-    }
-    if (defaultValue !== undefined && filters['defaultValue'] === undefined) {
-      filters['defaultValue'] = defaultValue;
-    }
-    value = await Filter.filter(value, filters);
 
     // notNull can be defaulted via global option
     validators['notNull'] = validators['notNull'] !== undefined ? validators['notNull'] : this.options['defaultNotNull'];
