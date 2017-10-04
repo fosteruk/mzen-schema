@@ -15,6 +15,7 @@
     "url": "https://github.com/kevin-foster/mZen-schema.git"
   },
   "dependencies": {
+    "babel-runtime": "^6.26.0",
     "bson-objectid": "^1.1.5",
     "clone": "^1.0.2"
   },
