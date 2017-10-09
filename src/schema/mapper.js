@@ -19,7 +19,7 @@ class SchemaMapper
     // If the data is an array we must present the spec as an array also
     var spec = Array.isArray(data) ? [clone(this.spec)] : clone(this.spec);
 
-    // We have to pass the data in as a object field as that is the only way to reference data
+    // We have to pass the data in as a object property as that is the only way to reference data
     var root = {root: data};
     
     this.mapField(spec, 'root', root, meta, callback);
@@ -113,7 +113,7 @@ class SchemaMapper
     // If match all spec is defined, newSpec defaults to an empty object since any spec rules should be replaced by 
     // - the match-all spec (defaults to original spec)
     const matchAllSpec = (spec && spec['*'] != undefined) ? spec['*'] : undefined;
-    const newSpec = (matchAllSpec != undefined) ? {} :  specTemp;
+    const newSpec = (matchAllSpec !== undefined) ? {} :  specTemp;
     for (var fieldName in object) {
       if (matchAllSpec !== undefined) {
         // If match all '*' field spec is set, we generate a new spec object using the match all spec for every field
@@ -174,7 +174,7 @@ class SchemaMapper
     callback(spec, fieldName, container, meta['path']);
     switch (fieldType) {
       case Object:
-        if (fieldType == Object && spec['$spec'] !== undefined) spec = spec['$spec'];
+        if (spec['$spec'] !== undefined) spec = spec['$spec'];
         this.mapRecursive(spec, container[fieldName], meta, callback);
       break;
       case Array:

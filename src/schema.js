@@ -91,23 +91,38 @@ class Schema
   filterPrivate(object, mode)
   {
     mode = mode ? mode : true;
+    var deleteRefs = [];
     this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
       const filters = fieldSpec && fieldSpec['$filter'] ? fieldSpec['$filter'] : {};
       if (filters['private'] === true || filters['private'] == mode){
-        delete fieldContainer[fieldName];
+        // We cant simply delete here because if we delete a parent of a structure we are already
+        // - iterating we will get errors. Instead make a list of references to delete.
+        // Once we have all the references we can safely delete them.
+        deleteRefs.push({fieldContainer, fieldName});
       }
+    });
+
+    deleteRefs.forEach((ref) => {
+      if (ref.fieldContainer && ref.fieldContainer[ref.fieldName]) delete ref.fieldContainer[ref.fieldName];
     });
   }
   filterPrivatePaths(paths, mode)
   {
     mode = mode ? mode : true;
     var objects = Array.isArray(paths) ? paths : [paths];
-
+    var deleteRefs = [];
     this.mapper.mapPaths(objects, (fieldSpec, fieldName, fieldContainer, path) => {
       const filters = fieldSpec && fieldSpec['$filter'] ? fieldSpec['$filter'] : {};
       if (filters['private'] === true || filters['private'] == mode){
-        delete fieldContainer[fieldName];
+        // We cant simply delete here because if we delete a parent of a structure we are already
+        // - iterating we will get errors. Instead make a list of references to delete.
+        // Once we have all the references we can safely delete them.
+        deleteRefs.push({fieldContainer, fieldName});
       }
+    });
+
+    deleteRefs.forEach((ref) => {
+      if (ref.fieldContainer && ref.fieldContainer[ref.fieldName]) delete ref.fieldContainer[ref.fieldName];
     });
   }
   specToFieldType(spec, value)
