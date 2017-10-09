@@ -27,6 +27,23 @@ describe('Schema', function() {
         done();
       });
     });
+    it('should inject default value when undefined using $spec', function(done) {
+      var data = {};
+
+      var schema = new Schema({
+        $type: Object,
+        $spec: {
+          house: {$type: Number, $filter: {defaultValue: 5}}
+        }
+      });
+
+      schema.validate(data).then(() => {
+        should(data.house).eql(5);
+        done();
+      }).catch((e) => {
+        done(e);
+      });
+    });
     it('should typecast default string to date', function(done) {
       var data = {};
 

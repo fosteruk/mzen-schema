@@ -386,7 +386,7 @@ describe('Schema', function() {
         });
       });
       it('invalid - null', function(done) {
-        var data = {name: null};
+        var data = {name: undefined};
 
         var schema = new Schema({
           name: {$type: 'Object', $validate: {notEmpty: true}, $spec: {
