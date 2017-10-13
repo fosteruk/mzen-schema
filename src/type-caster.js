@@ -114,6 +114,8 @@ class TypeCasterObjectID
 {
   static castString(value)
   {
+    // The string 'new' can be used request a new object id
+    value = value == 'new' ? undefined :  value;
     return ObjectID(value);
   }
 }

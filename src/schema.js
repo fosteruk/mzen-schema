@@ -172,7 +172,7 @@ class Schema
       defaultValue = {};
     } else if (fieldType == Array) {
       defaultValue = [];
-    } else if (fieldType == Types.ObjectID) {
+    } else if (fieldName == '_id' && fieldType == Types.ObjectID) {
       defaultValue = function() {
         return new Types.ObjectID;
       };

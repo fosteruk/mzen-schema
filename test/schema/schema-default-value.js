@@ -122,7 +122,7 @@ describe('Schema', function() {
         });
       });
     });
-    it('should inject new ObjectID if field defined as ObjectID but no value is provided', function(done) {
+    it('should inject new ObjectID if field named _id and defined as ObjectID does not have a value', function(done) {
       var data = {};
 
       var schema = new Schema({
@@ -134,6 +134,39 @@ describe('Schema', function() {
       schema.validate(data).then(() => {
         should(data._id.constructor.name).eql('ObjectID');
         done();
+      });
+    });
+    it('should not inject new ObjectID if field name is something other than _id, defined as ObjectID and does not have a value', function(done) {
+      var data = {};
+
+      var schema = new Schema({
+        other: {
+          $type: 'ObjectID'
+        }
+      });
+
+      schema.validate(data).then(() => {
+        should(data.other).eql(undefined);
+        done();
+      }).catch((e) => {
+        done(e);
+      });
+    });
+    it('should inject new ObjectID if field defined as ObjectID if default value is "new"', function(done) {
+      var data = {};
+
+      var schema = new Schema({
+        other: {
+          $type: 'ObjectID',
+          $filter: {defaultValue: 'new'}
+        }
+      });
+
+      schema.validate(data).then(() => {
+        should(data.other.constructor.name).eql('ObjectID');
+        done();
+      }).catch((e) => {
+        done(e);
       });
     });
     it('should inject empty object if no default object value is provided', function(done) {
