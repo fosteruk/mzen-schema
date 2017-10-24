@@ -2,7 +2,7 @@
   "name": "mzen-schema",
   "version": "0.0.26",
   "description": "mZen Schema",
-  "main": "./lib/schema",
+  "main": "./lib/index",
   "scripts": {
     "test": "mocha ./test/*",
     "build": "babel src --out-dir lib"
