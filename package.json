@@ -25,21 +25,5 @@
     "mocha": "^2.5.3",
     "should": "^11.2.0",
     "sinon": "^1.17.4"
-  },
-  "babel": {
-    "presets": [
-      [
-        "env",
-        {
-          "targets": {
-            "browsers": [
-              "> 4%",
-              "ie 11",
-              "safari >= 7"
-            ]
-          }
-        }
-      ]
-    ]
   }
 }
