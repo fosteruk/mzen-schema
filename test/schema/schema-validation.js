@@ -361,36 +361,40 @@ describe('Schema', function() {
         var data = {name: {first: 'Kevin'}};
 
         var schema = new Schema({
-          name: {$type: 'Object', $validate: {notEmpty: true}, $spec: {
-            first: {$type: String}
+          name: {$type: 'Object', $spec: {
+            first: {$type: String, $validate: {notEmpty: true}}
           }}
         });
 
         schema.validate(data).then((results) => {
           should(results.isValid).eql(true);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('invalid - undefined', function(done) {
         var data = {name: undefined};
 
         var schema = new Schema({
-          name: {$type: 'Object', $validate: {notEmpty: true}, $spec: {
-            first: {$type: String}
+          name: {$type: 'Object', $spec: {
+            first: {$type: String, $validate: {notEmpty: true}}
           }}
         });
 
         schema.validate(data).then((results) => {
           should(results.isValid).eql(false);
           done();
+        }).catch((error) => {
+          done(error);
         });
       });
       it('invalid - null', function(done) {
         var data = {name: undefined};
 
         var schema = new Schema({
-          name: {$type: 'Object', $validate: {notEmpty: true}, $spec: {
-            first: {$type: String}
+          name: {$type: 'Object', $spec: {
+            first: {$type: String, $validate: {notEmpty: true}}
           }}
         });
 
@@ -422,7 +426,6 @@ describe('Schema', function() {
 
         var schema = new Schema({
           name: {$type: 'Object', $validate: {notEmpty: true}, $spec: {
-            first: {$type: String}
           }}
         });
 
@@ -522,7 +525,7 @@ describe('Schema', function() {
       });
       it('valid - array of empty array', function(done) {
         var data = {name: [[]]};
-        
+
         var schema = new Schema({
           name: {$type: Array, $validate: {notEmpty: true}}
         });
