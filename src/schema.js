@@ -88,42 +88,13 @@ class Schema
 
     return promise;
   }
-  filterPrivate(object, mode)
+  filterPrivate(object, mode, mapperType)
   {
     mode = mode ? mode : true;
     var deleteRefs = [];
     var valueReplaceRefs = [];
-    this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
-      const filters = fieldSpec && fieldSpec['$filter'] ? fieldSpec['$filter'] : {};
-      if (filters['private'] === true || filters['private'] == mode){
-        // We cant simply delete here because if we delete a parent of a structure we are already
-        // - iterating we will get errors. Instead make a list of references to delete.
-        // Once we have all the references we can safely delete them.
-        deleteRefs.push({fieldContainer, fieldName});
-      }
-      if (filters['privateValue'] === true || filters['privateValue'] == mode) {
-        // The privateValue replaces any non null values as true and otherwise false
-        // - this allows the removal of the private value while still indicating if a value exists or not
-        valueReplaceRefs.push({fieldContainer, fieldName});
-      }
-    });
-
-    valueReplaceRefs.forEach((ref) => {
-      if (ref.fieldContainer && ref.fieldContainer[ref.fieldName]) {
-        ref.fieldContainer[ref.fieldName] = ref.fieldContainer[ref.fieldName] == undefined ? ref.fieldContainer[ref.fieldName] : true;
-      }
-    });
-    deleteRefs.forEach((ref) => {
-      if (ref.fieldContainer && ref.fieldContainer[ref.fieldName]) delete ref.fieldContainer[ref.fieldName];
-    });
-  }
-  filterPrivatePaths(paths, mode)
-  {
-    mode = mode ? mode : true;
-    var objects = Array.isArray(paths) ? paths : [paths];
-    var deleteRefs = [];
-    var valueReplaceRefs = [];
-    this.mapper.mapPaths(objects, (fieldSpec, fieldName, fieldContainer, path) => {
+    var mapperType = (mapperType == 'mapPaths') ? 'mapPaths' : 'map';
+    this.mapper[mapperType](object, (fieldSpec, fieldName, fieldContainer, path) => {
       const filters = fieldSpec && fieldSpec['$filter'] ? fieldSpec['$filter'] : {};
       if (filters['private'] === true || filters['private'] == mode){
         // We cant simply delete here because if we delete a parent of a structure we are already
