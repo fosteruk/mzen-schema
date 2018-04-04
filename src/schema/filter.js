@@ -4,18 +4,20 @@ var Schema = require('../schema');
 
 class Filter
 {
-  static async filter(value, filtersConfig) 
+  static async filter(value, filtersConfig)
   {
     var configKeys = Object.keys(filtersConfig);
     for (let x = 0; x < configKeys.length; x++) {
       let filterName = configKeys[x];
       let filter = Filter[filterName];
 
-      if (filterName == 'private') continue; // Ignore special filter "private"
+      var specialFilterNames = ['private', 'privateValue'];
+
+      if (specialFilterNames.indexOf(filterName) !== -1) continue; // Ignore special filters
       if (typeof filter != 'function') throw new Error('Uknown filter "' + filterName + '"');
 
       let filterConfig = filtersConfig[filterName];
-      // If filtersConfig is an array we run the validator multiple times 
+      // If filtersConfig is an array we run the validator multiple times
       // - one for each filtersConfig object
       filterConfig = Array.isArray(filterConfig) ? filterConfig : [filterConfig];
 
@@ -33,7 +35,7 @@ class Filter
       // The string value NULL or null are treated as a literal null
       typeof value == 'string' && value.toLowerCase() == 'null'
     );
-    
+
     return result;
   }
 
