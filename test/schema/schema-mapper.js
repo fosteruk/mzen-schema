@@ -48,7 +48,7 @@ describe('SchemaMapper', function () {
       schemaIterator.map(value, function(spec, fieldName, fieldContainer){
         results.push({fieldContainer});
       });
-  
+
       should(results[1].fieldContainer).eql(value);
       should(results[2].fieldContainer).eql(value[0]);
     });
@@ -61,7 +61,7 @@ describe('SchemaMapper', function () {
       schemaIterator.map(value, function(fieldSpec, fieldName, fieldContainer){
         results.push({fieldContainer});
       });
-      
+
       should(results[1].fieldContainer).eql(value);
       should(results[2].fieldContainer).eql(value[0]);
       should(results[3].fieldContainer).eql(value[0].names);
@@ -78,7 +78,7 @@ describe('SchemaMapper', function () {
       should(results[0].path).eql('');
       should(results[1].path).eql('name');
     });
-    it('should callback with field oath of nested array', function () {
+    it('should callback with field path of nested array', function () {
       var spec = {};
       var schemaIterator = new SchemaMapper(spec);
 
@@ -110,6 +110,26 @@ describe('SchemaMapper', function () {
       should(results[7].path).eql('2.name');
     });
   });
+  it('should callback with field spec from embedded schema reference', function () {
+    var specAddress = {
+      buildingNumber: Number,
+      street: String,
+      city: String,
+      country: String
+    };
+    var specUser = {
+      name: String,
+      address: {$schema: 'address'}
+    };
+    var schemaIterator = new SchemaMapper(specUser, {schemas: {address: specAddress}});
+
+    var results = [];
+    schemaIterator.map({name: 'Kevin'}, function(fieldSpec){
+      results.push({fieldSpec});
+    });
+
+    should(results[0].fieldSpec.address).eql(specAddress);
+  });
   describe('mapPaths', function () {
     it('should callback with field spec', function () {
       var spec = {name: String};
@@ -128,7 +148,7 @@ describe('SchemaMapper', function () {
     it('should callback with field index of array value', function () {
       var spec = {names: [String]};
       var schemaIterator = new SchemaMapper(spec);
-      
+
       var results = [];
       schemaIterator.mapPaths({'names': ['Kevin']}, function(fieldSpec, fieldName){
         results.push({fieldName});

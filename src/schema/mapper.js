@@ -11,13 +11,42 @@ class SchemaMapper
   {
     this.spec = (spec == undefined) ? {} : spec;
     this.options = (options == undefined) ? {} : options;
+    this.options.schemas = this.options.schemas ? this.options.schemas : {};
+
+    this.specNormalised = this.normalizeSpec(clone(this.spec));
+  }
+  normalizeSpec(spec)
+  {
+    // Resolve any embedded schema references
+    if (Array.isArray(spec)) {
+      spec.forEach(function(value, index){
+        spec[index] = this.normalizeSpec(value);
+      }.bind(this));
+    } else if (spec && typeof spec == 'object') {
+      if (spec['$schema']) {
+        let name = spec['$schema'];
+        // inject referenced schema spec
+        if (!this.options.schemas[name]) {
+          throw new Error('Missing schema reference ' + spec['$schema']);
+        } else {
+          spec = this.options.schemas[name];
+        }
+      } else {
+        // this spec does not contain a schema ref - recurse
+        Object.keys(spec).forEach(function(key){
+          spec[key] = this.normalizeSpec(spec[key]);
+        }.bind(this));
+      }
+    }
+
+    return spec;
   }
   map(data, callback)
   {
     const meta = {path: '', errors: {}};
     // Clone the spec as it may be temporarily modified in the process of validation
     // If the data is an array we must present the spec as an array also
-    var spec = Array.isArray(data) ? [clone(this.spec)] : clone(this.spec);
+    var spec = Array.isArray(data) ? [clone(this.specNormalised)] : clone(this.specNormalised);
 
     // We have to pass the data in as a object property as that is the only way to reference data
     var root = {root: data};
@@ -31,9 +60,9 @@ class SchemaMapper
 
     meta['path'] = this.initPath(meta['path']);
     objects.forEach(function(object){
-      for (let fieldPath in object) {
+      for (var fieldPath in object) {
         meta['path'] = fieldPath;
-        var spec = SchemaUtil.getSpec(fieldPath, this.spec);
+        var spec = SchemaUtil.getSpec(fieldPath, this.specNormalised);
         this.mapField(spec, fieldPath, object, meta, callback);
       }
     }.bind(this));
@@ -54,7 +83,7 @@ class SchemaMapper
         for (let fieldName in query) {
           if (!query.hasOwnProperty(fieldName)) continue;
           if (SchemaUtil.isQueryOperator(fieldName)) {
-            if (SchemaUtil.canValidateQueryOperator(childFieldName)) {
+            if (SchemaUtil.canValidateQueryOperator(fieldName)) {
               // If this element is an operator - we want to validate is values
               if (['$or', '$and'].indexOf(fieldName) != -1) {
                 query[fieldName].forEach(function(value, x){
@@ -71,7 +100,7 @@ class SchemaMapper
             // - otherwise we should callback with the field itself {field: value}
             var hasOpertators = false;
             if (TypeCaster.getType(query[fieldName]) == Object) {
-              for (var childFieldName in query[fieldName]) {
+              for (let childFieldName in query[fieldName]) {
                 hasOpertators = hasOpertators || SchemaUtil.isQueryOperator(childFieldName);
                 if (hasOpertators && SchemaUtil.canValidateQueryOperator(childFieldName)) {
                   if (Array.isArray(query[fieldName][childFieldName])) {
@@ -114,7 +143,7 @@ class SchemaMapper
     // - the match-all spec (defaults to original spec)
     const matchAllSpec = (spec && spec['*'] != undefined) ? spec['*'] : undefined;
     const newSpec = (matchAllSpec !== undefined) ? {} :  specTemp;
-    for (var fieldName in object) {
+    for (let fieldName in object) {
       if (matchAllSpec !== undefined) {
         // If match all '*' field spec is set, we generate a new spec object using the match all spec for every field
         newSpec[fieldName] = matchAllSpec;

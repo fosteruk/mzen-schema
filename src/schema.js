@@ -8,23 +8,21 @@ var Filter = require('./schema/filter');
 var Types = require('./schema/types');
 var TypeCaster = require('./type-caster');
 
-class Mixed {}
-
 class Schema
 {
   constructor(spec, options)
   {
     this.spec = (spec == undefined) ? {} : spec;
     this.options = (options == undefined) ? {} : options;
+    this.options.constructors = this.options.constructors ? this.options.constructors: [];
+    this.options.schemas = this.options.schemas ? this.options.schemas: {};
     this.mapper = new Mapper(this.spec, this.options);
   }
   getConstructorByName(name)
   {
-    if (Array.isArray(this.options.constructors)) {
-      for (var x = 0; x < this.options.constructors.length; x++) {
-        if (typeof this.options.constructors[x] === 'function' && this.options.constructors[x].name === name) {
-          return this.options.constructors[x];
-        }
+    for (var x = 0; x < this.options.constructors.length; x++) {
+      if (typeof this.options.constructors[x] === 'function' && this.options.constructors[x].name === name) {
+        return this.options.constructors[x];
       }
     }
   }
