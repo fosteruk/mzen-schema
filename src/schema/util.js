@@ -7,7 +7,7 @@ class SchemaUtil
   {
     var spec = spec ? spec : {};
     var pathParts = path && path ? path.split('.') : [];
-    
+
     var currentPathPart = pathParts.shift();
     if (currentPathPart) {
       if (spec[currentPathPart]) {
@@ -19,10 +19,10 @@ class SchemaUtil
           // There is no spec defined for the given path
           // - and the path is not an array so there is no matching field config
           return undefined;
-        } 
+        }
       }
     }
-    
+
     if (pathParts.length) {
       const type =  TypeCaster.getType(spec);
       if (type == Array && spec.length) {
@@ -31,7 +31,7 @@ class SchemaUtil
         spec = spec['$spec'];
       }
       spec = SchemaUtil.getSpec(pathParts.join('.'), spec);
-    } 
+    }
 
     return spec;
   }

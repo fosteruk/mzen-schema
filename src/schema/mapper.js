@@ -7,7 +7,7 @@ var TypeCaster = require('../type-caster');
 
 class SchemaMapper
 {
-  constructor(spec, options) 
+  constructor(spec, options)
   {
     this.spec = (spec == undefined) ? {} : spec;
     this.options = (options == undefined) ? {} : options;
@@ -21,8 +21,8 @@ class SchemaMapper
 
     // We have to pass the data in as a object property as that is the only way to reference data
     var root = {root: data};
-    
-    this.mapField(spec, 'root', root, meta, callback);
+
+    return this.mapField(spec, 'root', root, meta, callback);
   }
   mapPaths(paths, callback, meta)
   {
@@ -44,7 +44,7 @@ class SchemaMapper
     // - operators are skipped and their values are passed to the validator for validation - ( {$and: [{path: value}, {path: value}] )
     // - this is simple solution that allows validation of schema paths within simple query operators ($and / $or)
     // - Some operators cannot be validated in this way because the operator values are not schema paths
-    // - One example of this is the $near operator whos value is a specific structure unrelated to the schema 
+    // - One example of this is the $near operator whos value is a specific structure unrelated to the schema
     // - As a temporary solution we simply dont attempt to validate operator values which dont fit the basic pattern ($and / $or)
     // - See SchemaUtil.canValidateQueryOperator()
     // Whats needed is a more intelligent query validator that is aware of how to handle each operator value
@@ -99,18 +99,18 @@ class SchemaMapper
         query.forEach(function(arrayValue, x){
           mapRecursive(query[x], meta);
         });
-      } 
+      }
       return query;
     };
-    
+
     mapRecursive(query);
   }
   mapRecursive(spec, object, meta = {}, callback)
   {
     meta['path'] = this.initPath(meta['path']);
-  
+
     var specTemp = clone(spec);
-    // If match all spec is defined, newSpec defaults to an empty object since any spec rules should be replaced by 
+    // If match all spec is defined, newSpec defaults to an empty object since any spec rules should be replaced by
     // - the match-all spec (defaults to original spec)
     const matchAllSpec = (spec && spec['*'] != undefined) ? spec['*'] : undefined;
     const newSpec = (matchAllSpec !== undefined) ? {} :  specTemp;
@@ -149,13 +149,13 @@ class SchemaMapper
   mapField(spec, fieldName, container, meta = {}, callback)
   {
     meta['path'] = this.initPath(meta['path']);
-    
+
     var fieldType = undefined;
-    // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later). 
-    // - Otherwise we need to find the constructor, if the value is not already a constructor ([] or {}) 
+    // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later).
+    // - Otherwise we need to find the constructor, if the value is not already a constructor ([] or {})
     if (spec) fieldType = spec.constructor == String ? spec : TypeCaster.getType(spec);
     if (fieldType == Object && spec['$type'] !== undefined) fieldType = spec['$type'];
-    if (fieldType && fieldType.constructor == String) { 
+    if (fieldType && fieldType.constructor == String) {
       // The fieldType was specified with a string value (not a String constructor)
       // Attempt to covert the field type to a constructor
       fieldType = Types[fieldType];
@@ -170,7 +170,7 @@ class SchemaMapper
     if (container[fieldName] === undefined && defaultValue !== undefined) {
       container[fieldName] = defaultValue;
     }
-  
+
     callback(spec, fieldName, container, meta['path']);
     switch (fieldType) {
       case Object:
@@ -183,8 +183,8 @@ class SchemaMapper
           // If the field is an array the specification for the array elements shoud be contained in the first element
           arraySpec = spec[0];
         } else if (TypeCaster.getType(spec) == Object && spec['$spec']) {
-          // If the field type is an object which specifies type "Array" 
-          // - then the array elements spec should be specified using the "$spec" property 
+          // If the field type is an object which specifies type "Array"
+          // - then the array elements spec should be specified using the "$spec" property
           arraySpec = spec['$spec'];
         }
         if (arraySpec && container[fieldName]) {
@@ -192,6 +192,8 @@ class SchemaMapper
         }
       break;
     }
+
+    return container[fieldName];
   }
   initPath(path)
   {

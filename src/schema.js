@@ -18,6 +18,39 @@ class Schema
     this.options = (options == undefined) ? {} : options;
     this.mapper = new Mapper(this.spec, this.options);
   }
+  getConstructorByName(name)
+  {
+    if (Array.isArray(this.options.constructors)) {
+      for (var x = 0; x < this.options.constructors.length; x++) {
+        if (typeof this.options.constructors[x] === 'function' && this.options.constructors[x].name === name) {
+          return this.options.constructors[x];
+        }
+      }
+    }
+  }
+  applyConstructors(object)
+  {
+    var constructors = this.options.constructors;
+    if (constructors) {
+      return this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
+        var construct = fieldSpec ? fieldSpec['$construct'] : null;
+        if (construct){
+          var constructorFunction = null;
+          if (typeof construct === 'string') {
+            constructorFunction = this.getConstructorByName(construct);
+          } else if (typeof construct === 'function') {
+            constructorFunction = construct;
+          } else {
+            // constructor not found
+            throw new Error('Constructor not found for ' + path);
+          }
+          if (constructorFunction && !Array.isArray(fieldContainer[fieldName])) {
+            fieldContainer[fieldName] = Object.assign(Object.create(constructorFunction.prototype), fieldContainer[fieldName]);
+          }
+        }
+      });
+    }
+  }
   validate(object, options)
   {
     var meta = {errors: {}, root: object};
