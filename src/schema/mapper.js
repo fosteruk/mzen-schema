@@ -247,7 +247,7 @@ class SchemaMapper
     callback(spec, fieldName, container, meta.path);
     switch (fieldType) {
       case Object:
-        if (spec['$spec'] !== undefined) spec = spec.$spec;
+        if (spec.$spec !== undefined) spec = spec.$spec;
         this.mapRecursive(spec, container[fieldName], meta, callback);
       break;
       case Array:
