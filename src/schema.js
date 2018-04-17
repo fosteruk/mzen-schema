@@ -105,8 +105,7 @@ class Schema
   applyConstructors(object)
   {
     this.init();
-    var constructors = this.constructors;
-    if (constructors) {
+    if (this.constructors) {
       return this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
         var construct = fieldSpec ? fieldSpec.$construct : null;
         if (construct){
@@ -124,6 +123,8 @@ class Schema
           }
         }
       });
+    } else {
+      return object;
     }
   }
   validate(object, options)
