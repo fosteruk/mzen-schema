@@ -36,7 +36,7 @@ class Schema
   init()
   {
     if (!this.mapper) {
-      this.mapper = new Mapper(this.config.spec, this.config)
+      this.mapper = new Mapper(this.spec, this.config)
       this.mapper.addSchemas(this.schemas);
       this.mapper.init();
     }
