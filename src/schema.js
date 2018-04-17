@@ -12,30 +12,111 @@ class Schema
 {
   constructor(spec, options)
   {
-    this.spec = (spec == undefined) ? {} : spec;
-    this.options = (options == undefined) ? {} : options;
-    this.options.constructors = this.options.constructors ? this.options.constructors: [];
-    this.options.schemas = this.options.schemas ? this.options.schemas: {};
-    this.mapper = new Mapper(this.spec, this.options);
+    this.config = (options == undefined) ? {} : options;
+    this.config.name = this.config.name ? this.config.name : '';
+    this.config.spec = spec ? spec : {};
+    this.config.constructors = this.config.constructors ? this.config.constructors : {};
+    this.config.schemas = this.config.schemas ? this.config.schemas : {};
+
+    this.name = this.config.name ? this.config.name : (this.config.spec.$name ? this.config.spec.$name : this.constructor.name);
+    this.spec = this.config.spec ? this.config.spec : {};
+
+    this.constructors = {};
+    if (this.config.constructors) {
+      this.addConstructors(this.config['constructors']);
+    }
+
+    this.schemas = {};
+    if (this.config.schemas) {
+      this.addSchemas(this.config['schemas']);
+    }
+
+    this.mapper = null;
   }
-  getConstructorByName(name)
+  init()
   {
-    for (var x = 0; x < this.options.constructors.length; x++) {
-      if (typeof this.options.constructors[x] === 'function' && this.options.constructors[x].name === name) {
-        return this.options.constructors[x];
+    if (!this.mapper) {
+      this.mapper = new Mapper(this.config.spec, this.config)
+      this.mapper.addSchemas(this.schemas);
+      this.mapper.init();
+    }
+  }
+  getName()
+  {
+    return this.name;
+  }
+  setName(name)
+  {
+    this.name = name;
+  }
+  getSpec()
+  {
+    this.init(); // we need the normalised spec so we must initialise the mapper
+    return this.mapper.getSpec();
+  }
+  setSpec(spec)
+  {
+    this.spec = spec;
+  }
+  addConstructor(value)
+  {
+    this.constructors[value.name] = value;
+  }
+  getConstructor(constructorName)
+  {
+    return this.constructors[constructorName] ? this.constructors[constructorName] : null;
+  }
+  addConstructors(constructors)
+  {
+    if (constructors) {
+      if (Array.isArray(constructors)) {
+        constructors.forEach(function(construct) {
+          if (typeof construct == 'function') {
+            this.addConstructor(construct);
+          }
+        }.bind(this));
+      } else {
+        Object.keys(constructors).forEach(function(constructorName) {
+          if (typeof constructors[constructorName] == 'function') {
+            this.addConstructor(constructors[constructorName]);
+          }
+        }.bind(this));
+      }
+    }
+  }
+  addSchema(schema)
+  {
+    this.schemas[schema.getName()] = schema;
+  }
+  addSchemas(schemas)
+  {
+    if (schemas) {
+      if (Array.isArray(schemas)) {
+        schemas.forEach(function(schema) {
+          if (schema instanceof Schema) {
+            this.addSchema(schema);
+          }
+        }.bind(this));
+      } else {
+        Object.keys(schemas).forEach(function(schemaName) {
+          if (schemas[schemaName] instanceof Schema) {
+            this.addSchema(schemas[schemaName]);
+          }
+        }.bind(this));
       }
     }
   }
   applyConstructors(object)
   {
-    var constructors = this.options.constructors;
+    this.init();
+    var constructors = this.constructors;
     if (constructors) {
       return this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
-        var construct = fieldSpec ? fieldSpec['$construct'] : null;
+        var construct = fieldSpec ? fieldSpec.$construct : null;
         if (construct){
           var constructorFunction = null;
-          if (typeof construct === 'string') {
-            constructorFunction = this.getConstructorByName(construct);
+          if (typeof construct === 'string' && this.constructors[construct]) {
+            constructorFunction = this.constructors[construct];
           } else if (typeof construct === 'function') {
             constructorFunction = construct;
           } else {
@@ -51,6 +132,7 @@ class Schema
   }
   validate(object, options)
   {
+    this.init();
     var meta = {errors: {}, root: object};
     var isArray = Array.isArray(object);
     options = options ?  options : {};
@@ -72,13 +154,14 @@ class Schema
   }
   validatePaths(paths, options, meta)
   {
+    this.init();
     var meta = meta ? meta : {errors: {}};
     var objects = Array.isArray(paths) ? paths : [paths];
     options = options ?  options : {};
 
     var promises = [];
     this.mapper.mapPaths(objects, (fieldSpec, fieldName, fieldContainer, path) => {
-      meta['root'] = fieldContainer;
+      meta.root = fieldContainer;
       let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, options, meta).then((value) => {
         fieldContainer[fieldName] = value;
       });
@@ -94,11 +177,12 @@ class Schema
   }
   validateQuery(query, options)
   {
+    this.init();
     var meta = meta ? meta : {errors: {}};
     options = options ?  options : {};
     // This is a query - we are expecting fields which are not defined
     // - We dont want those to trigger an error so disabled strict validation
-    options['strict'] = false;
+    options.strict = false;
 
     var promises = [];
     this.mapper.mapQueryPaths(query, (path, queryPathFieldName, container) => {
@@ -121,12 +205,13 @@ class Schema
   }
   filterPrivate(object, mode, mapperType)
   {
+    this.init();
     mode = mode ? mode : true;
     var deleteRefs = [];
     var valueReplaceRefs = [];
     var mapperType = (mapperType == 'mapPaths') ? 'mapPaths' : 'map';
     this.mapper[mapperType](object, (fieldSpec, fieldName, fieldContainer, path) => {
-      const filters = fieldSpec && fieldSpec['$filter'] ? fieldSpec['$filter'] : {};
+      const filters = fieldSpec && fieldSpec.$filter ? fieldSpec.$filter : {};
       if (filters['private'] === true || filters['private'] == mode){
         // We cant simply delete here because if we delete a parent of a structure we are already
         // - iterating we will get errors. Instead make a list of references to delete.
@@ -160,9 +245,9 @@ class Schema
       } else {
         fieldType = TypeCaster.getType(spec);
         if (fieldType === Object) {
-          if (spec['$type'] !== undefined) {
+          if (spec.$type !== undefined) {
             // The type specified in a spec object may be a constructor or a string also so this is recursive
-            fieldType = this.specToFieldType(spec['$type'], value);
+            fieldType = this.specToFieldType(spec.$type, value);
           }
         }
       }
@@ -179,9 +264,9 @@ class Schema
   async validateField(spec, fieldName, value, path, options, meta = {})
   {
     path = path ? path : fieldName;
-    const validators = spec && spec['$validate'] ? spec['$validate'] : {};
-    const filters = spec && spec['$filter'] ? spec['$filter'] : {};
-    const name = spec && spec['$name'] ? spec['$name'] : fieldName;
+    const validators = spec && spec.$validate ? spec.$validate : {};
+    const filters = spec && spec.$filter ? spec.$filter : {};
+    const name = spec && spec.$name ? spec.$name : fieldName;
     options = options ? options : {};
 
     if (!SchemaUtil.isValidFieldName(fieldName)) {
@@ -191,7 +276,7 @@ class Schema
     var fieldType = this.specToFieldType(spec, value);
 
     // Configure default value filter if not already set
-    var defaultValue = filters['defaultValue'];
+    var defaultValue = filters.defaultValue;
     if (fieldType == Object) {
       defaultValue = {};
     } else if (fieldType == Array) {
@@ -215,7 +300,7 @@ class Schema
     }
 
     if (fieldType == Object) {
-      let strict = (options['strict'] !== undefined) ? options['strict'] : this.options['strict'];
+      let strict = (options.strict !== undefined) ? options.strict : this.config.strict;
       // If in strict mode we must ensure there are no fields which are not defined by the spec
       if (strict) {
         for (let fieldName in value) {
@@ -230,9 +315,9 @@ class Schema
     value = await Filter.filter(value, filters);
 
     // notNull can be defaulted via global option
-    validators['notNull'] = validators['notNull'] !== undefined ? validators['notNull'] : this.options['defaultNotNull'];
+    validators.notNull = validators.notNull !== undefined ? validators.notNull : this.config.defaultNotNull;
 
-    var validateResults = await Validator.validate(value, validators, {name, root: meta['root']});
+    var validateResults = await Validator.validate(value, validators, {name, root: meta.root});
     if (Array.isArray(validateResults)) {
       validateResults.forEach((result) => {
         Schema.appendError(meta, path, result);

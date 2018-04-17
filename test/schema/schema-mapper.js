@@ -1,4 +1,5 @@
 var should = require('should');
+var Schema = require('../../src/schema');
 var SchemaMapper = require('../../src/schema/mapper');
 
 describe('SchemaMapper', function () {
@@ -112,16 +113,21 @@ describe('SchemaMapper', function () {
   });
   it('should callback with field spec from embedded schema reference', function () {
     var specAddress = {
+      $name: 'address',  // this defines hte schema name
       buildingNumber: Number,
       street: String,
       city: String,
       country: String
     };
     var specUser = {
+      $name: 'user',  // this defines hte schema name
       name: String,
       address: {$schema: 'address'}
     };
-    var schemaIterator = new SchemaMapper(specUser, {schemas: {address: specAddress}});
+
+    var schemaIterator = new SchemaMapper(specUser, {
+      schemas: [new Schema(specAddress)]
+    });
 
     var results = [];
     schemaIterator.map({name: 'Kevin'}, function(fieldSpec){
