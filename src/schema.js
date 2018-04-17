@@ -105,7 +105,7 @@ class Schema
   applyConstructors(object)
   {
     this.init();
-    if (this.constructors) {
+    if (object && this.constructors) {
       return this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
         var construct = fieldSpec ? fieldSpec.$construct : null;
         if (construct){
