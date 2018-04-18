@@ -4,12 +4,43 @@ var Types = require('../../src/schema/types');
 
 describe('Schema', function() {
   describe('validation', function() {
-    describe('should validate required field', function() {
-      it('valid', function(done) {
-        var data = {house: 1};
+    describe('required', function() {
+      describe('should validate required field', function() {
+        it('valid', function(done) {
+          var data = {house: 1};
+
+          var schema = new Schema({
+            house: {$type: Number, $validate: {required: true}}
+          });
+
+          schema.validate(data).then((result) => {
+            should(result.isValid).eql(true);
+            done();
+          }).catch((error) => {
+            done(error);
+          });
+        });
+        it('invalid', function(done) {
+          var data = {other: 1};
+
+          var schema = new Schema({
+            house: {$type: Number, $validate: {required: true}}
+          });
+
+          schema.validate(data).then((result) => {
+            should(result.isValid).eql(false);
+            done();
+          }).catch((error) => {
+            done(error);
+          });
+        });
+      });
+      it('should accept a null value to satisfy required setting', function(done) {
+        // The 'required' option simply specifies that the field exists regardless of its value
+        var data = {name: null};
 
         var schema = new Schema({
-          house: {$type: Number, $validate: {required: true}}
+          name: {$validate: {required: true}}
         });
 
         schema.validate(data).then((result) => {
@@ -19,111 +50,82 @@ describe('Schema', function() {
           done(error);
         });
       });
-      it('invalid', function(done) {
-        var data = {other: 1};
+      describe('should validate required embedded field', function() {
+        it('valid', function(done) {
+          var data = {house: {bedRooms: '3', discounted: '1'}};
 
-        var schema = new Schema({
-          house: {$type: Number, $validate: {required: true}}
+          var schema = new Schema({
+            house: {
+              bedRooms: Number,
+              discounted: {$type: Boolean, $validate: {required: true}},
+            }
+          });
+
+          schema.validate(data).then((result) => {
+            should(result.isValid).eql(true);
+            done();
+          }).catch((error) => {
+            done(error);
+          });
         });
+        it('invalid', function(done) {
+          var data = {house: {bedRooms: '2'}};
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
-      });
-    });
-    it('should accept a null value to satisfy required setting', function(done) {
-      // The 'required' option simply specifies that the field exists regardless of its value
-      var data = {name: null};
+          var schema = new Schema({
+            house: {
+              bedRooms: Number,
+              discounted: {$type: Boolean, $validate: {required: true}},
+            }
+          });
 
-      var schema = new Schema({
-        name: {$validate: {required: true}}
-      });
-
-      schema.validate(data).then((result) => {
-        should(result.isValid).eql(true);
-        done();
-      }).catch((error) => {
-        done(error);
-      });
-    });
-    describe('should validate required embedded field', function() {
-      it('valid', function(done) {
-        var data = {house: {bedRooms: '3', discounted: '1'}};
-
-        var schema = new Schema({
-          house: {
-            bedRooms: Number,
-            discounted: {$type: Boolean, $validate: {required: true}},
-          }
-        });
-
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
+          schema.validate(data).then((result) => {
+            should(result.isValid).eql(false);
+            done();
+          }).catch((error) => {
+            done(error);
+          });
         });
       });
-      it('invalid', function(done) {
-        var data = {house: {bedRooms: '2'}};
+      describe('should validate required embedded field when given array of objects', function() {
+        it('valid', function(done) {
+          var data = [
+            {house: {bedRooms: '3', discounted: '1'}},
+            {house: {bedRooms: '2', discounted: '0'}}
+          ];
 
-        var schema = new Schema({
-          house: {
-            bedRooms: Number,
-            discounted: {$type: Boolean, $validate: {required: true}},
-          }
+          var schema = new Schema({
+            house: {
+              bedRooms: Number,
+              discounted: {$type: Boolean, $validate: {required: true}},
+            }
+          });
+
+          schema.validate(data).then((result) => {
+            should(result.isValid).eql(true);
+            done();
+          }).catch((error) => {
+            done(error);
+          });
         });
+        it('invalid', function(done) {
+          var data = [
+            {house: {bedRooms: '3', discounted: '1'}},
+            {house: {bedRooms: '2'}}
+          ];
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
-      });
-    });
-    describe('should validate required embedded field when given array of objects', function() {
-      it('valid', function(done) {
-        var data = [
-          {house: {bedRooms: '3', discounted: '1'}},
-          {house: {bedRooms: '2', discounted: '0'}}
-        ];
+          var schema = new Schema({
+            house: {
+              bedRooms: Number,
+              discounted: {$type: Boolean, $validate: {required: true}},
+            }
+          });
 
-        var schema = new Schema({
-          house: {
-            bedRooms: Number,
-            discounted: {$type: Boolean, $validate: {required: true}},
-          }
-        });
-
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
-      });
-      it('invalid', function(done) {
-        var data = [
-          {house: {bedRooms: '3', discounted: '1'}},
-          {house: {bedRooms: '2'}}
-        ];
-
-        var schema = new Schema({
-          house: {
-            bedRooms: Number,
-            discounted: {$type: Boolean, $validate: {required: true}},
-          }
-        });
-
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
+          schema.validate(data).then((result) => {
+            should(result.isValid).eql(false);
+            done();
+          }).catch((error) => {
+            done(error);
+          });
         });
       });
     });
@@ -780,7 +782,7 @@ describe('Schema', function() {
       var data = {other: 1};
 
       var schema = new Schema({
-        house: {$name: 'House number', $type: Number, $validate: {required: true}}
+        house: {$displayName: 'House number', $type: Number, $validate: {required: true}}
       });
 
       schema.validate(data).then((results) => {
