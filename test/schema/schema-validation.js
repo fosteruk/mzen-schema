@@ -715,8 +715,58 @@ describe('Schema', function() {
       var data = {age: '33', pi: '3.14159265359'};
 
       var schema = new Schema({
+        $strict: true,
         age: Number
-      }, {strict: true});
+      });
+
+      schema.validate(data).then((results) => {
+        should(results.isValid).eql(false);
+        done();
+      }).catch((error) => {
+        done(error);
+      });
+    });
+    it('should fail validation in strict mode should propagate', function(done) {
+      var data = {
+        name: 'Kevin',
+        address: {
+          street: 'London Road',
+          city: 'Liverpool'
+        }
+      };
+
+      var schema = new Schema({
+        $strict: true,
+        name: String,
+        address: {
+          street: String
+        }
+      });
+
+      schema.validate(data).then((results) => {
+        should(results.isValid).eql(false);
+        done();
+      }).catch((error) => {
+        done(error);
+      });
+    });
+    it('should fail validation in strict mode should propagation can be overriden', function(done) {
+      var data = {
+        name: 'Kevin',
+        address: {
+          street: 'London Road',
+          city: 'Liverpool'
+        }
+      };
+
+      var schema = new Schema({
+        $strict: true,
+        name: String,
+        address: {
+          $strict: false,
+          street: String
+        }
+      });
 
       schema.validate(data).then((results) => {
         should(results.isValid).eql(false);
