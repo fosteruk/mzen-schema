@@ -6,23 +6,27 @@ Features:
   - Validate and type-cast against defined data types
   - Specify validation rules for each field
   - Populate default values from schema
+  - Reuse schema's by referencing them within other schemas
 
-Initially designed for use with the mZen domain modeling package but has no dependency on mZen.
+Initially designed for use with the mZen ORM package but has no dependency on mZen.
 
 
 ```javascript
 var Schema = require('mzen-schema');
 
 var schemaPerson = new Schema({
+  // field names with a $ prefix are used to specify options in the schema specification
+  $name: 'person', // A schema can be referenced in other schema's by name to allow composition
+  $strict: true, // in strict mode any undefined fields will produce an error on validation
   _id: 'ObjectID',
   name: {
-    // This is the name that will be used in any error message 
+    // $displayName specifies the name that will be used in any validation error message
     // - defaults to the field name
-    $name: 'Name', 
-    $type: String, 
+    $displayName: 'Name',
+    $type: String,
     $validate: {
       required: true,
-      length: {min: 1, max: 50} 
+      length: {min: 1, max: 50}
     },
     $filter: {defaultValue: 'Unknown'}
   },
@@ -36,11 +40,11 @@ var schemaPerson = new Schema({
       // - The validator will be executed once per options object
       regex: [
         {
-          pattern: '[+0-9]+', 
+          pattern: '[+0-9]+',
           message: 'Tel does not appear to be valid'
         },
         {
-          pattern: '^\+[0-9]{2}', 
+          pattern: '^\+[0-9]{2}',
           message: 'Tel must start with your country code (e.g. +44)'
         }
       ]
@@ -56,7 +60,7 @@ var paul = {
   }
 };
 
-// Calling Schema.validate() will type-cast and validate 
+// Calling Schema.validate() will type-cast and validate
 // the data against the schema
 // The validate() method returns a result object with meta data
 // Two useful values returned are 'isValid' and 'errors'
