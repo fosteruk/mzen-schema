@@ -48,7 +48,7 @@ class SchemaManager
       this.schemas[schema.getName()] = schema;
     } else if (typeof schema == 'function') {
       // Schema constructor provided
-      const schemaInstance = Object.create(Schema.prototype, schema);
+      const schemaInstance = Object.create(schema);
       this.schemas[schemaInstance.getName()] = schemaInstance;
     }
   }
