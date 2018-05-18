@@ -46,11 +46,7 @@ class SchemaManager
   {
     if (schema && schema.getName) {
       this.schemas[schema.getName()] = schema;
-    } else if (typeof schema == 'function') {
-      // Schema constructor provided
-      const schemaInstance = Object.create(schema);
-      this.schemas[schemaInstance.getName()] = schemaInstance;
-    }
+    } 
   }
   addSchemas(schemas)
   {
