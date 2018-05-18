@@ -1,5 +1,7 @@
 'use strict'
 
+var Schema = require('./schema');
+
 class SchemaManager
 {
   constructor(options)
