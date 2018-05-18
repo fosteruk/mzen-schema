@@ -1,6 +1,6 @@
 {
   "name": "mzen-schema",
-  "version": "0.0.43",
+  "version": "0.0.44",
   "description": "mZen Schema",
   "main": "./lib/index",
   "scripts": {
