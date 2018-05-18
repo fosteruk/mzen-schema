@@ -42,7 +42,13 @@ class SchemaManager
   }
   addSchema(schema)
   {
-    if (schema && schema.getName) this.schemas[schema.getName()] = schema;
+    if (schema && schema.getName) {
+      this.schemas[schema.getName()] = schema;
+    } else if (typeof schema == 'function') {
+      // Schema constructor provided
+      const schemaInstance = Object.create(Schema, schema);
+      this.schemas[schemaInstance.getName()] = schemaInstance;
+    }
   }
   addSchemas(schemas)
   {
