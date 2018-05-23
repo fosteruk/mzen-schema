@@ -144,5 +144,25 @@ describe('Schema', function () {
         should(result).equal('Values do not match');
       });
     });
+    describe('enumeration', function () {
+      it('should return boolean true on success', function () {
+        var value = 'Car';
+        var result = Validator.enumeration(value, {name: 'Transport', values: ['Car', 'Bus', 'Train', 'Boat']});
+
+        should(result).be.true(result === true);
+      });
+      it('should return error message on failure', function () {
+        var value = 'Guitar';
+        var result = Validator.enumeration(value, {name: 'Transport', values: ['Car', 'Bus', 'Train', 'Boat']});
+
+        should(result).be.a.String();
+      });
+      it('should allow custom message', function () {
+        var value = 'Guitar';
+        var result = Validator.enumeration(value, {name: 'Transport', values: ['Car', 'Bus', 'Train', 'Boat'], message: 'Value is not valid'});
+
+        should(result).equal('Value is not valid');
+      });
+    });
   });
 });

@@ -3,7 +3,7 @@ var TypeCaster = require('../type-caster');
 
 class Validator
 {
-  static async validate(value, validatorsConfig, options) 
+  static async validate(value, validatorsConfig, options)
   {
     var results = true;
     var {name, root} = options;
@@ -14,17 +14,17 @@ class Validator
       let validator = Validator[validatorName];
       if (typeof validator != 'function') throw new Error('Uknown validator "' + validatorName + '"');
 
-      if (validatorsConfig[validatorName] === false || validatorsConfig[validatorName] == undefined) continue; // Falsey value disables the validator  
+      if (validatorsConfig[validatorName] === false || validatorsConfig[validatorName] == undefined) continue; // Falsey value disables the validator
 
-      let validatorConfig = !validatorsConfig[validatorName] || (typeof validatorsConfig[validatorName] == 'boolean') 
+      let validatorConfig = !validatorsConfig[validatorName] || (typeof validatorsConfig[validatorName] == 'boolean')
                               ? {} : validatorsConfig[validatorName];
-      // If validatorConfig is an array we run the validator multiple times 
+      // If validatorConfig is an array we run the validator multiple times
       // - one for each validatorConfig object
       validatorConfig = Array.isArray(validatorConfig) ? validatorConfig : [validatorConfig];
 
       for (let y = 0; y < validatorConfig.length; y++) {
         let config = Object.assign({}, options, validatorConfig[y]);
-        // We only validate if we dont already have an error 
+        // We only validate if we dont already have an error
         if (results === true) {
           // Validate function can return a promise but it may also return boolean, string or array
           // - we must first resolve the return value to ensure we have promise
@@ -79,7 +79,7 @@ class Validator
       value == undefined ||
       // In Javascript [[]] evalulates to false - we dont want this
       // - an array is only considered empty if it has zero elements
-      (valueType != Array && value == false) || 
+      (valueType != Array && value == false) ||
       (valueType == Number && isNaN(value)) ||
       (valueType == Object && Object.keys(value).length == 0) ||
       (valueType == Array && value.length == 0)
@@ -107,7 +107,7 @@ class Validator
   static email(value, options)
   {
     var name = options && options['name'] ? options['name'] : 'email';
-    // We have a very loose regex pattern for validating email addresses since unicode email addresses 
+    // We have a very loose regex pattern for validating email addresses since unicode email addresses
     // - have been supported by modern mail servers for several years
     // - https://tools.ietf.org/html/rfc6531
     // - https://en.wikipedia.org/wiki/International_email#Email_addresses
@@ -124,14 +124,14 @@ class Validator
     var max = options && options['max'] ? options['max'] : null;
     var messageMin = options && options['message'] ? options['message'] : name + ' must be at least ' + min + ' characters long';
     var messageMax = options && options['message'] ? options['message'] : name + ' must be no more than ' + max + ' characters long';
-    
+
     var valueType = TypeCaster.getType(value);
 
     var resultMin = !min || (
       (value != null) &&
       // In Javascript [[]] evalulates to false - we dont want this
       // - an array is only considered empty if it has zero elements
-      ((valueType != Array && valueType != String) || value.length >= min) && 
+      ((valueType != Array && valueType != String) || value.length >= min) &&
       (valueType != Number || (isNaN(value) && value >= min)) &&
       (valueType != Object || Object.keys(value).length >= min)
     );
@@ -140,7 +140,7 @@ class Validator
       (value != null) &&
       // In Javascript [[]] evalulates to false - we dont want this
       // - an array is only considered empty if it has zero elements
-      ((valueType != Array && valueType != String) || value.length <= max) && 
+      ((valueType != Array && valueType != String) || value.length <= max) &&
       (valueType != Number || (isNaN(value) && value <= max)) &&
       (valueType != Object || Object.keys(value).length <= max)
     );
@@ -160,7 +160,15 @@ class Validator
     return result;
   }
 
-  // Custom validator allows you to specify your own validator function 
+  static enumeration(value, options)
+  {
+    var name = options && options['name'] ? options['name'] : 'field';
+    var values = options && options['values'] ? options['values'] : [];
+    var message = options && options['message'] ? options['message'] : name + ' is invalid';
+    return (Array.isArray(values) && values.indexOf(value) !== -1) || message;
+  }
+
+  // Custom validator allows you to specify your own validator function
   // - the function should return boolean true for a valid value
   // - or return an error message string or an array of error messages
   static custom(value, options)
