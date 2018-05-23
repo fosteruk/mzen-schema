@@ -53,8 +53,8 @@ class Validator
   static required(value, options)
   {
     var isValid = (value !== undefined);
-    var name = options && options['name'] ? options['name'] : 'field';
-    var message = options && options['message'] ? options['message'] : name + ' is required';
+    var name = options && options.name ? options.name : 'field';
+    var message = options && options.message ? options.message : name + ' is required';
     var result = isValid ? isValid : message;
 
     return result;
@@ -66,8 +66,8 @@ class Validator
       // The string value NULL or null are treated as a literal null
       typeof value == 'string' && value.toLowerCase() == 'null'
     );
-    var name = options && options['name'] ? options['name'] : 'field';
-    var message = options && options['message'] ? options['message'] : name + ' cannot be null';
+    var name = options && options.name ? options.name : 'field';
+    var message = options && options.message ? options.message : name + ' cannot be null';
     var result = isValid ? isValid : message;
     return result;
   }
@@ -89,41 +89,41 @@ class Validator
 
   static notEmpty(value, options)
   {
-    var name = options && options['name'] ? options['name'] : 'field';
-    var message = options && options['message'] ? options['message'] : name + ' cannot be empty';
+    var name = options && options.name ? options.name : 'field';
+    var message = options && options.message ? options.message : name + ' cannot be empty';
     var result = !Validator.isEmpty(value) ? true : message;
     return result;
   }
 
   static regex(value, options)
   {
-    var name = options && options['name'] ? options['name'] : 'field';
-    var regex = options && options['pattern'] ? new RegExp(options['pattern']) : new RegExp;
-    var message = options && options['message'] ? options['message'] : name + ' does not appear to be valid';
+    var name = options && options.name ? options.name : 'field';
+    var regex = options && options.pattern ? new RegExp(options.pattern) : new RegExp;
+    var message = options && options.message ? options.message : name + ' does not appear to be valid';
     var result = regex.test(value) ? true : message;
     return result;
   }
 
   static email(value, options)
   {
-    var name = options && options['name'] ? options['name'] : 'email';
+    var name = options && options.name ? options.name : 'email';
     // We have a very loose regex pattern for validating email addresses since unicode email addresses
     // - have been supported by modern mail servers for several years
     // - https://tools.ietf.org/html/rfc6531
     // - https://en.wikipedia.org/wiki/International_email#Email_addresses
     var regex = new RegExp(/^[^\s]+@[^\s]+\.[^\s]{2,9}$/);
-    var message = options && options['message'] ? options['message'] : name + ' does not appear to be a valid address';
+    var message = options && options.message ? options.message : name + ' does not appear to be a valid address';
     var result = regex.test(value) ? true : message;
     return result;
   }
 
   static valueLength(value, options)
   {
-    var name = options && options['name'] ? options['name'] : 'field';
-    var min = options && options['min'] ? options['min'] : null;
-    var max = options && options['max'] ? options['max'] : null;
-    var messageMin = options && options['message'] ? options['message'] : name + ' must be at least ' + min + ' characters long';
-    var messageMax = options && options['message'] ? options['message'] : name + ' must be no more than ' + max + ' characters long';
+    var name = options && options.name ? options.name : 'field';
+    var min = options && options.min ? options.min : null;
+    var max = options && options.max ? options.max : null;
+    var messageMin = options && options.message ? options.message : name + ' must be at least ' + min + ' characters long';
+    var messageMax = options && options.message ? options.message : name + ' must be no more than ' + max + ' characters long';
 
     var valueType = TypeCaster.getType(value);
 
@@ -152,19 +152,19 @@ class Validator
 
   static equality(value, options)
   {
-    var name = options && options['name'] ? options['name'] : 'field';
-    var root = options && options['root'] ? options['root'] : {};
-    var path = options && options['path'] ? options['path'] : null;
-    var message = options && options['message'] ? options['message'] : name + ' does not match';
+    var name = options && options.name ? options.name : 'field';
+    var root = options && options.root ? options.root : {};
+    var path = options && options.path ? options.path : null;
+    var message = options && options.message ? options.message : name + ' does not match';
     var result = !path || root[path] === value ? true : message;
     return result;
   }
 
   static enumeration(value, options)
   {
-    var name = options && options['name'] ? options['name'] : 'field';
-    var values = options && options['values'] ? options['values'] : [];
-    var message = options && options['message'] ? options['message'] : name + ' is invalid';
+    var name = options && options.name ? options.name : 'field';
+    var values = options && options.values ? options.values : [];
+    var message = options && options.message ? options.message : name + ' is invalid';
     return (Array.isArray(values) && values.indexOf(value) !== -1) || message;
   }
 
@@ -173,7 +173,7 @@ class Validator
   // - or return an error message string or an array of error messages
   static custom(value, options)
   {
-    var validator = options && options['validator'] ? options['validator'] : () => true;
+    var validator = options && options.validator ? options.validator : () => true;
     return validator(value, options);
   }
 }
