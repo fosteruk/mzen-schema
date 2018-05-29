@@ -10,6 +10,14 @@ class ConstructorTestUser
   }
 }
 
+class ConstructorTestAddress
+{
+  getStreet()
+  {
+    return this.street;
+  }
+}
+
 describe('Schema', function() {
   describe('applyConstructors', function() {
     it('should apply $construct function to the root object', function() {
@@ -160,6 +168,35 @@ describe('Schema', function() {
       should(object.users[0].getName()).eql('John Smith');
       should(object.users[1].constructor).eql(ConstructorTestUser);
       should(object.users[1].getName()).eql('Tom Jones');
+    });
+    it('should apply $construct function to schemaRelation', function() {
+      var object = {
+        nameFirst: 'John',
+        nameLast: 'Smith',
+        address: {street: 'Picton Road'}
+      };
+
+      var schemaAddress = new Schema({
+        $name: 'address',
+        $construct: ConstructorTestAddress,
+        street: {$type: 'String', $validate: {notNull: true}},
+      });
+
+      var schema = new Schema({
+        $construct: ConstructorTestUser,
+        nameFirst: String,
+        nameLast: String,
+        address: {$schemaRelation: 'address'}
+      });
+      schema.addConstructor(ConstructorTestUser);
+      schema.addConstructor(ConstructorTestAddress);
+      schema.addSchema(schemaAddress);
+
+      object = schema.applyConstructors(object);
+      should(object.constructor).eql(ConstructorTestUser);
+      should(object.getName()).eql('John Smith');
+      should(object.address.constructor).eql(ConstructorTestAddress);
+      should(object.address.getStreet()).eql('Picton Road');
     });
   });
 });
