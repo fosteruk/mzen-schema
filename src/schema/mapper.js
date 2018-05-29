@@ -62,13 +62,20 @@ class SchemaMapper
         spec[index] = this.normalizeSpec(value);
       }.bind(this));
     } else if (spec && typeof spec == 'object') {
-      if (spec.$schema) {
-        let name = spec.$schema;
+      if (spec.$schema || spec.$schemaRelation) {
+        let name = spec.$schema ? spec.$schema : spec.$schemaRelation;
+        let isRelation = spec.$schemaRelation !== undefined;
         // inject referenced schema spec
         if (!this.schemas[name]) {
           throw new Error('Missing schema reference ' + spec.$schema);
         } else {
-          spec = this.schemas[name].getSpec();
+          if (isRelation) {
+            // If the schema is a for a relation we need to mark the spec to ensure its not used for validation
+            spec = clone(this.schemas[name].getSpec());
+            spec.$isRelation = true;
+          } else {
+            spec = this.schemas[name].getSpec();
+          }
         }
       } else {
         // this spec does not contain a schema ref - recurse

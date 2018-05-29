@@ -4,6 +4,28 @@ var Types = require('../../src/schema/types');
 
 describe('Schema', function() {
   describe('validation', function() {
+    it('should ignore schema of relations', function(done) {
+      // An empty field is any falsy value: undefined, null, false, 0, '', [], {}
+      var data = {name: [1]};
+
+      var schemaAddress = new Schema({
+        $name: 'address',
+        street: [{$type: 'String', $validate: {notNull: true}}],
+      });
+
+      var schema = new Schema({
+        name: [{$type: 'Mixed', $validate: {notNull: true}}],
+        address: {$schemaRelation: 'address'}
+      });
+      schema.addSchema(schemaAddress);
+
+      schema.validate(data).then((results) => {
+        should(results.isValid).eql(true);
+        done();
+      }).catch((error) => {
+        done(error);
+      });
+    });
     describe('required', function() {
       describe('should validate required field', function() {
         it('valid', function(done) {

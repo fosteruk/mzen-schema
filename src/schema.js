@@ -136,6 +136,9 @@ class Schema
 
     var promises = [];
     this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
+      // If the spec if for related data we do not validate
+      // - this data will be stripped before any insertion or updating to persistance
+      if (fieldSpec && fieldSpec.$isRelation) return;
       let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, options, meta).then((value) => {
         fieldContainer[fieldName] = value;
       });
@@ -158,6 +161,9 @@ class Schema
 
     var promises = [];
     this.mapper.mapPaths(objects, (fieldSpec, fieldName, fieldContainer, path) => {
+      // If the spec if for related data we do not validate
+      // - this data will be stripped before any insertion or updating to persistance
+      if (fieldSpec && fieldSpec.$isRelation) return;
       meta.root = fieldContainer;
       let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, options, meta).then((value) => {
         fieldContainer[fieldName] = value;
