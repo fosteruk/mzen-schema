@@ -131,7 +131,6 @@ class Schema
   {
     this.init();
     var meta = {errors: {}, root: object};
-    var isArray = Array.isArray(object);
     options = options ?  options : {};
 
     var promises = [];
@@ -192,6 +191,7 @@ class Schema
       var paths = {};
       paths[path] = container[queryPathFieldName];
       this.mapper.mapPaths(paths, (fieldSpec, fieldName, fieldContainer, path) => {
+        if (fieldSpec && fieldSpec.$isRelation) return;
         let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, options, meta).then((value) => {
           container[queryPathFieldName] = value;
         });
