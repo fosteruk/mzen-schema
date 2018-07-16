@@ -2,7 +2,7 @@
 var ObjectID = require('bson-objectid');
 
 class TypeCaster
-{  
+{
   /**
    * Get Type
    *
@@ -12,7 +12,7 @@ class TypeCaster
   {
     return typeof value == 'function' ? value : ((value === null || value === undefined) ? value : (value).constructor);
   }
-  
+
   static getTypeName(value)
   {
     return TypeCaster.getType(value).name;
@@ -23,7 +23,7 @@ class TypeCaster
     const fromTypeName = TypeCaster.getTypeName(value);
     const fromTypeCaster = TypeCaster.type[fromTypeName];
     if (fromTypeCaster == undefined) throw new Error('Can not cast from unknown type "' + fromTypeName + '"');
-    
+
     const toTypeName = TypeCaster.getTypeName(toType);
     const toTypeCaster = TypeCaster.type[TypeCaster.getTypeName(toType)];
     if (toTypeCaster == undefined) throw new Error('Can not cast to unknown type "' + toTypeName + '"');
@@ -32,15 +32,14 @@ class TypeCaster
     // If there is a cast function for toType then we cast the value
     // - otherwise the case is not supported so we simply return the original value
     const castFunctionName = TypeCaster.getCastFunctionName(fromTypeName);
-    //console.log(toTypeName, toType, castFunctionName);
     if (typeof toTypeCaster[castFunctionName] == 'function') {
       result = toTypeCaster[castFunctionName](value);
     }
-    
+
     return result;
   }
-  
-  static getCastFunctionName(typeName) 
+
+  static getCastFunctionName(typeName)
   {
     return 'cast' + typeName.charAt(0).toUpperCase() + typeName.slice(1);
   }
@@ -52,12 +51,12 @@ class TypeCasterString
   {
     return (value).toString();
   }
-  
+
   static castBoolean(value)
   {
     return (value) ? '1' : '0';
   }
-  
+
   static castObjectID(value)
   {
     return value.toString();
@@ -70,7 +69,7 @@ class TypeCasterNumber
   {
     return (+value);
   }
-  
+
   static castBoolean(value)
   {
     return (value) ? 1 : 0;
@@ -84,7 +83,7 @@ class TypeCasterBoolean
     value = value.trim().toLowerCase();
     return (value == '1' || value == 'true');
   }
-  
+
   static castNumber(value)
   {
     return (value > 0);
@@ -103,7 +102,7 @@ class TypeCasterDate
     }
     return result;
   }
-  
+
   static castNumber(value)
   {
     return new Date(value);
@@ -121,7 +120,7 @@ class TypeCasterObjectID
 }
 
 TypeCaster.type = {
-  String: TypeCasterString, 
+  String: TypeCasterString,
   Number: TypeCasterNumber,
   Boolean: TypeCasterBoolean,
   Object: {}, // Object is a valid type but we can not cast a primitive to an object so it has no cast methods

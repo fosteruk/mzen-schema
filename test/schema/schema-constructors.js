@@ -186,7 +186,7 @@ describe('Schema', function() {
         $construct: ConstructorTestUser,
         nameFirst: String,
         nameLast: String,
-        address: {$schemaRelation: 'address'}
+        address: {$schema: 'address', $relation: true}
       });
       schema.addConstructor(ConstructorTestUser);
       schema.addConstructor(ConstructorTestAddress);

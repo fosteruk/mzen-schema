@@ -1,6 +1,6 @@
 var should = require('should');
 var SchemaManager = require('../src/schema-manager');
-var Schema = require('mzen-schema');
+var Schema = require('../src/schema');
 
 describe('SchemaManager', function () {
   describe('init()', function () {
