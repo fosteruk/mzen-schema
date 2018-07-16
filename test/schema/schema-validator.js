@@ -105,15 +105,39 @@ describe('Schema', function () {
       });
     });
     describe('valueLength', function () {
-      it('should return boolean true on success', function () {
+      it('should return boolean true on success (min + max)', function () {
         var value = '456756789';
         var result = Validator.valueLength(value, {min: 2, max: 9});
 
         should(result).be.true(result === true);
       });
-      it('should return error message on failure', function () {
+      it('should return boolean true on success (min)', function () {
+        var value = '456756789';
+        var result = Validator.valueLength(value, {min: 2});
+
+        should(result).be.true(result === true);
+      });
+      it('should return boolean true on success (max)', function () {
+        var value = '45';
+        var result = Validator.valueLength(value, {max: 3});
+
+        should(result).be.true(result === true);
+      });
+      it('should return boolean true on for max length with null value', function () {
+        var value = null;
+        var result = Validator.valueLength(value, {max: 3});
+
+        should(result).be.true(result === true);
+      });
+      it('should return error message on failure (too short)', function () {
         var value = '456756789';
         var result = Validator.valueLength(value, {min: 20, max: 50});
+
+        should(result).be.a.String();
+      });
+      it('should return error message on failure (too long)', function () {
+        var value = '456756789';
+        var result = Validator.valueLength(value, {min: 2, max: 5});
 
         should(result).be.a.String();
       });

@@ -137,7 +137,7 @@ class Validator
     );
 
     var resultMax = !max || (
-      (value != null) &&
+      (value == null) ||
       // In Javascript [[]] evalulates to false - we dont want this
       // - an array is only considered empty if it has zero elements
       ((valueType != Array && valueType != String) || value.length <= max) &&
