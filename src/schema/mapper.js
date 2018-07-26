@@ -249,7 +249,7 @@ class SchemaMapper
     } else if (fieldType == Array) {
       defaultValue = [];
     }
-    if (container[fieldName] === undefined && defaultValue !== undefined) {
+    if (container && container[fieldName] === undefined && defaultValue !== undefined) {
       container[fieldName] = defaultValue;
     }
 
@@ -257,7 +257,7 @@ class SchemaMapper
     switch (fieldType) {
       case Object:
         if (spec.$spec !== undefined) spec = spec.$spec;
-        this.mapRecursive(spec, container[fieldName], callback, options, meta);
+        if (container) this.mapRecursive(spec, container[fieldName], callback, options, meta);
       break;
       case Array:
         var arraySpec = undefined;
@@ -269,13 +269,13 @@ class SchemaMapper
           // - then the array elements spec should be specified using the "$spec" property
           arraySpec = spec.$spec;
         }
-        if (arraySpec && container[fieldName]) {
+        if (container && arraySpec && container[fieldName]) {
           this.mapArrayElements(arraySpec, container[fieldName], callback, options, meta);
         }
       break;
     }
 
-    return container[fieldName];
+    return container ? container[fieldName] : undefined;
   }
   initPath(path)
   {
