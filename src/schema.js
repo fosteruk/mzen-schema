@@ -137,14 +137,19 @@ class Schema
 
     var promises = [];
     this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
-      if (fieldContainer) {
-        // If the spec if for related data we do not validate
-        // - this data will be stripped before any insertion or updating to persistance
-        let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, options, meta).then((value) => {
-          fieldContainer[fieldName] = value;
-        });
-        promises.push(promise);
-      }
+      // If the spec if for related data we do not validate
+      // - this data will be stripped before any insertion or updating to persistance
+      let promise = this.validateField(
+        fieldSpec,
+        fieldName,
+        fieldContainer ? fieldContainer[fieldName] : undefined,
+        path,
+        options,
+        meta
+      ).then((value) => {
+        if (fieldContainer) fieldContainer[fieldName] = value;
+      });
+      promises.push(promise);
     }, {skipRelations: true});
 
     var promise = Promise.all(promises).then(() => {
@@ -163,15 +168,20 @@ class Schema
 
     var promises = [];
     this.mapper.mapPaths(objects, (fieldSpec, fieldName, fieldContainer, path) => {
-      if (fieldContainer) {
-        // If the spec if for related data we do not validate
-        // - this data will be stripped before any insertion or updating to persistance
-        meta.root = fieldContainer;
-        let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, options, meta).then((value) => {
-          fieldContainer[fieldName] = value;
-        });
-        promises.push(promise);
-      }
+      // If the spec if for related data we do not validate
+      // - this data will be stripped before any insertion or updating to persistance
+      meta.root = fieldContainer;
+      let promise = this.validateField(
+        fieldSpec,
+        fieldName,
+        fieldContainer ? fieldContainer[fieldName] : undefined,
+        path,
+        options,
+        meta
+      ).then((value) => {
+        if (fieldContainer) fieldContainer[fieldName] = value;
+      });
+      promises.push(promise);
     }, {skipRelations: true});
 
     var promise = Promise.all(promises).then(() => {
@@ -192,16 +202,21 @@ class Schema
 
     var promises = [];
     this.mapper.mapQueryPaths(query, (path, queryPathFieldName, container) => {
-      if (container) {
-        var paths = {};
-        paths[path] = container[queryPathFieldName];
-        this.mapper.mapPaths(paths, (fieldSpec, fieldName, fieldContainer, path) => {
-          let promise = this.validateField(fieldSpec, fieldName, fieldContainer[fieldName], path, options, meta).then((value) => {
-            container[queryPathFieldName] = value;
-          });
-          promises.push(promise);
-        }, {skipRelations: true});
-      }
+      var paths = {};
+      paths[path] = container[queryPathFieldName];
+      this.mapper.mapPaths(paths, (fieldSpec, fieldName, fieldContainer, path) => {
+        let promise = this.validateField(
+          fieldSpec,
+          fieldName,
+          fieldContainer ? fieldContainer[fieldName] : undefined,
+          path,
+          options,
+          meta
+        ).then((value) => {
+          if (container) container[queryPathFieldName] = value;
+        });
+        promises.push(promise);
+      }, {skipRelations: true});
     }, {skipRelations: true});
 
     var promise = Promise.all(promises).then(() => {
@@ -224,12 +239,12 @@ class Schema
         // We cant simply delete here because if we delete a parent of a structure we are already
         // - iterating we will get errors. Instead make a list of references to delete.
         // Once we have all the references we can safely delete them.
-        deleteRefs.push({fieldContainer, fieldName});
+        if (fieldContainer) deleteRefs.push({fieldContainer, fieldName});
       }
       if (filters.privateValue === true || filters.privateValue == mode) {
         // The privateValue replaces any non null values as true and otherwise false
         // - this allows the removal of the private value while still indicating if a value exists or not
-        valueReplaceRefs.push({fieldContainer, fieldName});
+        if (fieldContainer) valueReplaceRefs.push({fieldContainer, fieldName});
       }
     });
 

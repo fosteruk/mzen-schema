@@ -257,7 +257,13 @@ class SchemaMapper
     switch (fieldType) {
       case Object:
         if (spec.$spec !== undefined) spec = spec.$spec;
-        if (container) this.mapRecursive(spec, container[fieldName], callback, options, meta);
+        this.mapRecursive(
+          spec,
+          container ? container[fieldName] : undefined, 
+          callback,
+          options,
+          meta
+        );
       break;
       case Array:
         var arraySpec = undefined;
