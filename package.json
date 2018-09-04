@@ -19,7 +19,6 @@
     "clone": "^1.0.4"
   },
   "devDependencies": {
-    "babel-cli": "^6.24.1",
     "babel-preset-env": "^1.7.0",
     "mocha": "^2.5.3",
     "should": "^11.2.0",
