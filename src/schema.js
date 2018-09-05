@@ -103,41 +103,30 @@ class Schema
       }
     }
   }
-  applyConstructors(object)
+  applyTransients(object)
   {
     this.init();
-    if (object && this.constructors) {
-      return this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path, meta) => {
-        if (fieldContainer) {
-          var construct = fieldSpec ? fieldSpec.$construct : null;
-          if (construct){
-            var constructorFunction = null;
-            if (typeof construct === 'string' && this.constructors[construct]) {
-              constructorFunction = this.constructors[construct];
-            } else if (typeof construct === 'function') {
-              constructorFunction = construct;
-            } else {
-              // constructor not found
-              throw new Error('Constructor not found for ' + path);
-            }
-            if (constructorFunction && !Array.isArray(fieldContainer[fieldName])) {
-              fieldContainer[fieldName] = Object.assign(Object.create(constructorFunction.prototype), fieldContainer[fieldName]);
-            }
-          }
-        }
-      });
-    } else {
-      return object;
-    }
-  }
-  applyPathRefs(object)
-  {
-    this.init();
-    return (object && this.constructors)  ? this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path, meta) => {
+    return (object && this.constructors) ? this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path, meta) => {
       if (fieldContainer) {
         var pathref = fieldSpec ? fieldSpec.$pathref : null;
         if (pathref){
           fieldContainer[fieldName] = ObjectPathAccessor.getPath(pathref, meta.root);
+        }
+
+        var construct = fieldSpec ? fieldSpec.$construct : null;
+        if (construct){
+          var constructorFunction = null;
+          if (typeof construct === 'string' && this.constructors[construct]) {
+            constructorFunction = this.constructors[construct];
+          } else if (typeof construct === 'function') {
+            constructorFunction = construct;
+          } else {
+            // constructor not found
+            throw new Error('Constructor not found for ' + path);
+          }
+          if (constructorFunction && !Array.isArray(fieldContainer[fieldName])) {
+            fieldContainer[fieldName] = Object.assign(Object.create(constructorFunction.prototype), fieldContainer[fieldName]);
+          }
         }
       }
     }) : object;

@@ -19,7 +19,7 @@ class ConstructorTestAddress
 }
 
 describe('Schema', function() {
-  describe('applyConstructors', function() {
+  describe('applyTransients', function() {
     it('should apply $construct function to the root object', function() {
       var object = {nameFirst: 'John', nameLast: 'Smith'};
 
@@ -31,7 +31,7 @@ describe('Schema', function() {
         constructors: [ConstructorTestUser]
       });
 
-      object = schema.applyConstructors(object);
+      object = schema.applyTransients(object);
       should(object.constructor).eql(ConstructorTestUser);
       should(object.getName()).eql('John Smith');
     });
@@ -62,7 +62,7 @@ describe('Schema', function() {
         constructors: [ConstructorTestUser]
       });
 
-      object = schema.applyConstructors(object);
+      object = schema.applyTransients(object);
       should(object.userMostPopular.constructor).eql(ConstructorTestUser);
       should(object.userMostPopular.getName()).eql('John Smith');
       should(object.userLeastPopular.constructor).eql(ConstructorTestUser);
@@ -79,7 +79,7 @@ describe('Schema', function() {
         constructors: [ConstructorTestUser]
       });
 
-      object = schema.applyConstructors(object);
+      object = schema.applyTransients(object);
       should(object.constructor).eql(ConstructorTestUser);
       should(object.getName()).eql('John Smith');
     });
@@ -110,7 +110,7 @@ describe('Schema', function() {
         constructors: [ConstructorTestUser]
       });
 
-      object = schema.applyConstructors(object);
+      object = schema.applyTransients(object);
       should(object.userMostPopular.constructor).eql(ConstructorTestUser);
       should(object.userMostPopular.getName()).eql('John Smith');
       should(object.userLeastPopular.constructor).eql(ConstructorTestUser);
@@ -136,7 +136,7 @@ describe('Schema', function() {
         constructors: [ConstructorTestUser]
       });
 
-      object = schema.applyConstructors(object);
+      object = schema.applyTransients(object);
       should(object.users[0].constructor).eql(ConstructorTestUser);
       should(object.users[0].getName()).eql('John Smith');
       should(object.users[1].constructor).eql(ConstructorTestUser);
@@ -163,7 +163,7 @@ describe('Schema', function() {
         constructors: [ConstructorTestUser]
       });
 
-      object = schema.applyConstructors(object);
+      object = schema.applyTransients(object);
       should(object.users[0].constructor).eql(ConstructorTestUser);
       should(object.users[0].getName()).eql('John Smith');
       should(object.users[1].constructor).eql(ConstructorTestUser);
@@ -192,11 +192,99 @@ describe('Schema', function() {
       schema.addConstructor(ConstructorTestAddress);
       schema.addSchema(schemaAddress);
 
-      object = schema.applyConstructors(object);
+      object = schema.applyTransients(object);
       should(object.constructor).eql(ConstructorTestUser);
       should(object.getName()).eql('John Smith');
       should(object.address.constructor).eql(ConstructorTestAddress);
       should(object.address.getStreet()).eql('Picton Road');
     });
+  });
+  it('should apply $pathref value', function() {
+    var user = {
+      _id: '123',
+      address: {
+        postcode: 'L1'
+      }
+    };
+
+    var schema = new Schema({
+      _id: 'String',
+      address: {
+        userId: {$pathref: '_id'},
+        postcode: 'L1'
+      }
+    });
+
+    user = schema.applyTransients(user);
+    should(user.address.userId).eql('123');
+  });
+  it('should apply $pathref value deep', function() {
+    var user = {
+      _id: '123',
+      address: {
+        postcode: 'L1'
+      }
+    };
+
+    var schema = new Schema({
+      _id: 'String',
+      a: {
+        b: {
+          c:  {
+            userId: {$pathref: '_id'}
+          }
+        }
+      }
+    });
+
+    user = schema.applyTransients(user);
+    should(user.a.b.c.userId).eql('123');
+  });
+});
+describe('stripTransients', function() {
+  it('should should strip $pathref value', function() {
+    var user = {
+      _id: '123',
+      address: {
+        postcode: 'L1'
+      }
+    };
+
+    var schema = new Schema({
+      _id: 'String',
+      address: {
+        userId: {$pathref: '_id'},
+        postcode: 'L1'
+      }
+    });
+
+    user = schema.applyTransients(user);
+    should(user.address.userId).eql('123');
+    user = schema.stripTransients(user);
+    should(user.address.userId).eql(undefined);
+  });
+  it('should should strip $pathref value deep', function() {
+    var user = {
+      _id: '123',
+      address: {
+        postcode: 'L1'
+      }
+    };
+
+    var schema = new Schema({
+      _id: 'String',
+      a: {
+        b: {
+          c:  {
+            userId: {$pathref: '_id'}
+          }
+        }
+      }
+    });
+
+    user = schema.applyTransients(user);
+    should(user.a.b.c.userId).eql('123');
+    user = schema.stripTransients(user);
+    should(user.a.b.c.userId).eql(undefined);
   });
 });
