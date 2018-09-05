@@ -7,6 +7,7 @@ var Validator = require('./schema/validator');
 var Filter = require('./schema/filter');
 var Types = require('./schema/types');
 var TypeCaster = require('./type-caster');
+var ObjectPathAccessor = require('./object-path-accessor');
 
 class Schema
 {
@@ -106,7 +107,7 @@ class Schema
   {
     this.init();
     if (object && this.constructors) {
-      return this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
+      return this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path, meta) => {
         if (fieldContainer) {
           var construct = fieldSpec ? fieldSpec.$construct : null;
           if (construct){
@@ -128,6 +129,30 @@ class Schema
     } else {
       return object;
     }
+  }
+  applyPathRefs(object)
+  {
+    this.init();
+    return (object && this.constructors)  ? this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path, meta) => {
+      if (fieldContainer) {
+        var pathref = fieldSpec ? fieldSpec.$pathref : null;
+        if (pathref){
+          fieldContainer[fieldName] = ObjectPathAccessor.getPath(pathref, meta.root);
+        }
+      }
+    }) : object;
+  }
+  stripTransients(object)
+  {
+    this.init();
+    return (object && this.constructors)  ? this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path, meta) => {
+      if (fieldContainer) {
+        var pathref = fieldSpec ? fieldSpec.$pathref : null;
+        if (pathref){
+          delete fieldContainer[fieldName];
+        }
+      }
+    }) : object;
   }
   validate(object, options)
   {

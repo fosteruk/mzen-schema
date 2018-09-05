@@ -84,7 +84,7 @@ class SchemaMapper
   map(data, callback, options)
   {
     this.init();
-    const meta = {path: '', errors: {}};
+    const meta = {path: '', errors: {}, root: data};
     // Clone the spec as it may be temporarily modified in the process of validation
     // If the data is an array we must present the spec as an array also
     var spec = Array.isArray(data) ? [clone(this.specNormalised)] : clone(this.specNormalised);
@@ -92,9 +92,7 @@ class SchemaMapper
     if (spec && spec.$relation && options && options.skipRelations) return;
 
     // We have to pass the data in as a object property as that is the only way to reference data
-    var root = {root: data};
-
-    return this.mapField(spec, 'root', root, callback, options, meta);
+    return this.mapField(spec, 'root', {root: data}, callback, options, meta);
   }
   mapPaths(paths, callback, options, meta)
   {
@@ -253,13 +251,13 @@ class SchemaMapper
       container[fieldName] = defaultValue;
     }
 
-    callback(spec, fieldName, container, meta.path);
+    callback(spec, fieldName, container, meta.path, meta);
     switch (fieldType) {
       case Object:
         if (spec.$spec !== undefined) spec = spec.$spec;
         this.mapRecursive(
           spec,
-          container ? container[fieldName] : undefined, 
+          container ? container[fieldName] : undefined,
           callback,
           options,
           meta
