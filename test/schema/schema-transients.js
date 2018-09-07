@@ -198,93 +198,93 @@ describe('Schema', function() {
       should(object.address.constructor).eql(ConstructorTestAddress);
       should(object.address.getStreet()).eql('Picton Road');
     });
-  });
-  it('should apply $pathref value', function() {
-    var user = {
-      _id: '123',
-      address: {
-        postcode: 'L1'
-      }
-    };
+    it('should apply $pathRef value', function() {
+      var user = {
+        _id: '123',
+        address: {
+          postcode: 'L1'
+        }
+      };
 
-    var schema = new Schema({
-      _id: 'String',
-      address: {
-        userId: {$pathref: '_id'},
-        postcode: 'L1'
-      }
+      var schema = new Schema({
+        _id: 'String',
+        address: {
+          userId: {$pathRef: '_id'},
+          postcode: 'L1'
+        }
+      });
+
+      user = schema.applyTransients(user);
+      should(user.address.userId).eql('123');
     });
+    it('should apply $pathRef value deep', function() {
+      var user = {
+        _id: '123',
+        address: {
+          postcode: 'L1'
+        }
+      };
 
-    user = schema.applyTransients(user);
-    should(user.address.userId).eql('123');
-  });
-  it('should apply $pathref value deep', function() {
-    var user = {
-      _id: '123',
-      address: {
-        postcode: 'L1'
-      }
-    };
-
-    var schema = new Schema({
-      _id: 'String',
-      a: {
-        b: {
-          c:  {
-            userId: {$pathref: '_id'}
+      var schema = new Schema({
+        _id: 'String',
+        a: {
+          b: {
+            c:  {
+              userId: {$pathRef: '_id'}
+            }
           }
         }
-      }
+      });
+
+      user = schema.applyTransients(user);
+      should(user.a.b.c.userId).eql('123');
     });
-
-    user = schema.applyTransients(user);
-    should(user.a.b.c.userId).eql('123');
   });
-});
-describe('stripTransients', function() {
-  it('should should strip $pathref value', function() {
-    var user = {
-      _id: '123',
-      address: {
-        postcode: 'L1'
-      }
-    };
+  describe('stripTransients', function() {
+    it('should should strip $pathRef value', function() {
+      var user = {
+        _id: '123',
+        address: {
+          postcode: 'L1'
+        }
+      };
 
-    var schema = new Schema({
-      _id: 'String',
-      address: {
-        userId: {$pathref: '_id'},
-        postcode: 'L1'
-      }
+      var schema = new Schema({
+        _id: 'String',
+        address: {
+          userId: {$pathRef: '_id'},
+          postcode: 'L1'
+        }
+      });
+
+      user = schema.applyTransients(user);
+      should(user.address.userId).eql('123');
+      user = schema.stripTransients(user);
+      should(user.address.userId).eql(undefined);
     });
+    it('should should strip $pathRef value deep', function() {
+      var user = {
+        _id: '123',
+        address: {
+          postcode: 'L1'
+        }
+      };
 
-    user = schema.applyTransients(user);
-    should(user.address.userId).eql('123');
-    user = schema.stripTransients(user);
-    should(user.address.userId).eql(undefined);
-  });
-  it('should should strip $pathref value deep', function() {
-    var user = {
-      _id: '123',
-      address: {
-        postcode: 'L1'
-      }
-    };
-
-    var schema = new Schema({
-      _id: 'String',
-      a: {
-        b: {
-          c:  {
-            userId: {$pathref: '_id'}
+      var schema = new Schema({
+        _id: 'String',
+        a: {
+          b: {
+            c:  {
+              userId: {$pathRef: '_id'}
+            }
           }
         }
-      }
-    });
+      });
 
-    user = schema.applyTransients(user);
-    should(user.a.b.c.userId).eql('123');
-    user = schema.stripTransients(user);
-    should(user.a.b.c.userId).eql(undefined);
+      user = schema.applyTransients(user);
+      should(user.a.b.c.userId).eql('123');
+      user = schema.stripTransients(user);
+      should(user.a.b.c.userId).eql(undefined);
+    });
   });
 });

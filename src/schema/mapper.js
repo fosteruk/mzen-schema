@@ -89,7 +89,7 @@ class SchemaMapper
     // If the data is an array we must present the spec as an array also
     var spec = Array.isArray(data) ? [clone(this.specNormalised)] : clone(this.specNormalised);
 
-    if (spec && spec.$relation && options && options.skipRelations) return;
+    if (SchemaMapper.specIsTransient(spec) && options && options.skipTransients) return;
 
     // We have to pass the data in as a object property as that is the only way to reference data
     return this.mapField(spec, 'root', {root: data}, callback, options, meta);
@@ -181,7 +181,7 @@ class SchemaMapper
     this.init();
     meta.path = this.initPath(meta.path);
 
-    if (spec && spec.$relation && options && options.skipRelations) return;
+    if (SchemaMapper.specIsTransient(spec) && options && options.skipTransients) return;
 
     var specTemp = clone(spec);
     // If match all spec is defined, newSpec defaults to an empty object since any spec rules should be replaced by
@@ -216,7 +216,7 @@ class SchemaMapper
 
     var basePath = meta.path;
 
-    if (spec && spec.$relation && options && options.skipRelations) return;
+    if (SchemaMapper.specIsTransient(spec) && options && options.skipTransients) return;
 
     array.forEach(function(element, x){
       meta.path = basePath.length ? basePath + '.' + x :  '' + x;
@@ -228,7 +228,7 @@ class SchemaMapper
     this.init();
     meta.path = this.initPath(meta.path);
 
-    if (spec && spec.$relation && options && options.skipRelations) return;
+    if (SchemaMapper.specIsTransient(spec) && options && options.skipTransients) return;
 
     var fieldType = undefined;
     // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later).
@@ -284,6 +284,10 @@ class SchemaMapper
   initPath(path)
   {
     return path !== undefined && path.length ? path : '';
+  }
+  static specIsTransient(spec)
+  {
+    return (spec && (spec.$relation != null || spec.$pathRef != null));
   }
 }
 

@@ -108,9 +108,9 @@ class Schema
     this.init();
     return (object && this.constructors) ? this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path, meta) => {
       if (fieldContainer) {
-        var pathref = fieldSpec ? fieldSpec.$pathref : null;
-        if (pathref){
-          fieldContainer[fieldName] = ObjectPathAccessor.getPath(pathref, meta.root);
+        var pathRef = fieldSpec ? fieldSpec.$pathRef : null;
+        if (pathRef){
+          fieldContainer[fieldName] = ObjectPathAccessor.getPath(pathRef, meta.root);
         }
 
         var construct = fieldSpec ? fieldSpec.$construct : null;
@@ -136,8 +136,8 @@ class Schema
     this.init();
     return (object && this.constructors)  ? this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path, meta) => {
       if (fieldContainer) {
-        var pathref = fieldSpec ? fieldSpec.$pathref : null;
-        if (pathref){
+        var pathRef = fieldSpec ? fieldSpec.$pathRef : null;
+        if (pathRef){
           delete fieldContainer[fieldName];
         }
       }
@@ -151,8 +151,6 @@ class Schema
 
     var promises = [];
     this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
-      // If the spec if for related data we do not validate
-      // - this data will be stripped before any insertion or updating to persistance
       let promise = this.validateField(
         fieldSpec,
         fieldName,
@@ -164,7 +162,11 @@ class Schema
         if (fieldContainer) fieldContainer[fieldName] = value;
       });
       promises.push(promise);
-    }, {skipRelations: true});
+    }, {
+      // If the spec is for related data we do not validate
+      // - this data will be stripped before any insertion or updating to persistance
+      skipTransients: true
+    });
 
     var promise = Promise.all(promises).then(() => {
       meta.isValid = (Object.keys(meta.errors).length == 0);
@@ -182,8 +184,6 @@ class Schema
 
     var promises = [];
     this.mapper.mapPaths(objects, (fieldSpec, fieldName, fieldContainer, path) => {
-      // If the spec if for related data we do not validate
-      // - this data will be stripped before any insertion or updating to persistance
       meta.root = fieldContainer;
       let promise = this.validateField(
         fieldSpec,
@@ -196,7 +196,11 @@ class Schema
         if (fieldContainer) fieldContainer[fieldName] = value;
       });
       promises.push(promise);
-    }, {skipRelations: true});
+    }, {
+      // If the spec is for related data we do not validate
+      // - this data will be stripped before any insertion or updating to persistance
+      skipTransients: true
+    });
 
     var promise = Promise.all(promises).then(() => {
       meta.isValid = (Object.keys(meta.errors).length == 0);
@@ -230,8 +234,8 @@ class Schema
           if (container) container[queryPathFieldName] = value;
         });
         promises.push(promise);
-      }, {skipRelations: true});
-    }, {skipRelations: true});
+      }, {skipTransients: true});
+    }, {skipTransients: true});
 
     var promise = Promise.all(promises).then(() => {
       meta.isValid = (Object.keys(meta.errors).length == 0);
