@@ -18,7 +18,7 @@ class SchemaManager
   }
   addConstructor(value)
   {
-    this.constructors[value.name] = value;
+    this.constructors[value.constructorName ? value.constructorName : value.name] = value;
   }
   getConstructor(constructorName)
   {
@@ -46,7 +46,7 @@ class SchemaManager
   {
     if (schema && schema.getName) {
       this.schemas[schema.getName()] = schema;
-    } 
+    }
   }
   addSchemas(schemas)
   {

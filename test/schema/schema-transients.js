@@ -18,6 +18,15 @@ class ConstructorTestAddress
   }
 }
 
+class ConstructorTestBike
+{
+  getNumWheels()
+  {
+    return this.numWheels;
+  }
+}
+ConstructorTestBike.constructorName = 'Bicycle';
+
 describe('Schema', function() {
   describe('applyTransients', function() {
     it('should apply $construct function to the root object', function() {
@@ -34,6 +43,20 @@ describe('Schema', function() {
       object = schema.applyTransients(object);
       should(object.constructor).eql(ConstructorTestUser);
       should(object.getName()).eql('John Smith');
+    });
+    it('should apply $construct function to the root object via constructorName', function() {
+      var object = {numWheels: 2};
+
+      var schema = new Schema({
+        $construct: 'Bicycle',
+        numWheels: Number
+      }, {
+        constructors: [ConstructorTestBike]
+      });
+
+      object = schema.applyTransients(object);
+      should(object.constructor).eql(ConstructorTestBike);
+      should(object.getNumWheels()).eql(2);
     });
     it('should apply $construct function to the embedded objects', function() {
       var object = {

@@ -57,7 +57,7 @@ class Schema
   }
   addConstructor(value)
   {
-    this.constructors[value.name] = value;
+    this.constructors[value.constructorName ? value.constructorName : value.name] = value;
   }
   getConstructor(constructorName)
   {
