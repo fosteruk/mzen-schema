@@ -25,7 +25,7 @@ class ConstructorTestBike
     return this.numWheels;
   }
 }
-ConstructorTestBike.constructorName = 'Bicycle';
+ConstructorTestBike.alias = 'Bicycle';
 
 describe('Schema', function() {
   describe('applyTransients', function() {
