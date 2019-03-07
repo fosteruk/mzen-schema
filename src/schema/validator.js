@@ -6,13 +6,12 @@ class Validator
   static async validate(value, validatorsConfig, options)
   {
     var results = true;
-    var {name, root} = options;
 
     var configKeys = Object.keys(validatorsConfig);
     for (let x = 0; x < configKeys.length; x++) {
       let validatorName = configKeys[x];
-      let validator = Validator[validatorName];
-      if (typeof validator != 'function') throw new Error('Uknown validator "' + validatorName + '"');
+      let validatorFn = Validator[validatorName];
+      if (typeof validatorFn != 'function') throw new Error('Uknown validator "' + validatorName + '"');
 
       if (validatorsConfig[validatorName] === false || validatorsConfig[validatorName] == undefined) continue; // Falsey value disables the validator
 
@@ -28,18 +27,14 @@ class Validator
         if (results === true) {
           // Validate function can return a promise but it may also return boolean, string or array
           // - we must first resolve the return value to ensure we have promise
-          let result = await Promise.resolve(validator(value, config));
-          if (result !== true) {
+          let resultCurrent = await Promise.resolve(validatorFn(value, config));
+          if (resultCurrent !== true) {
             // validator function can return either true, a single message string or an array of error messages
             // - the main validate() method returns a promise that resolves to true or an array of error messages
             // - We already know the current results is not true so lets ensure we have an array of errors
-            result = Array.isArray(result) ? result : [result];
+            resultCurrent = Array.isArray(resultCurrent) ? resultCurrent : [resultCurrent];
 
-            if (Array.isArray(results)) {
-              results = results.concat(result);
-            } else {
-              results = result;
-            }
+            results = Array.isArray(results) ? results.concat(resultCurrent) : resultCurrent;
           }
         }
       }
