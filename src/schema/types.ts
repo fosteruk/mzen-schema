@@ -1,5 +1,4 @@
-'use strict'
-var ObjectID = require('bson-objectid');
+import ObjectID from 'bson-objectid';
 
 class Mixed {}
 
@@ -14,4 +13,4 @@ const Types = {
   Mixed: Mixed
 };
 
-module.exports = Types;
+export default Types;

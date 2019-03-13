@@ -5,7 +5,7 @@
   "main": "./lib/index",
   "scripts": {
     "test": "mocha ./test/*",
-    "build": "babel src --out-dir lib"
+    "build": "tsc"
   },
   "author": "Kevin Foster <kevin.foster.uk@gmail.com>",
   "license": "BSD-3-Clause",
@@ -15,15 +15,14 @@
     "url": "https://github.com/kevin-foster/mZen-schema.git"
   },
   "dependencies": {
-    "bson-objectid": "^1.2.3",
+    "bson-objectid": "^1.2.4",
     "clone": "^1.0.4"
   },
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.3.4",
-    "@babel/preset-env": "^7.3.4",
+    "@types/node": "^11.11.3",
     "mocha": "^6.0.2",
     "should": "^11.2.0",
-    "sinon": "^1.17.4"
+    "sinon": "^1.17.4",
+    "typescript": "^3.3.3333"
   }
 }

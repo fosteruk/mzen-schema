@@ -1,17 +1,30 @@
-'use strict'
-var clone = require('clone');
-var ObjectID = require('bson-objectid');
-var SchemaUtil = require('./schema/util');
-var Mapper = require('./schema/mapper');
-var Validator = require('./schema/validator');
-var Filter = require('./schema/filter');
-var Types = require('./schema/types');
-var TypeCaster = require('./type-caster');
-var ObjectPathAccessor = require('./object-path-accessor');
+import ObjectID from 'bson-objectid';
+import SchemaUtil from './schema/util';
+import Mapper from './schema/mapper';
+import Validator from './schema/validator';
+import Filter from './schema/filter';
+import Types from './schema/types';
+import TypeCaster from './type-caster';
+import ObjectPathAccessor from './object-path-accessor';
+import SchemaConfig from './schema/config';
+import SchemaSpec from './schema/spec';
+import SchemaMapperMeta from './schema/mapper-meta';
 
-class Schema
+interface SchemaValidationResult {
+  errors?: object;
+  isValid?: boolean;
+}
+
+export default class Schema
 {
-  constructor(spec, options)
+  config: SchemaConfig;
+  name: string;
+  spec: SchemaSpec;
+  constructors: object;
+  schemas: object;
+  mapper: Mapper | null | undefined;
+  
+  constructor(spec: SchemaSpec, options?: SchemaConfig)
   {
     this.config = (options == undefined) ? {} : options;
     this.config.name = this.config.name ? this.config.name : '';
@@ -33,7 +46,7 @@ class Schema
   init()
   {
     if (!this.mapper) {
-      this.mapper = new Mapper(this.spec, this.config)
+      this.mapper = new Mapper(this.spec, this.config);
       this.mapper.addSchemas(this.schemas);
       this.mapper.init();
     }
@@ -67,17 +80,17 @@ class Schema
   {
     if (constructors) {
       if (Array.isArray(constructors)) {
-        constructors.forEach(function(construct) {
+        constructors.forEach((construct) => {
           if (typeof construct == 'function') {
             this.addConstructor(construct);
           }
-        }.bind(this));
+        });
       } else {
-        Object.keys(constructors).forEach(function(constructorName) {
+        Object.keys(constructors).forEach((constructorName) => {
           if (typeof constructors[constructorName] == 'function') {
             this.addConstructor(constructors[constructorName]);
           }
-        }.bind(this));
+        });
       }
     }
   }
@@ -89,24 +102,30 @@ class Schema
   {
     if (schemas) {
       if (Array.isArray(schemas)) {
-        schemas.forEach(function(schema) {
+        schemas.forEach((schema) => {
           if (schema instanceof Schema) {
             this.addSchema(schema);
           }
-        }.bind(this));
+        });
       } else {
-        Object.keys(schemas).forEach(function(schemaName) {
+        Object.keys(schemas).forEach((schemaName) => {
           if (schemas[schemaName] instanceof Schema) {
             this.addSchema(schemas[schemaName]);
           }
-        }.bind(this));
+        });
       }
     }
   }
   applyTransients(object)
   {
     this.init();
-    return (object && this.constructors) ? this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path, meta) => {
+    return (object && this.constructors) ? this.mapper.map(object, (
+      fieldSpec: SchemaSpec, 
+      fieldName: string | number, 
+      fieldContainer: object, 
+      path: string | number, 
+      meta: any
+    ) => {
       if (fieldContainer) {
         var pathRef = fieldSpec ? fieldSpec.$pathRef : null;
         if (pathRef){
@@ -134,7 +153,13 @@ class Schema
   stripTransients(object)
   {
     this.init();
-    return (object && this.constructors)  ? this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path, meta) => {
+    return (object && this.constructors)  ? this.mapper.map(object, (
+      fieldSpec: SchemaSpec, 
+      fieldName: string | number, 
+      fieldContainer: object, 
+      path: string | number, 
+      meta: SchemaMapperMeta
+    ) => {
       if (fieldContainer) {
         var pathRef = fieldSpec ? fieldSpec.$pathRef : null;
         if (pathRef){
@@ -143,14 +168,19 @@ class Schema
       }
     }) : object;
   }
-  validate(object, options)
+  validate(object, options?: SchemaConfig)
   {
     this.init();
-    var meta = {errors: {}, root: object};
+    var meta = {errors: {}, root: object} as SchemaMapperMeta;
     options = options ?  options : {};
 
     var promises = [];
-    this.mapper.map(object, (fieldSpec, fieldName, fieldContainer, path) => {
+    this.mapper.map(object, (     
+      fieldSpec: SchemaSpec, 
+      fieldName: string | number, 
+      fieldContainer: object, 
+      path: string | number
+    ) => {
       let promise = this.validateField(
         fieldSpec,
         fieldName,
@@ -183,7 +213,12 @@ class Schema
     options = options ?  options : {};
 
     var promises = [];
-    this.mapper.mapPaths(objects, (fieldSpec, fieldName, fieldContainer, path) => {
+    this.mapper.mapPaths(objects, (      
+      fieldSpec: SchemaSpec, 
+      fieldName: string | number, 
+      fieldContainer: object, 
+      path: string | number
+    ) => {
       meta.root = fieldContainer;
       let promise = this.validateField(
         fieldSpec,
@@ -209,7 +244,7 @@ class Schema
 
     return promise;
   }
-  validateQuery(query, options)
+  validateQuery(query, options?: SchemaConfig)
   {
     this.init();
     var meta = meta ? meta : {errors: {}};
@@ -244,14 +279,19 @@ class Schema
 
     return promise;
   }
-  filterPrivate(object, mode, mapperType)
+  filterPrivate(object: object, mode: boolean|string, mapperType: string = 'map')
   {
     this.init();
     mode = mode ? mode : true;
     var deleteRefs = [];
     var valueReplaceRefs = [];
     var mapperType = (mapperType == 'mapPaths') ? 'mapPaths' : 'map';
-    this.mapper[mapperType](object, (fieldSpec, fieldName, fieldContainer, path) => {
+    this.mapper[mapperType](object, (      
+      fieldSpec: SchemaSpec, 
+      fieldName: string | number, 
+      fieldContainer: object, 
+      path: string | number
+    ) => {
       const filters = fieldSpec && fieldSpec.$filter ? fieldSpec.$filter : {};
       if (filters.private === true || filters.private == mode){
         // We cant simply delete here because if we delete a parent of a structure we are already
@@ -302,7 +342,7 @@ class Schema
 
     return fieldType;
   }
-  async validateField(spec, fieldName, value, path, options, meta = {})
+  async validateField(spec: SchemaSpec, fieldName: string | number, value: any, path: string | number, options?: SchemaConfig, meta: SchemaMapperMeta = {})
   {
     path = path ? path : fieldName;
     const validators = spec && spec.$validate ? spec.$validate : {};
@@ -342,7 +382,7 @@ class Schema
     }
 
     if (fieldType == Object && (strict || options.strict)) {
-      // If $strict option was specified (true or false) set to it options so it propagates
+      // If strict option was specified (true or false) set to it options so it propagates
       if (strict !== undefined) options.strict = strict;
       // In strict mode we must ensure there are no fields which are not defined by the spec
       for (let fieldName in value) {
@@ -418,10 +458,10 @@ class Schema
 
     return result;
   }
-  static mergeValidationResults(results)
+  static mergeValidationResults(results: Array<SchemaValidationResult>)
   {
     results = Array.isArray(results) ? results : [];
-    var finalResult = {errors: {}};
+    var finalResult = {errors: {}} as SchemaValidationResult;
     results.forEach(function(result, x){
       if (result.errors) Object.assign(finalResult.errors, result.errors)
     });
@@ -429,5 +469,3 @@ class Schema
     return finalResult;
   }
 }
-
-module.exports = Schema;

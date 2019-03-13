@@ -1,6 +1,6 @@
 var should = require('should');
-var Schema = require('../../src/schema');
-var Types = require('../../src/schema/types');
+var Schema = require('../../lib/schema').default;
+var Types = require('../../lib/schema/types').default;
 
 class ConstructorTestUser
 {

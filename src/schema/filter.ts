@@ -1,8 +1,7 @@
-'use strict'
-var TypeCaster = require('../type-caster');
-var Schema = require('../schema');
+import TypeCaster from '../type-caster';
+import Schema from '../schema';
 
-class Filter
+export default class Filter
 {
   static async filter(value, filtersConfig)
   {
@@ -75,5 +74,3 @@ class Filter
     return value;
   }
 }
-
-module.exports = Filter;

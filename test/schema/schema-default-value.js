@@ -1,5 +1,5 @@
 var should = require('should');
-var Schema = require('../../src/schema');
+var Schema = require('../../lib/schema').default;
 
 describe('Schema', function() {
   describe('default value', function() {

@@ -1,13 +1,28 @@
-'use strict'
-var clone = require('clone');
-var ObjectID = require('bson-objectid');
-var SchemaUtil = require('./util');
-var Types = require('./types');
-var TypeCaster = require('../type-caster');
+import clone = require('clone');
+import ObjectID from 'bson-objectid';
+import SchemaUtil from './util';
+import Types from './types';
+import TypeCaster from '../type-caster';
+import SchemaConfig from './config';
+import SchemaSpec from './spec';
+import SchemaMapperMeta from './mapper-meta';
 
-class SchemaMapper
+interface SchemaMapperCallback {
+  (spec: SchemaSpec, fieldName: string | number, container: object, metaPath: string, meta: object): void
+}
+
+export interface SchemaMapperMappingConfig {
+  skipTransients?: boolean;
+};
+
+export default class SchemaMapper
 {
-  constructor(spec, options)
+  config: SchemaConfig;
+  spec: SchemaSpec;
+  specNormalised: SchemaSpec | null | undefined;
+  schemas: object;
+  
+  constructor(spec: SchemaSpec, options?: SchemaConfig)
   {
     this.config = (options == undefined) ? {} : options;
     this.config.spec = spec ? spec : {};
@@ -44,13 +59,13 @@ class SchemaMapper
   {
     if (schemas) {
       if (Array.isArray(schemas)) {
-        schemas.forEach(function(schema) {
+        schemas.forEach((schema) => {
           this.addSchema(schema);
-        }.bind(this));
+        });
       } else {
-        Object.keys(schemas).forEach(function(schemaName) {
+        Object.keys(schemas).forEach((schemaName) => {
           this.addSchema(schemas[schemaName]);
-        }.bind(this));
+        });
       }
     }
   }
@@ -58,9 +73,9 @@ class SchemaMapper
   {
     // Resolve any embedded schema references
     if (Array.isArray(spec)) {
-      spec.forEach(function(value, index){
+      spec.forEach((value, index) => {
         spec[index] = this.normalizeSpec(value);
-      }.bind(this));
+      });
     } else if (spec && typeof spec == 'object') {
       if (spec.$schema) {
         let name = spec.$schema;
@@ -73,18 +88,18 @@ class SchemaMapper
         delete spec.$schema;
       } else {
         // this spec does not contain a schema ref - recurse
-        Object.keys(spec).forEach(function(key){
+        Object.keys(spec).forEach((key) => {
           spec[key] = this.normalizeSpec(spec[key]);
-        }.bind(this));
+        });
       }
     }
 
     return spec;
   }
-  map(data, callback, options)
+  map(data: Array<object>|object, callback: SchemaMapperCallback, options?: SchemaMapperMappingConfig)
   {
     this.init();
-    const meta = {path: '', errors: {}, root: data};
+    const meta = {path: '', errors: {}, root: data} as SchemaMapperMeta;
     // Clone the spec as it may be temporarily modified in the process of validation
     // If the data is an array we must present the spec as an array also
     var spec = Array.isArray(data) ? [clone(this.specNormalised)] : clone(this.specNormalised);
@@ -94,20 +109,20 @@ class SchemaMapper
     // We have to pass the data in as a object property as that is the only way to reference data
     return this.mapField(spec, 'root', {root: data}, callback, options, meta);
   }
-  mapPaths(paths, callback, options, meta)
+  mapPaths(paths: object, callback: SchemaMapperCallback, options?: object, meta?: SchemaMapperMeta)
   {
     this.init();
-    var meta = meta ? meta : {path: '', errors: {}};
+    var meta = meta ? meta : {path: '', errors: {}} as SchemaMapperMeta;
     var objects = Array.isArray(paths) ? paths : [paths];
 
     meta.path = this.initPath(meta.path);
-    objects.forEach(function(object){
+    objects.forEach((object) => {
       for (var fieldPath in object) {
         meta.path = fieldPath;
         var spec = SchemaUtil.getSpec(fieldPath, this.specNormalised);
         this.mapField(spec, fieldPath, object, callback, options, meta);
       }
-    }.bind(this));
+    });
   }
   mapQueryPaths(query, callback, options = {})
   {
@@ -120,7 +135,7 @@ class SchemaMapper
     // - See SchemaUtil.canValidateQueryOperator()
     // Whats needed is a more intelligent query validator that is aware of how to handle each operator value
 
-    const mapRecursive = (query) => {
+    const mapRecursiveQuery = (query) => {
       if (TypeCaster.getType(query) == Object) {
         for (let fieldName in query) {
           if (!query.hasOwnProperty(fieldName)) continue;
@@ -129,10 +144,10 @@ class SchemaMapper
               // If this element is an operator - we want to validate is values
               if (['$or', '$and'].indexOf(fieldName) != -1) {
                 query[fieldName].forEach(function(value, x){
-                  mapRecursive(query[fieldName][x]);
+                  mapRecursiveQuery(query[fieldName][x]);
                 });
               } else {
-                mapRecursive(query[fieldName]);
+                mapRecursiveQuery(query[fieldName]);
               }
             }
           } else {
@@ -168,15 +183,21 @@ class SchemaMapper
         }
       } else if (Array.isArray(query)) {
         query.forEach(function(arrayValue, x){
-          mapRecursive(query[x], meta);
+          mapRecursiveQuery(query[x]);
         });
       }
       return query;
     };
 
-    mapRecursive(query);
+    mapRecursiveQuery(query);
   }
-  mapRecursive(spec, object, callback, options = {}, meta = {})
+  mapRecursive(
+    spec: SchemaSpec, 
+    object: object, 
+    callback: SchemaMapperCallback, 
+    options?: SchemaMapperMappingConfig, 
+    meta: SchemaMapperMeta = {}
+  )
   {
     this.init();
     meta.path = this.initPath(meta.path);
@@ -209,7 +230,13 @@ class SchemaMapper
       this.mapField(specTemp[fieldName], fieldName, object, callback, options, meta);
     }
   }
-  mapArrayElements(spec, array, callback, options = {}, meta = {})
+  mapArrayElements(
+    spec: SchemaSpec, 
+    array: Array<any>, 
+    callback: SchemaMapperCallback, 
+    options?: SchemaMapperMappingConfig, 
+    meta: SchemaMapperMeta = {}
+  )
   {
     this.init();
     meta.path = this.initPath(meta.path);
@@ -218,12 +245,19 @@ class SchemaMapper
 
     if (SchemaMapper.specIsTransient(spec) && options && options.skipTransients) return;
 
-    array.forEach(function(element, x){
+    array.forEach((element, x) => {
       meta.path = basePath.length ? basePath + '.' + x :  '' + x;
       this.mapField(spec, x, array, callback, options, meta);
-    }, this);
+    });
   }
-  mapField(spec, fieldName, container, callback, options, meta = {})
+  mapField(
+    spec: SchemaSpec, 
+    fieldName: string | number, 
+    container: object, 
+    callback: SchemaMapperCallback, 
+    options: SchemaMapperMappingConfig, 
+    meta: SchemaMapperMeta = {}
+  )
   {
     this.init();
     meta.path = this.initPath(meta.path);
@@ -290,5 +324,3 @@ class SchemaMapper
     return (spec && (spec.$relation != null || spec.$pathRef != null));
   }
 }
-
-module.exports = SchemaMapper;

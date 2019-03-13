@@ -1,4 +1,3 @@
-'use strict'
 /**
  * Object Path Accessor
  *
@@ -11,7 +10,7 @@
  * An asterisks can be used to match any value:
  *  For exmaple: 'prop1.some_array.*.myVariable'. 
  */
-class ObjectPathAccessor
+export default class ObjectPathAccessor
 {
   /**
    * Get path
@@ -51,7 +50,14 @@ class ObjectPathAccessor
    * Matched values may be modifed using optional mutatorFunc.
    * Returns matched value(s). 
    */
-  static searchRescursive(pattern, subject, mutatorFunc, currentPath = '', currentDepth = 1, matches = []) 
+  static searchRescursive(
+    pattern: string, 
+    subject: object, 
+    mutatorFunc?: (match: string) => void, 
+    currentPath: string = '', 
+    currentDepth: number = 1, 
+    matches: Array<string> = []
+  ) 
   {
     const patternParts = pattern.split('.');
     const currentParts = patternParts.slice(0, currentDepth); // Pattern parts up to current depth
@@ -121,6 +127,3 @@ class ObjectPathAccessor
   }
   
 }
-
-
-module.exports = ObjectPathAccessor;

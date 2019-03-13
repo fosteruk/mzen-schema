@@ -1,6 +1,6 @@
 var should = require('should');
-var Schema = require('../../src/schema');
-var Validator = require('../../src/schema/validator');
+var Schema = require('../../lib/schema').default;
+var Validator = require('../../lib/schema/validator').default;
 
 describe('Schema', function () {
   describe('validator', function () {

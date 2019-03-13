@@ -1,8 +1,9 @@
-'use strict'
-var ObjectID = require('bson-objectid');
+import ObjectID from 'bson-objectid';
 
-class TypeCaster
+export default class TypeCaster
 {
+  static type: {[key: string]: any};
+  
   /**
    * Get Type
    *
@@ -115,7 +116,7 @@ class TypeCasterObjectID
   {
     // The string 'new' can be used request a new object id
     value = value == 'new' ? undefined :  value;
-    return ObjectID(value);
+    return new ObjectID(value);
   }
 }
 
@@ -128,5 +129,3 @@ TypeCaster.type = {
   Date: TypeCasterDate,
   ObjectID: TypeCasterObjectID, // This is a mongodb specific type
 };
-
-module.exports = TypeCaster;

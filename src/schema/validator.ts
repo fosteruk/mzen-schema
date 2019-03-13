@@ -1,7 +1,6 @@
-'use strict'
-var TypeCaster = require('../type-caster');
+import TypeCaster from '../type-caster';
 
-class Validator
+export default class Validator
 {
   static async validate(value, validatorsConfig, options)
   {
@@ -93,7 +92,7 @@ class Validator
   static regex(value, options)
   {
     var name = options && options.name ? options.name : 'field';
-    var regex = options && options.pattern ? new RegExp(options.pattern) : new RegExp;
+    var regex = options && options.pattern ? new RegExp(options.pattern) : new RegExp('');
     var message = options && options.message ? options.message : name + ' does not appear to be valid';
     var result = regex.test(value) ? true : message;
     return result;
@@ -172,5 +171,3 @@ class Validator
     return validator(value, options);
   }
 }
-
-module.exports = Validator;

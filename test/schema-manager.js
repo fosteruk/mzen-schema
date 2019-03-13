@@ -1,6 +1,6 @@
 var should = require('should');
-var SchemaManager = require('../src/schema-manager');
-var Schema = require('../src/schema');
+var SchemaManager = require('../lib/schema/manager').default;
+var Schema = require('../lib/schema').default;
 
 describe('SchemaManager', function () {
   describe('init()', function () {

@@ -1,9 +1,16 @@
-'use strict'
+import Schema from '../schema';
 
-const Schema = require('./schema');
+interface SchemaManagerConfig {
+  constructors: object;
+  schemas: object;
+}
 
-class SchemaManager
+export default class SchemaManager
 {
+  config: SchemaManagerConfig;
+  constructors: object;
+  schemas: object;
+  
   constructor(options)
   {
     this.config = (options == undefined) ? {} : options;
@@ -28,17 +35,17 @@ class SchemaManager
   {
     if (constructors) {
       if (Array.isArray(constructors)) {
-        constructors.forEach(function(construct) {
+        constructors.forEach((construct) => {
           if (typeof construct == 'function') {
             this.addConstructor(construct);
           }
-        }.bind(this));
+        });
       } else {
-        Object.keys(constructors).forEach(function(constructorName) {
+        Object.keys(constructors).forEach((constructorName) => {
           if (typeof constructors[constructorName] == 'function') {
             this.addConstructor(constructors[constructorName]);
           }
-        }.bind(this));
+        });
       }
     }
   }
@@ -52,13 +59,13 @@ class SchemaManager
   {
     if (schemas) {
       if (Array.isArray(schemas)) {
-        schemas.forEach(function(schema) {
+        schemas.forEach((schema) => {
           this.addSchema(schema);
-        }.bind(this));
+        });
       } else {
-        Object.keys(schemas).forEach(function(schemaName) {
+        Object.keys(schemas).forEach((schemaName) => {
           this.addSchema(schemas[schemaName]);
-        }.bind(this));
+        });
       }
     }
   }
@@ -80,5 +87,3 @@ class SchemaManager
     }
   }
 }
-
-module.exports = SchemaManager;

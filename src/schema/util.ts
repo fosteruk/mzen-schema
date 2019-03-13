@@ -1,7 +1,6 @@
-'use strict'
-var TypeCaster = require('../type-caster');
+import TypeCaster from '../type-caster';
 
-class SchemaUtil
+export default class SchemaUtil
 {
   static getSpec(path, spec)
   {
@@ -49,5 +48,3 @@ class SchemaUtil
     return (cantValidateOperators.indexOf(fieldName) == -1);
   }
 }
-
-module.exports = SchemaUtil;
