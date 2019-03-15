@@ -1,6 +1,5 @@
-var should = require('should');
-var Schema = require('../../lib/schema').default;
-var Types = require('../../lib/schema/types').default;
+import should = require('should');
+import Schema from '../../lib/schema';
 
 describe('Schema', function() {
   describe('filtering', function() {
@@ -12,7 +11,7 @@ describe('Schema', function() {
           name: {$type: String, $filter: {trim: true}}
         });
 
-        schema.validate(data).then((result) => {
+        schema.validate(data).then(() => {
           should(data.name).eql('Kevin');
           done();
         }).catch((error) => {
@@ -28,7 +27,7 @@ describe('Schema', function() {
           name: {$type: String, $filter: {uppercase: true}}
         });
 
-        schema.validate(data).then((result) => {
+        schema.validate(data).then(() => {
           should(data.name).eql('KEVIN');
           done();
         }).catch((error) => {
@@ -44,7 +43,7 @@ describe('Schema', function() {
           name: {$type: String, $filter: {lowercase: true}}
         });
 
-        schema.validate(data).then((result) => {
+        schema.validate(data).then(() => {
           should(data.name).eql('kevin');
           done();
         }).catch((error) => {
@@ -60,7 +59,7 @@ describe('Schema', function() {
           name: {$type: String, $filter: {defaultValue: 'Kevin'}}
         });
 
-        schema.validate(data).then((result) => {
+        schema.validate(data).then(() => {
           should(data.name).eql('Kevin');
           done();
         }).catch((error) => {
@@ -78,7 +77,7 @@ describe('Schema', function() {
           }}}
         });
 
-        schema.validate(data).then((result) => {
+        schema.validate(data).then(() => {
           should(data.name).eql('Kevin modified');
           done();
         }).catch((error) => {

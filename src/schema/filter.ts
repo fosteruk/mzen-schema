@@ -1,6 +1,3 @@
-import TypeCaster from '../type-caster';
-import Schema from '../schema';
-
 export default class Filter
 {
   static async filter(value, filtersConfig)
@@ -49,19 +46,19 @@ export default class Filter
 
   // Filter function
   // - returns an error message string or an array of error messages on failure otherwise returns boolean true
-  static trim(value, options)
+  static trim(value)
   {
     if (typeof value == 'string') value = value.trim();
     return value;
   }
 
-  static uppercase(value, options)
+  static uppercase(value)
   {
     if (typeof value == 'string') value = value.toUpperCase();
     return value;
   }
 
-  static lowercase(value, options)
+  static lowercase(value)
   {
     if (typeof value == 'string') value = value.toLowerCase();
     return value;

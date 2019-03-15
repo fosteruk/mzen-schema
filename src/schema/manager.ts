@@ -1,5 +1,3 @@
-import Schema from '../schema';
-
 interface SchemaManagerConfig {
   constructors: object;
   schemas: object;
@@ -8,10 +6,10 @@ interface SchemaManagerConfig {
 export default class SchemaManager
 {
   config: SchemaManagerConfig;
-  constructors: object;
-  schemas: object;
+  constructors: {[key: string]: any};
+  schemas: {[key: string]: any};
   
-  constructor(options)
+  constructor(options?)
   {
     this.config = (options == undefined) ? {} : options;
     this.config.constructors = this.config.constructors ? this.config.constructors : {};

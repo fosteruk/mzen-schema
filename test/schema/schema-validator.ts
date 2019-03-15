@@ -1,6 +1,5 @@
-var should = require('should');
-var Schema = require('../../lib/schema').default;
-var Validator = require('../../lib/schema/validator').default;
+import should = require('should');
+import Validator from '../../lib/schema/validator';
 
 describe('Schema', function () {
   describe('validator', function () {
@@ -8,8 +7,8 @@ describe('Schema', function () {
       it('should return boolean true on success', function () {
         var value = 'Kevin';
         var result = Validator.required(value);
-
-        should(result).be.true(result === true);
+        
+        should(result).equal(true);
       });
       it('should return error message on failure', function () {
         var value = undefined;
@@ -29,7 +28,7 @@ describe('Schema', function () {
         var value = 'Kevin';
         var result = Validator.notNull(value);
 
-        should(result).be.true(result === true);
+        should(result).equal(true);
       });
       it('should return error message on failure', function () {
         var value = null;
@@ -49,7 +48,7 @@ describe('Schema', function () {
         var value = 'Kevin';
         var result = Validator.notEmpty(value);
 
-        should(result).be.true(result === true);
+        should(result).equal(true);
       });
       it('should return error message on failure', function () {
         var value = '';
@@ -69,7 +68,7 @@ describe('Schema', function () {
         var value = 'Kevin';
         var result = Validator.regex(value, {pattern: '^[a-zA-Z]+$'});
 
-        should(result).be.true(result === true);
+        should(result).equal(true);
       });
       it('should return error message on failure', function () {
         var value = '123';
@@ -89,7 +88,7 @@ describe('Schema', function () {
         var value = 'foobar@gmail.com';
         var result = Validator.email(value);
 
-        should(result).be.true(result === true);
+        should(result).equal(true);
       });
       it('should return error message on failure', function () {
         var value = 'not an email';
@@ -109,25 +108,25 @@ describe('Schema', function () {
         var value = '456756789';
         var result = Validator.valueLength(value, {min: 2, max: 9});
 
-        should(result).be.true(result === true);
+        should(result).equal(true);
       });
       it('should return boolean true on success (min)', function () {
         var value = '456756789';
         var result = Validator.valueLength(value, {min: 2});
 
-        should(result).be.true(result === true);
+        should(result).equal(true);
       });
       it('should return boolean true on success (max)', function () {
         var value = '45';
         var result = Validator.valueLength(value, {max: 3});
 
-        should(result).be.true(result === true);
+        should(result).equal(true);
       });
       it('should return boolean true on for max length with null value', function () {
         var value = null;
         var result = Validator.valueLength(value, {max: 3});
 
-        should(result).be.true(result === true);
+        should(result).equal(true);
       });
       it('should return error message on failure (too short)', function () {
         var value = '456756789';
@@ -153,7 +152,7 @@ describe('Schema', function () {
         var value = {a: 123, b: 123};
         var result = Validator.equality(value.a, {path: 'b', name: 'A', root: value});
 
-        should(result).be.true(result === true);
+        should(result).equal(true);
       });
       it('should return error message on failure', function () {
         var value = {a: 123, b: 4567};
@@ -173,7 +172,7 @@ describe('Schema', function () {
         var value = 'Car';
         var result = Validator.enumeration(value, {name: 'Transport', values: ['Car', 'Bus', 'Train', 'Boat']});
 
-        should(result).be.true(result === true);
+        should(result).equal(true);
       });
       it('should return error message on failure', function () {
         var value = 'Guitar';

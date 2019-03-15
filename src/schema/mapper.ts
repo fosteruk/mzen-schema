@@ -1,5 +1,4 @@
 import clone = require('clone');
-import ObjectID from 'bson-objectid';
 import SchemaUtil from './util';
 import Types from './types';
 import TypeCaster from '../type-caster';
@@ -124,6 +123,7 @@ export default class SchemaMapper
       }
     });
   }
+  // @ts-ignore - unused options
   mapQueryPaths(query, callback, options = {})
   {
     // When validating a query its assumed that all fields-names of the query object, other than operators, are data object paths
@@ -143,8 +143,8 @@ export default class SchemaMapper
             if (SchemaUtil.canValidateQueryOperator(fieldName)) {
               // If this element is an operator - we want to validate is values
               if (['$or', '$and'].indexOf(fieldName) != -1) {
-                query[fieldName].forEach(function(value, x){
-                  mapRecursiveQuery(query[fieldName][x]);
+                query[fieldName].forEach(function(value){
+                  mapRecursiveQuery(value);
                 });
               } else {
                 mapRecursiveQuery(query[fieldName]);
@@ -161,6 +161,7 @@ export default class SchemaMapper
                 hasOpertators = hasOpertators || SchemaUtil.isQueryOperator(childFieldName);
                 if (hasOpertators && SchemaUtil.canValidateQueryOperator(childFieldName)) {
                   if (Array.isArray(query[fieldName][childFieldName])) {
+                    // @ts-ignore - unused value
                     query[fieldName][childFieldName].forEach(function(value, x){
                       callback(fieldName, x, query[fieldName][childFieldName]);
                     });
@@ -172,6 +173,7 @@ export default class SchemaMapper
             }
             if (!hasOpertators) {
               if (Array.isArray(query[fieldName])) {
+                // @ts-ignore - unused value
                 query[fieldName].forEach(function(value, x){
                   callback(fieldName, x, query[fieldName]);
                 });
@@ -182,8 +184,8 @@ export default class SchemaMapper
           }
         }
       } else if (Array.isArray(query)) {
-        query.forEach(function(arrayValue, x){
-          mapRecursiveQuery(query[x]);
+        query.forEach(function(arrayValue){
+          mapRecursiveQuery(arrayValue);
         });
       }
       return query;
@@ -245,6 +247,7 @@ export default class SchemaMapper
 
     if (SchemaMapper.specIsTransient(spec) && options && options.skipTransients) return;
 
+    // @ts-ignore - unused element
     array.forEach((element, x) => {
       meta.path = basePath.length ? basePath + '.' + x :  '' + x;
       this.mapField(spec, x, array, callback, options, meta);

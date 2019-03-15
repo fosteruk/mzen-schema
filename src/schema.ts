@@ -1,4 +1,3 @@
-import ObjectID from 'bson-objectid';
 import SchemaUtil from './schema/util';
 import Mapper from './schema/mapper';
 import Validator from './schema/validator';
@@ -10,9 +9,27 @@ import SchemaConfig from './schema/config';
 import SchemaSpec from './schema/spec';
 import SchemaMapperMeta from './schema/mapper-meta';
 
-interface SchemaValidationResult {
+export interface SchemaValidationResult 
+{
   errors?: object;
   isValid?: boolean;
+}
+
+export interface SchemaPaths 
+{
+  [key: string]: any
+}
+
+export interface SchemaQuery
+{
+  $eq?: any;
+  $lt?: any;
+  $gt?: any;
+  $in?: Array<any>;
+  $nin?: Array<any>;
+  $and?: SchemaQuery | Array<SchemaQuery>;
+  $or?: SchemaQuery | Array<SchemaQuery>;
+  [key: string]: SchemaQuery | Array<SchemaQuery> | any;
 }
 
 export default class Schema
@@ -20,8 +37,8 @@ export default class Schema
   config: SchemaConfig;
   name: string;
   spec: SchemaSpec;
-  constructors: object;
-  schemas: object;
+  constructors: {[key: string]: any};
+  schemas: {[key: string]: any};
   mapper: Mapper | null | undefined;
   
   constructor(spec: SchemaSpec, options?: SchemaConfig)
@@ -156,9 +173,7 @@ export default class Schema
     return (object && this.constructors)  ? this.mapper.map(object, (
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
-      fieldContainer: object, 
-      path: string | number, 
-      meta: SchemaMapperMeta
+      fieldContainer: object
     ) => {
       if (fieldContainer) {
         var pathRef = fieldSpec ? fieldSpec.$pathRef : null;
@@ -205,7 +220,7 @@ export default class Schema
 
     return promise;
   }
-  validatePaths(paths, options, meta)
+  validatePaths(paths: SchemaPaths | Array<SchemaPaths>, options?, meta?)
   {
     this.init();
     var meta = meta ? meta : {errors: {}};
@@ -279,7 +294,7 @@ export default class Schema
 
     return promise;
   }
-  filterPrivate(object: object, mode: boolean|string, mapperType: string = 'map')
+  filterPrivate(object: object, mode: boolean|string = true, mapperType: string = 'map')
   {
     this.init();
     mode = mode ? mode : true;
@@ -289,8 +304,7 @@ export default class Schema
     this.mapper[mapperType](object, (      
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
-      fieldContainer: object, 
-      path: string | number
+      fieldContainer: object
     ) => {
       const filters = fieldSpec && fieldSpec.$filter ? fieldSpec.$filter : {};
       if (filters.private === true || filters.private == mode){
@@ -462,7 +476,7 @@ export default class Schema
   {
     results = Array.isArray(results) ? results : [];
     var finalResult = {errors: {}} as SchemaValidationResult;
-    results.forEach(function(result, x){
+    results.forEach(function(result){
       if (result.errors) Object.assign(finalResult.errors, result.errors)
     });
     finalResult.isValid = (Object.keys(finalResult.errors).length == 0);

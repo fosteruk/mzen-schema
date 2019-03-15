@@ -1,10 +1,12 @@
-var should = require('should');
-var Schema = require('../../lib/schema').default;
+import should = require('should');
+import Schema from '../../lib/schema';
+import ObjectID from 'bson-objectid';
+
 
 describe('Schema', function() {
   describe('default value', function() {
     it('should inject default value when undefined', function(done) {
-      var data = {};
+      var data = {} as {house: number};
 
       var schema = new Schema({
         house: {$type: Number, $filter: {defaultValue: 5}}
@@ -16,7 +18,7 @@ describe('Schema', function() {
       });
     });
     it('should inject default function value when undefined', function(done) {
-      var data = {};
+      var data = {} as {created: Date};
 
       var schema = new Schema({
         created: {$type: Date, $filter: {defaultValue: () => new Date}}
@@ -28,7 +30,7 @@ describe('Schema', function() {
       });
     });
     it('should inject default value when undefined using $spec', function(done) {
-      var data = {};
+      var data = {} as {house: number};
 
       var schema = new Schema({
         $type: Object,
@@ -45,7 +47,7 @@ describe('Schema', function() {
       });
     });
     it('should typecast default string to date', function(done) {
-      var data = {};
+      var data = {} as {created: Date};
 
       var schema = new Schema({
         created: {$type: Date, $filter: {defaultValue: 'now'}}
@@ -57,7 +59,7 @@ describe('Schema', function() {
       });
     });
     it('should inject default value when null', function(done) {
-      var data = {house: null};
+      var data = {} as {house: number};
 
       var schema = new Schema({
         house: {$type: Number, $filter: {defaultValue: 5}}
@@ -69,7 +71,7 @@ describe('Schema', function() {
       });
     });
     it('should inject default value when null, even when defined as not null', function(done) {
-      var data = {house: null};
+      var data = {} as {house: number};
 
       var schema = new Schema({
         house: {$type: Number, $validate: {notNull: true}, $filter: {defaultValue: 5}}
@@ -123,7 +125,7 @@ describe('Schema', function() {
       });
     });
     it('should inject new ObjectID if field named _id and defined as ObjectID does not have a value', function(done) {
-      var data = {};
+      var data = {} as {_id: ObjectID};
 
       var schema = new Schema({
         _id: {
@@ -137,7 +139,7 @@ describe('Schema', function() {
       });
     });
     it('should not inject new ObjectID if field name is something other than _id, defined as ObjectID and does not have a value', function(done) {
-      var data = {};
+      var data = {} as {other: ObjectID};
 
       var schema = new Schema({
         other: {
@@ -153,7 +155,7 @@ describe('Schema', function() {
       });
     });
     it('should inject new ObjectID if field defined as ObjectID if default value is "new"', function(done) {
-      var data = {};
+      var data = {} as {other: ObjectID};
 
       var schema = new Schema({
         other: {
@@ -170,7 +172,7 @@ describe('Schema', function() {
       });
     });
     it('should inject empty object if no default object value is provided', function(done) {
-      var data = {};
+      var data = {} as {user: ObjectID};
 
       var schema = new Schema({
         user: {
@@ -185,7 +187,7 @@ describe('Schema', function() {
       });
     });
     it('should inject empty nested object if no default object value is provided', function(done) {
-      var data = {};
+      var data = {} as {user: {address: {}}};
 
       var schema = new Schema({
         user: {
@@ -200,7 +202,7 @@ describe('Schema', function() {
       });
     });
     it('should set field with primitive type to undefined if not provided', function(done) {
-      var data = {};
+      var data = {} as {name: string};
 
       var schema = new Schema({
         name: {$type: String}
@@ -212,7 +214,7 @@ describe('Schema', function() {
       });
     });
     it('should set field of nested object with primitive type to undefined if not provided', function(done) {
-      var data = {};
+      var data = {} as {user: {name: string}};
 
       var schema = new Schema({
         user: {
@@ -226,7 +228,7 @@ describe('Schema', function() {
       });
     });
     it('should set default value on nested object even if parent object was not provided', function(done) {
-      var data = {};
+      var data = {} as {user: {name: string}};
 
       var schema = new Schema({
         user: {

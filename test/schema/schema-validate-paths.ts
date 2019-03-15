@@ -1,5 +1,5 @@
-var should = require('should');
-var Schema = require('../../lib/schema').default;
+import should = require('should');
+import Schema from '../../lib/schema';
 
 describe('Schema', function() {
   describe('validatePaths', function() {

@@ -1,6 +1,6 @@
-var should = require('should');
-var Schema = require('../../lib/schema').default;
-var Types = require('../../lib/schema/types').default;
+import should = require('should');
+import Schema from '../../lib/schema';
+import Types from '../../lib/schema/types';
 
 describe('Schema', function() {
   describe('validation', function() {
@@ -676,7 +676,7 @@ describe('Schema', function() {
         });
       });
     });
-    describe('should validate notNull on array elements with mixed type values', function(done) {
+    describe('should validate notNull on array elements with mixed type values', function() {
       it('valid - valid array of 1', function(done) {
         // An empty field is any falsy value: undefined, null, false, 0, '', [], {}
         var data = {name: [1]};
@@ -829,6 +829,7 @@ describe('Schema', function() {
       schema.validate(data).then((results) => {
         should(results.isValid).eql(false);
         should(results.errors).is.Object();
+        // @ts-ignore - 'house' does not exist on type 'object'
         should(results.errors.house).is.Array(); // Error messages are returned as an array of strings
         done();
       }).catch((error) => {
@@ -844,6 +845,7 @@ describe('Schema', function() {
 
       schema.validate(data).then((results) => {
         should(results.isValid).eql(false);
+        // @ts-ignore - 'house' does not exist on type 'object'
         should(results.errors.house[0]).equal('house is required'); // Error messages are returned as an array of strings
         done();
       }).catch((error) => {
@@ -859,6 +861,7 @@ describe('Schema', function() {
 
       schema.validate(data).then((results) => {
         should(results.isValid).eql(false);
+        // @ts-ignore - 'house' does not exist on type 'object'
         should(results.errors.house[0]).equal('House number is required'); // Error messages are returned as an array of strings
         done();
       }).catch((error) => {

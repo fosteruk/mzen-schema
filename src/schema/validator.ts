@@ -2,7 +2,7 @@ import TypeCaster from '../type-caster';
 
 export default class Validator
 {
-  static async validate(value, validatorsConfig, options)
+  static async validate(value: any, validatorsConfig: any, options?)
   {
     var results = true;
 
@@ -44,7 +44,7 @@ export default class Validator
 
   // Validator function
   // - returns an error message string or an array of error messages on failure otherweise returns boolean true
-  static required(value, options)
+  static required(value: any, options?)
   {
     var isValid = (value !== undefined);
     var name = options && options.name ? options.name : 'field';
@@ -54,7 +54,7 @@ export default class Validator
     return result;
   }
 
-  static notNull(value, options)
+  static notNull(value: any, options?)
   {
     var isValid = (value !== null) && !(
       // The string value NULL or null are treated as a literal null
@@ -66,7 +66,7 @@ export default class Validator
     return result;
   }
 
-  static isEmpty(value)
+  static isEmpty(value: any)
   {
     var valueType = value ? TypeCaster.getType(value) : undefined;
     var result = (
@@ -81,7 +81,7 @@ export default class Validator
     return result;
   }
 
-  static notEmpty(value, options)
+  static notEmpty(value: any, options?)
   {
     var name = options && options.name ? options.name : 'field';
     var message = options && options.message ? options.message : name + ' cannot be empty';
@@ -89,7 +89,7 @@ export default class Validator
     return result;
   }
 
-  static regex(value, options)
+  static regex(value: any, options?)
   {
     var name = options && options.name ? options.name : 'field';
     var regex = options && options.pattern ? new RegExp(options.pattern) : new RegExp('');
@@ -98,7 +98,7 @@ export default class Validator
     return result;
   }
 
-  static email(value, options)
+  static email(value: any, options?)
   {
     var name = options && options.name ? options.name : 'email';
     // We have a very loose regex pattern for validating email addresses since unicode email addresses
@@ -111,7 +111,7 @@ export default class Validator
     return result;
   }
 
-  static valueLength(value, options)
+  static valueLength(value: any, options?)
   {
     var name = options && options.name ? options.name : 'field';
     var min = options && options.min ? options.min : null;
@@ -144,7 +144,7 @@ export default class Validator
     return result;
   }
 
-  static equality(value, options)
+  static equality(value: any, options?)
   {
     var name = options && options.name ? options.name : 'field';
     var root = options && options.root ? options.root : {};
@@ -154,7 +154,7 @@ export default class Validator
     return result;
   }
 
-  static enumeration(value, options)
+  static enumeration(value: any, options?)
   {
     var name = options && options.name ? options.name : 'field';
     var values = options && options.values ? options.values : [];
@@ -165,7 +165,7 @@ export default class Validator
   // Custom validator allows you to specify your own validator function
   // - the function should return boolean true for a valid value
   // - or return an error message string or an array of error messages
-  static custom(value, options)
+  static custom(value: any, options?)
   {
     var validator = options && options.validator ? options.validator : () => true;
     return validator(value, options);

@@ -1,9 +1,13 @@
-var should = require('should');
-var Schema = require('../../lib/schema').default;
-var Types = require('../../lib/schema/types').default;
+import should = require('should');
+import Schema from '../../lib/schema';
 
 class ConstructorTestUser
 {
+  _id?: string;
+  nameFirst?: string;
+  nameLast?: string;
+  address?: ConstructorTestAddress;
+
   getName()
   {
     return this.nameFirst + ' ' + this.nameLast;
@@ -12,6 +16,10 @@ class ConstructorTestUser
 
 class ConstructorTestAddress
 {
+  userId?: string;
+  street?: string;
+  postcode?: string;
+  
   getStreet()
   {
     return this.street;
@@ -20,6 +28,9 @@ class ConstructorTestAddress
 
 class ConstructorTestBike
 {
+  numWheels: number;
+  static alias: string;
+    
   getNumWheels()
   {
     return this.numWheels;
@@ -30,7 +41,7 @@ ConstructorTestBike.alias = 'Bicycle';
 describe('Schema', function() {
   describe('applyTransients', function() {
     it('should apply $construct function to the root object', function() {
-      var object = {nameFirst: 'John', nameLast: 'Smith'};
+      var object = {nameFirst: 'John', nameLast: 'Smith'} as ConstructorTestUser;
 
       var schema = new Schema({
         $construct: ConstructorTestUser,
@@ -45,7 +56,7 @@ describe('Schema', function() {
       should(object.getName()).eql('John Smith');
     });
     it('should apply $construct function to the root object via constructorName', function() {
-      var object = {numWheels: 2};
+      var object = {numWheels: 2} as ConstructorTestBike;
 
       var schema = new Schema({
         $construct: 'Bicycle',
@@ -63,11 +74,11 @@ describe('Schema', function() {
         userMostPopular: {
           nameFirst: 'John',
           nameLast: 'Smith',
-        },
+        } as ConstructorTestUser,
         userLeastPopular: {
           nameFirst: 'Tom',
           nameLast: 'Jones',
-        }
+        } as ConstructorTestUser
       };
 
       var schema = new Schema({
@@ -92,7 +103,7 @@ describe('Schema', function() {
       should(object.userLeastPopular.getName()).eql('Tom Jones');
     });
     it('should apply $construct function to the root object as referenced by constrcutor name', function() {
-      var object = {nameFirst: 'John', nameLast: 'Smith'};
+      var object = {nameFirst: 'John', nameLast: 'Smith'} as ConstructorTestUser;
 
       var schema = new Schema({
         $construct: 'ConstructorTestUser',
@@ -111,11 +122,11 @@ describe('Schema', function() {
         userMostPopular: {
           nameFirst: 'John',
           nameLast: 'Smith',
-        },
+        } as ConstructorTestUser,
         userLeastPopular: {
           nameFirst: 'Tom',
           nameLast: 'Jones',
-        }
+        } as ConstructorTestUser
       };
 
       var schema = new Schema({
@@ -142,8 +153,8 @@ describe('Schema', function() {
     it('should apply $construct function according to array spec', function() {
       var object = {
         users: [
-          {nameFirst: 'John', nameLast: 'Smith'},
-          {nameFirst: 'Tom', nameLast: 'Jones'}
+          {nameFirst: 'John', nameLast: 'Smith'} as ConstructorTestUser,
+          {nameFirst: 'Tom', nameLast: 'Jones'} as ConstructorTestUser
         ]
       };
 
@@ -168,8 +179,8 @@ describe('Schema', function() {
     it('should apply $construct function according to array spec object', function() {
       var object = {
         users: [
-          {nameFirst: 'John', nameLast: 'Smith'},
-          {nameFirst: 'Tom', nameLast: 'Jones'}
+          {nameFirst: 'John', nameLast: 'Smith'} as ConstructorTestUser,
+          {nameFirst: 'Tom', nameLast: 'Jones'} as ConstructorTestUser
         ]
       };
 
@@ -197,13 +208,13 @@ describe('Schema', function() {
         nameFirst: 'John',
         nameLast: 'Smith',
         address: {street: 'Picton Road'}
-      };
+      } as ConstructorTestUser;
 
       var schemaAddress = new Schema({
         $name: 'address',
         $construct: ConstructorTestAddress,
         street: {$type: 'String', $validate: {notNull: true}},
-      });
+      }) as ConstructorTestUser;
 
       var schema = new Schema({
         $construct: ConstructorTestUser,
@@ -227,7 +238,7 @@ describe('Schema', function() {
         address: {
           postcode: 'L1'
         }
-      };
+      } as ConstructorTestUser;
 
       var schema = new Schema({
         _id: 'String',
@@ -246,7 +257,7 @@ describe('Schema', function() {
         address: {
           postcode: 'L1'
         }
-      };
+      } as any;
 
       var schema = new Schema({
         _id: 'String',
@@ -270,7 +281,7 @@ describe('Schema', function() {
         address: {
           postcode: 'L1'
         }
-      };
+      } as ConstructorTestUser;
 
       var schema = new Schema({
         _id: 'String',
@@ -291,7 +302,7 @@ describe('Schema', function() {
         address: {
           postcode: 'L1'
         }
-      };
+      } as any;
 
       var schema = new Schema({
         _id: 'String',

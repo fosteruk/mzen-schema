@@ -4,9 +4,13 @@ interface SchemaManagerConfig {
 }
 export default class SchemaManager {
     config: SchemaManagerConfig;
-    constructors: object;
-    schemas: object;
-    constructor(options: any);
+    constructors: {
+        [key: string]: any;
+    };
+    schemas: {
+        [key: string]: any;
+    };
+    constructor(options?: any);
     addConstructor(value: any): void;
     getConstructor(constructorName: any): any;
     addConstructors(constructors: any): void;

@@ -1,6 +1,6 @@
-var should = require('should');
-var Schema = require('../../lib/schema').default;
-var Types = require('../../lib/schema/types').default;
+import should = require('should');
+import Schema from '../../lib/schema';
+import Types from '../../lib/schema/types';
 
 describe('Schema', function() {
   describe('type cast', function() {
@@ -149,8 +149,10 @@ describe('Schema', function() {
 
       schema.validate(data).then(() => {
         should(data.created.constructor).eql(Date);
+        // @ts-ignore - 'getTime' does not exist on type 'string'
         should(data.created.toJSON()).eql('2016-11-19T06:50:08.284Z');
         should(data.updated.constructor).eql(Date);
+        // @ts-ignore - 'toUTCString' does not exist on type 'string'
         should(data.updated.toUTCString()).eql('Sat, 19 Nov 2016 06:50:33 GMT');
         done();
       });
@@ -169,6 +171,7 @@ describe('Schema', function() {
         // Set the time just before now for comparision
         dateForComparison.setSeconds(dateForComparison.getSeconds() - 1);
         should(data.created.constructor).eql(Date);
+        // @ts-ignore - 'getTime' does not exist on type 'string'
         should(data.created.getTime()).be.above(dateForComparison.getTime());
         done();
       });
@@ -190,8 +193,10 @@ describe('Schema', function() {
         dateForComparison.setSeconds(dateForComparison.getSeconds() - 1);
         
         should(data.created.constructor).eql(Date);
+        // @ts-ignore - 'getTime' does not exist on type 'string'
         should(data.created.getTime()).be.above(dateForComparison.getTime());
         should(data.updated.constructor).eql(Date);
+        // @ts-ignore - 'getTime' does not exist on type 'string'
         should(data.updated.getTime()).be.above(dateForComparison.getTime());
         done();
       });
@@ -211,8 +216,10 @@ describe('Schema', function() {
 
       schema.validate(data).then(() => {
         should(data.created.constructor).eql(Date);
+        // @ts-ignore - 'getTime' does not exist on type 'number'
         should(data.created.toJSON()).eql('2016-11-19T06:50:08.284Z');
         should(data.updated.constructor).eql(Date);
+        // @ts-ignore - 'getTime' does not exist on type 'number'
         should(data.updated.toUTCString()).eql('Sat, 19 Nov 2016 06:50:33 GMT');
         done();
       });
@@ -275,6 +282,7 @@ describe('Schema', function() {
         should(data.deleted.constructor).eql(Boolean);
         should(data.deleted).eql(false);
         should(data.created.constructor).eql(Date);
+        // @ts-ignore - 'toJSON' does not exist on type 'number'
         should(data.created.toJSON()).eql('2016-11-21T08:34:04.995Z');
         
         should(data._idB.constructor).eql(Types.ObjectID);
@@ -288,6 +296,7 @@ describe('Schema', function() {
         should(data.deletedB.constructor).eql(Boolean);
         should(data.deletedB).eql(false);
         should(data.createdB.constructor).eql(Date);
+        // @ts-ignore - 'toJSON' does not exist on type 'number'
         should(data.createdB.toJSON()).eql('2016-11-21T08:34:04.995Z');
         done();
       });
@@ -466,7 +475,7 @@ describe('Schema', function() {
       });
     });
     it('should not attempt to cast specific Object type', function(done) {
-      class TestType {};
+      class TestType {name: string};
 
       var data = new TestType;
       data.name = 'Kevin';

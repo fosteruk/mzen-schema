@@ -1,5 +1,5 @@
-var should = require('should');
-var ObjectPathAccessor = require('../lib/object-path-accessor').default;
+import should = require('should');
+import ObjectPathAccessor from '../lib/object-path-accessor';
 
 describe('ObjectPathAccessor', function () {
   describe('pathsMatch()', function () {

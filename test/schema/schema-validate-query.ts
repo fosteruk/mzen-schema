@@ -1,5 +1,5 @@
-var should = require('should');
-var Schema = require('../../lib/schema').default;
+import should = require('should');
+import Schema, { SchemaQuery } from '../../lib/schema';
 
 describe('Schema', function() {
   describe('validateQuery', function() {
@@ -9,7 +9,7 @@ describe('Schema', function() {
         age: {$lt: '33'},
         cityId: {$in: ['10', '11', '12']},
         countryId: {$nin: [13, 14, 15]},
-      };
+      } as SchemaQuery;
 
       var schema = new Schema({
         name: String,
@@ -40,7 +40,7 @@ describe('Schema', function() {
           {name: {$eq: 123}},
           {name: {$eq: 456}}
         ]
-      };
+      } as SchemaQuery;
 
       var schema = new Schema({
         name: String,
@@ -57,7 +57,7 @@ describe('Schema', function() {
     it('should cast query parameters of $in operator', function(done) {
       var data = {
         name: {$in: [123, 456, 789]} 
-      };
+      } as SchemaQuery;
 
       var schema = new Schema({
         name: String
@@ -76,7 +76,7 @@ describe('Schema', function() {
     it('should cast query parameters of $nin operator', function(done) {
       var data = {
         name: {$nin: [123, 456, 789]} 
-      };
+      } as SchemaQuery;
 
       var schema = new Schema({
         name: String
@@ -98,7 +98,7 @@ describe('Schema', function() {
           {name: {$eq: 123}},
           {age: {$eq: '35'}}
         ]
-      };
+      } as SchemaQuery;
 
       var schema = new Schema({
         name: String,
@@ -129,7 +129,7 @@ describe('Schema', function() {
             ]
           },
         ]
-      };
+      } as SchemaQuery;
 
       var schema = new Schema({
         name: String,

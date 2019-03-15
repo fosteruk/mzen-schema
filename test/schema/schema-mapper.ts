@@ -1,6 +1,6 @@
-var should = require('should');
-var Schema = require('../../lib/schema').default;
-var SchemaMapper = require('../../lib/schema/mapper').default;
+import should = require('should');
+import Schema from '../../lib/schema';
+import SchemaMapper from '../../lib/schema/mapper';
 
 describe('SchemaMapper', function () {
   describe('map', function () {
@@ -20,6 +20,7 @@ describe('SchemaMapper', function () {
       var schemaIterator = new SchemaMapper(spec);
 
       var results = [];
+      // @ts-ignore - unused fieldSpec
       schemaIterator.map({name: 'Kevin'}, function(fieldSpec, fieldName){
         results.push({fieldName});
       });
@@ -32,6 +33,7 @@ describe('SchemaMapper', function () {
       var schemaIterator = new SchemaMapper(spec);
 
       var results = [];
+      // @ts-ignore - unused fieldSpec
       schemaIterator.map({names: ['Kevin']}, function(fieldSpec, fieldName){
         results.push({fieldName});
       });
@@ -46,7 +48,8 @@ describe('SchemaMapper', function () {
       var value = [{name: 'Kevin'}];
 
       var results = [];
-      schemaIterator.map(value, function(spec, fieldName, fieldContainer){
+      // @ts-ignore - unused fieldSpec and fieldName
+      schemaIterator.map(value, function(fieldSpec, fieldName, fieldContainer){
         results.push({fieldContainer});
       });
 
@@ -59,6 +62,7 @@ describe('SchemaMapper', function () {
       var value = [{names: ['Kevin']}];
 
       var results = [];
+      // @ts-ignore - unused fieldSpec and fieldName
       schemaIterator.map(value, function(fieldSpec, fieldName, fieldContainer){
         results.push({fieldContainer});
       });
@@ -72,6 +76,7 @@ describe('SchemaMapper', function () {
       var schemaIterator = new SchemaMapper(spec);
 
       var results = [];
+      // @ts-ignore - unused fieldSpec and fieldName and fieldContainer
       schemaIterator.map({name: 'Kevin'}, function(fieldSpec, fieldName, fieldContainer, path){
         results.push({path});
       });
@@ -97,6 +102,7 @@ describe('SchemaMapper', function () {
       ];
 
       var results = [];
+      // @ts-ignore - unused fieldSpec and fieldName and fieldContainer
       schemaIterator.map(data, function(fieldSpec, fieldName, fieldContainer, path){
         results.push({path});
       });
@@ -147,6 +153,7 @@ describe('SchemaMapper', function () {
     it('should callback with field name', function () {
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
+      // @ts-ignore - unused fieldSpec
       schemaIterator.mapPaths({'name': 'Kevin'}, function(fieldSpec, fieldName){
         should(fieldName).eql('name');
       });
@@ -156,6 +163,7 @@ describe('SchemaMapper', function () {
       var schemaIterator = new SchemaMapper(spec);
 
       var results = [];
+      // @ts-ignore - unused fieldSpec
       schemaIterator.mapPaths({'names': ['Kevin']}, function(fieldSpec, fieldName){
         results.push({fieldName});
       });
@@ -166,6 +174,7 @@ describe('SchemaMapper', function () {
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
       var object = {name: 'Kevin'};
+      // @ts-ignore - unused fieldSpec and fieldName
       schemaIterator.mapPaths({name: 'Kevin'}, function(fieldSpec, fieldName, fieldContainer){
         should(fieldContainer).eql(object);
       });
@@ -176,6 +185,7 @@ describe('SchemaMapper', function () {
       var value = {names: ['Kevin']};
 
       var results = [];
+      // @ts-ignore - unused fieldSpec and fieldName
       schemaIterator.mapPaths({names: ['Kevin']}, function(fieldSpec, fieldName, fieldContainer){
         results.push({fieldContainer});
       });
@@ -185,6 +195,7 @@ describe('SchemaMapper', function () {
     it('should callback with field path', function () {
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
+      // @ts-ignore - unused fieldSpec and fieldName and fieldContainer
       schemaIterator.mapPaths({name: 'Kevin'}, function(fieldSpec, fieldName, fieldContainer, path){
         should(path).eql('name');
       });

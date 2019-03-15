@@ -1,6 +1,5 @@
-'use strict'
-var should = require('should');
-var SchemaUtil = require('../../lib/schema/util').default;
+import should = require('should');
+import SchemaUtil from '../../lib/schema/util';
 
 describe('SchemaUtil', function () {
   describe('getSpec()', function () {

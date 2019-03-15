@@ -29,6 +29,7 @@ export default class ObjectPathAccessor
   */
   static setPath(path, value, subject)
   {
+    // @ts-ignore
     return ObjectPathAccessor.searchRescursive(path, subject, function(originalValue){
       return value;
     });
@@ -61,12 +62,12 @@ export default class ObjectPathAccessor
   {
     const patternParts = pattern.split('.');
     const currentParts = patternParts.slice(0, currentDepth); // Pattern parts up to current depth
-    const currentPattern = currentParts.join('.'); // Pattern string up to current depth
     const currentNode = currentParts[currentParts.length - 1]; // Current node value
     const depth = currentDepth + 1;
     
     if (currentDepth <= patternParts.length) {
       if (Array.isArray(subject)) {
+        // @ts-ignore - unused element
         subject.forEach(function(element, x){
           processElement(x);
         });
