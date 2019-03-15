@@ -1,6 +1,6 @@
 export default class Validator {
     static validate(value: any, validatorsConfig: any, options?: any): Promise<boolean>;
-    static required(value: any, options?: any): boolean | string;
+    static required(value: any, options?: any): any;
     static notNull(value: any, options?: any): any;
     static isEmpty(value: any): boolean;
     static notEmpty(value: any, options?: any): any;
