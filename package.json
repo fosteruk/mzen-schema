@@ -3,7 +3,10 @@
   "version": "0.0.68",
   "description": "mZen Schema",
   "main": "./lib/index",
+  "types": "./lib/index.d.ts",
   "scripts": {
+    "prepare" : "npm run build",
+    "prepublishOnly": "npm test",
     "test": "mocha -r test/ts-node-hooks.js test/**/*.ts",
     "build": "tsc"
   },
