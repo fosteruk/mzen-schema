@@ -41,7 +41,7 @@ export class Schema
   schemas: {[key: string]: any};
   mapper: Mapper | null | undefined;
   
-  constructor(spec: SchemaSpec, options?: SchemaConfig)
+  constructor(spec?: SchemaSpec, options?: SchemaConfig)
   {
     this.config = (options == undefined) ? {} : options;
     this.config.name = this.config.name ? this.config.name : '';
