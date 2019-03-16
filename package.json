@@ -28,5 +28,10 @@
     "should": "^13.2.3",
     "ts-node": "^8.0.3",
     "typescript": "^3.3.3333"
-  }
+  },
+  "files": [
+    "/lib",
+    "/src",
+    "/tsconfig.json"
+  ]
 }
