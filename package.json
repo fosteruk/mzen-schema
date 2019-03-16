@@ -3,9 +3,12 @@
   "version": "0.0.68",
   "description": "mZen Schema",
   "main": "./lib/index",
+  "types": "./lib/index.d.ts",
   "scripts": {
-    "test": "mocha ./test/*",
-    "build": "babel src --out-dir lib"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test",
+    "test": "mocha -r test/ts-node-hooks.js test/**/*.ts",
+    "build": "tsc"
   },
   "author": "Kevin Foster <kevin.foster.uk@gmail.com>",
   "license": "BSD-3-Clause",
@@ -15,15 +18,15 @@
     "url": "https://github.com/kevin-foster/mZen-schema.git"
   },
   "dependencies": {
-    "bson-objectid": "^1.2.3",
+    "bson-objectid": "^1.2.4",
     "clone": "^1.0.4"
   },
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.3.4",
-    "@babel/preset-env": "^7.3.4",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^11.11.3",
     "mocha": "^6.0.2",
-    "should": "^11.2.0",
-    "sinon": "^1.17.4"
+    "should": "^13.2.3",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.3333"
   }
 }
