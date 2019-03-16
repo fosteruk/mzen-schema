@@ -183,7 +183,7 @@ export class Schema
       }
     }) : object;
   }
-  validate(object, options?: SchemaConfig)
+  validate(object, options?: SchemaConfig): Promise<SchemaValidationResult>
   {
     this.init();
     var meta = {errors: {}, root: object} as SchemaMapperMeta;
@@ -220,7 +220,7 @@ export class Schema
 
     return promise;
   }
-  validatePaths(paths: SchemaPaths | Array<SchemaPaths>, options?, meta?)
+  validatePaths(paths: SchemaPaths | Array<SchemaPaths>, options?, meta?): Promise<SchemaValidationResult>
   {
     this.init();
     var meta = meta ? meta : {errors: {}};
@@ -259,7 +259,7 @@ export class Schema
 
     return promise;
   }
-  validateQuery(query, options?: SchemaConfig)
+  validateQuery(query, options?: SchemaConfig): Promise<SchemaValidationResult>
   {
     this.init();
     var meta = meta ? meta : {errors: {}};
@@ -472,7 +472,7 @@ export class Schema
 
     return result;
   }
-  static mergeValidationResults(results: Array<SchemaValidationResult>)
+  static mergeValidationResults(results: Array<SchemaValidationResult>): SchemaValidationResult
   {
     results = Array.isArray(results) ? results : [];
     var finalResult = {errors: {}} as SchemaValidationResult;
