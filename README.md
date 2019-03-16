@@ -2,17 +2,14 @@
 ## Data schema's in Javascript
 
 Features:
-  - Define data structures as schema
-  - Validate and type-cast against defined data types
-  - Specify validation rules for each field
-  - Populate default values from schema
-  - Reuse schema's by referencing them within other schemas
-
-Initially designed for use with the mZen ORM package but has no dependency on mZen.
-
-
+  - Define Javascript data structure Schemas
+  - Specify validation rules and default values
+  - Validate, type-cast and populate default values
+  - Define schema relations
+  
 ```javascript
-var Schema = require('mzen-schema');
+import Schema from 'mzen-schema';
+// var Schema = require('mzen-schema').default; // commonjs
 
 var schemaPerson = new Schema({
   // field names with a $ prefix are used to specify options in the schema specification
