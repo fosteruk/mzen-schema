@@ -9,7 +9,7 @@
     "prepublishOnly": "npm test",
     "test": "mocha -r test/ts-node-hooks.js test/**/*.ts",
     "build": "npm run clean && tsc",
-    "clean": "rm -r ./lib/*"
+    "clean": "rm -rf ./lib/*"
   },
   "author": "Kevin Foster <kevin.foster.uk@gmail.com>",
   "license": "BSD-3-Clause",

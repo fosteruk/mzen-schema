@@ -3,7 +3,7 @@ interface SchemaManagerConfig {
   schemas: object;
 }
 
-export default class SchemaManager
+export class SchemaManager
 {
   config: SchemaManagerConfig;
   constructors: {[key: string]: any};
@@ -85,3 +85,5 @@ export default class SchemaManager
     }
   }
 }
+
+export default SchemaManager;

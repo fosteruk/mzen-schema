@@ -1,6 +1,6 @@
 import TypeCaster from '../type-caster';
 
-export default class Validator
+export class Validator
 {
   static async validate(value: any, validatorsConfig: any, options?)
   {
@@ -171,3 +171,5 @@ export default class Validator
     return validator(value, options);
   }
 }
+
+export default Validator;

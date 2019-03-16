@@ -1,6 +1,6 @@
 import ObjectID from 'bson-objectid';
 
-export default class TypeCaster
+export class TypeCaster
 {
   static type: {[key: string]: any};
   
@@ -129,3 +129,5 @@ TypeCaster.type = {
   Date: TypeCasterDate,
   ObjectID: TypeCasterObjectID, // This is a mongodb specific type
 };
+
+export default TypeCaster;

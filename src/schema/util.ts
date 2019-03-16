@@ -1,6 +1,6 @@
 import TypeCaster from '../type-caster';
 
-export default class SchemaUtil
+export class SchemaUtil
 {
   static getSpec(path, spec)
   {
@@ -48,3 +48,5 @@ export default class SchemaUtil
     return (cantValidateOperators.indexOf(fieldName) == -1);
   }
 }
+
+export default SchemaUtil;

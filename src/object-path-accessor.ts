@@ -10,7 +10,7 @@
  * An asterisks can be used to match any value:
  *  For exmaple: 'prop1.some_array.*.myVariable'. 
  */
-export default class ObjectPathAccessor
+export class ObjectPathAccessor
 {
   /**
    * Get path
@@ -128,3 +128,5 @@ export default class ObjectPathAccessor
   }
   
 }
+
+export default ObjectPathAccessor;

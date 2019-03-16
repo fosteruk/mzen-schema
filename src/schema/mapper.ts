@@ -14,7 +14,7 @@ export interface SchemaMapperMappingConfig {
   skipTransients?: boolean;
 };
 
-export default class SchemaMapper
+export class SchemaMapper
 {
   config: SchemaConfig;
   spec: SchemaSpec;
@@ -327,3 +327,5 @@ export default class SchemaMapper
     return (spec && (spec.$relation != null || spec.$pathRef != null));
   }
 }
+
+export default SchemaMapper;

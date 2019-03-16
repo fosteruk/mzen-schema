@@ -1,4 +1,4 @@
-export default class Filter
+export class Filter
 {
   static async filter(value, filtersConfig)
   {
@@ -71,3 +71,5 @@ export default class Filter
     return value;
   }
 }
+
+export default Filter;

@@ -32,7 +32,7 @@ export interface SchemaQuery
   [key: string]: SchemaQuery | Array<SchemaQuery> | any;
 }
 
-export default class Schema
+export class Schema
 {
   config: SchemaConfig;
   name: string;
@@ -483,3 +483,5 @@ export default class Schema
     return finalResult;
   }
 }
+
+export default Schema;

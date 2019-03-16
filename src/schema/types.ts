@@ -2,7 +2,7 @@ import ObjectID from 'bson-objectid';
 
 class Mixed {}
 
-const Types = {
+export const Types = {
   String: String,
   Number: Number,
   Boolean: Boolean,
