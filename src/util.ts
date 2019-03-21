@@ -1,8 +1,9 @@
 import TypeCaster from './type-caster';
+import SchemaSpec from './spec';
 
 export class SchemaUtil
 {
-  static getSpec(path, spec)
+  static getSpec(path: string, spec: SchemaSpec)
   {
     var spec = spec ? spec : {};
     var pathParts = path && path ? path.split('.') : [];

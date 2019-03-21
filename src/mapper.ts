@@ -2,6 +2,7 @@ import clone = require('clone');
 import SchemaUtil from './util';
 import Types from './types';
 import TypeCaster from './type-caster';
+import Schema from './schema';
 import SchemaConfig from './config';
 import SchemaSpec from './spec';
 
@@ -27,8 +28,8 @@ export class SchemaMapper
 {
   config: SchemaConfig;
   spec: SchemaSpec;
-  specNormalised: SchemaSpec | null | undefined;
-  schemas: object;
+  specNormalised: SchemaSpec;
+  schemas: {[key: string]: Schema};
   
   constructor(spec: SchemaSpec, options?: SchemaConfig)
   {
@@ -58,7 +59,7 @@ export class SchemaMapper
     return this.specNormalised;
   }
   
-  addSchema(schema)
+  addSchema(schema: Schema)
   {
     if (schema.getName) {
       this.schemas[schema.getName()] = schema;
@@ -67,18 +68,14 @@ export class SchemaMapper
     }
   }
   
-  addSchemas(schemas)
+  addSchemas(schemas: {[key: string]: Schema} | Array<Schema>)
   {
     if (schemas) {
-      if (Array.isArray(schemas)) {
-        schemas.forEach((schema) => {
-          this.addSchema(schema);
-        });
-      } else {
-        Object.keys(schemas).forEach((schemaName) => {
-          this.addSchema(schemas[schemaName]);
-        });
-      }
+      // could be an array of schema objects functions or a object map
+      var schemasArray = Array.isArray(schemas) ? schemas : Object.keys(schemas).map(name => schemas[name]);
+      schemasArray.forEach((schema) => {
+        if (schema instanceof Schema) this.addSchema(schema);
+      });
     }
   }
   
@@ -110,7 +107,7 @@ export class SchemaMapper
     return spec;
   }
   
-  map(data: Array<object>|object, callback: SchemaMapperCallback, options?: SchemaMapperMappingConfig)
+  map(data: Array<object>|any, callback: SchemaMapperCallback, options?: SchemaMapperMappingConfig)
   {
     this.init();
     const meta = {path: '', errors: {}, root: data} as SchemaMapperMeta;
@@ -123,7 +120,8 @@ export class SchemaMapper
     // We have to pass the data in as a object property as that is the only way to reference data
     return this.mapField(spec, 'root', {root: data}, callback, options, meta);
   }
-  mapPaths(paths: object, callback: SchemaMapperCallback, options?: object, meta?: SchemaMapperMeta)
+  
+  mapPaths(paths: any, callback: SchemaMapperCallback, options?: object, meta?: SchemaMapperMeta)
   {
     this.init();
     var meta = meta ? meta : {path: '', errors: {}} as SchemaMapperMeta;
@@ -212,7 +210,7 @@ export class SchemaMapper
   
   mapRecursive(
     spec: SchemaSpec, 
-    object: object, 
+    object: any, 
     callback: SchemaMapperCallback, 
     options?: SchemaMapperMappingConfig, 
     meta: SchemaMapperMeta = {}
@@ -275,7 +273,7 @@ export class SchemaMapper
   mapField(
     spec: SchemaSpec, 
     fieldName: string | number, 
-    container: object, 
+    container: any, 
     callback: SchemaMapperCallback, 
     options: SchemaMapperMappingConfig, 
     meta: SchemaMapperMeta = {}
