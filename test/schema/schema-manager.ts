@@ -1,5 +1,5 @@
 import should = require('should');
-import SchemaManager from '../../lib/schema/manager';
+import SchemaManager from '../../lib/manager';
 import Schema from '../../lib/schema';
 
 describe('SchemaManager', function () {

@@ -1,18 +1,27 @@
 import clone = require('clone');
 import SchemaUtil from './util';
 import Types from './types';
-import TypeCaster from '../type-caster';
+import TypeCaster from './type-caster';
 import SchemaConfig from './config';
 import SchemaSpec from './spec';
-import SchemaMapperMeta from './mapper-meta';
 
-interface SchemaMapperCallback {
+interface SchemaMapperCallback 
+{
   (spec: SchemaSpec, fieldName: string | number, container: object, metaPath: string, meta: object): void
 }
 
-export interface SchemaMapperMappingConfig {
+export interface SchemaMapperMappingConfig 
+{
   skipTransients?: boolean;
-};
+}
+
+export interface SchemaMapperMeta 
+{
+  root?: object;
+  errors?: object;
+  isValid?: boolean
+  path?: string
+}
 
 export class SchemaMapper
 {
@@ -35,17 +44,20 @@ export class SchemaMapper
     this.spec = this.config.spec ? this.config.spec : {};
     this.specNormalised = null;
   }
+  
   init()
   {
     if (!this.specNormalised) {
       this.specNormalised = this.normalizeSpec(clone(this.spec));
     }
   }
+  
   getSpec()
   {
     this.init();
     return this.specNormalised;
   }
+  
   addSchema(schema)
   {
     if (schema.getName) {
@@ -54,6 +66,7 @@ export class SchemaMapper
       throw new Error('Invalid schema')
     }
   }
+  
   addSchemas(schemas)
   {
     if (schemas) {
@@ -68,6 +81,7 @@ export class SchemaMapper
       }
     }
   }
+  
   normalizeSpec(spec)
   {
     // Resolve any embedded schema references
@@ -95,6 +109,7 @@ export class SchemaMapper
 
     return spec;
   }
+  
   map(data: Array<object>|object, callback: SchemaMapperCallback, options?: SchemaMapperMappingConfig)
   {
     this.init();
@@ -123,6 +138,7 @@ export class SchemaMapper
       }
     });
   }
+  
   // @ts-ignore - unused options
   mapQueryPaths(query, callback, options = {})
   {
@@ -193,6 +209,7 @@ export class SchemaMapper
 
     mapRecursiveQuery(query);
   }
+  
   mapRecursive(
     spec: SchemaSpec, 
     object: object, 
@@ -232,6 +249,7 @@ export class SchemaMapper
       this.mapField(specTemp[fieldName], fieldName, object, callback, options, meta);
     }
   }
+  
   mapArrayElements(
     spec: SchemaSpec, 
     array: Array<any>, 
@@ -253,6 +271,7 @@ export class SchemaMapper
       this.mapField(spec, x, array, callback, options, meta);
     });
   }
+  
   mapField(
     spec: SchemaSpec, 
     fieldName: string | number, 
@@ -318,10 +337,12 @@ export class SchemaMapper
 
     return container ? container[fieldName] : undefined;
   }
+  
   initPath(path)
   {
     return path !== undefined && path.length ? path : '';
   }
+  
   static specIsTransient(spec)
   {
     return (spec && (spec.$relation != null || spec.$pathRef != null));

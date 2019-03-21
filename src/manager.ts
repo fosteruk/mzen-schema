@@ -21,14 +21,17 @@ export class SchemaManager
     this.schemas = {};
     if (this.config.schemas) this.addSchemas(this.config.schemas);
   }
+  
   addConstructor(value)
   {
     this.constructors[value.alias ? value.alias : value.name] = value;
   }
+  
   getConstructor(constructorName)
   {
     return this.constructors[constructorName] ? this.constructors[constructorName] : null;
   }
+  
   addConstructors(constructors)
   {
     if (constructors) {
@@ -47,12 +50,14 @@ export class SchemaManager
       }
     }
   }
+  
   addSchema(schema)
   {
     if (schema && schema.getName) {
       this.schemas[schema.getName()] = schema;
     }
   }
+  
   addSchemas(schemas)
   {
     if (schemas) {
@@ -67,15 +72,18 @@ export class SchemaManager
       }
     }
   }
+  
   getSchema(schemaName)
   {
     return this.schemas[schemaName] ? this.schemas[schemaName] : null;
   }
+  
   async init()
   {
     await this.initSchemas();
     return this;
   }
+  
   async initSchemas()
   {
     for (var schemaName in this.schemas) {

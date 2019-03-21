@@ -1,6 +1,6 @@
 import should = require('should');
 import Schema from '../../lib/schema';
-import Types from '../../lib/schema/types';
+import Types from '../../lib/types';
 
 describe('Schema', function() {
   describe('validation', function() {

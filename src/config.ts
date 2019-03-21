@@ -1,4 +1,4 @@
-import Schema from '../schema';
+import Schema from './schema';
 
 export interface SchemaConfig {
   name?: string;

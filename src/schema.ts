@@ -1,13 +1,12 @@
-import SchemaUtil from './schema/util';
-import Mapper from './schema/mapper';
-import Validator from './schema/validator';
-import Filter from './schema/filter';
-import Types from './schema/types';
+import SchemaUtil from './util';
+import Mapper, { SchemaMapperMeta } from './mapper';
+import Validator from './validator';
+import Filter from './filter';
+import Types from './types';
 import TypeCaster from './type-caster';
 import ObjectPathAccessor from './object-path-accessor';
-import SchemaConfig from './schema/config';
-import SchemaSpec from './schema/spec';
-import SchemaMapperMeta from './schema/mapper-meta';
+import SchemaConfig from './config';
+import SchemaSpec from './spec';
 
 export interface SchemaValidationResult 
 {
@@ -60,6 +59,7 @@ export class Schema
 
     this.mapper = null;
   }
+  
   init()
   {
     if (!this.mapper) {
@@ -68,31 +68,38 @@ export class Schema
       this.mapper.init();
     }
   }
+  
   getName()
   {
     return this.name;
   }
+  
   setName(name: string)
   {
     this.name = name;
   }
+  
   getSpec(): SchemaSpec
   {
     this.init(); // we need the normalised spec so we must initialise the mapper
     return this.mapper.getSpec();
   }
+  
   setSpec(spec: SchemaSpec)
   {
     this.spec = spec;
   }
+  
   addConstructor(value)
   {
     this.constructors[value.alias ? value.alias : value.name] = value;
   }
+  
   getConstructor(constructorName)
   {
     return this.constructors[constructorName] ? this.constructors[constructorName] : null;
   }
+  
   addConstructors(constructors)
   {
     if (constructors) {
@@ -103,10 +110,12 @@ export class Schema
       });
     }
   }
+  
   addSchema(schema: Schema)
   {
     this.schemas[schema.getName()] = schema;
   }
+  
   addSchemas(schemas: Array<Schema> | {[key:string]: Schema})
   {
     if (schemas) {
@@ -117,6 +126,7 @@ export class Schema
       });
     }
   }
+  
   applyTransients(object: any)
   {
     this.init();
@@ -151,6 +161,7 @@ export class Schema
       }
     }) : object;
   }
+  
   stripTransients(object: any)
   {
     this.init();
@@ -167,6 +178,7 @@ export class Schema
       }
     }) : object;
   }
+  
   validate(object: any, options?: SchemaConfig): Promise<SchemaValidationResult>
   {
     this.init();
@@ -204,6 +216,7 @@ export class Schema
 
     return promise;
   }
+  
   validatePaths(paths: SchemaPaths | Array<SchemaPaths>, options?, meta?: SchemaMapperMeta): Promise<SchemaValidationResult>
   {
     this.init();
@@ -243,6 +256,7 @@ export class Schema
 
     return promise;
   }
+  
   validateQuery(query: any, options?: SchemaConfig): Promise<SchemaValidationResult>
   {
     this.init();
@@ -278,6 +292,7 @@ export class Schema
 
     return promise;
   }
+  
   filterPrivate(object: any, mode: boolean|string = true, mapperType: string = 'map')
   {
     this.init();
@@ -313,6 +328,7 @@ export class Schema
       if (ref.fieldContainer && ref.fieldContainer[ref.fieldName]) delete ref.fieldContainer[ref.fieldName];
     });
   }
+  
   specToFieldType(spec, value)
   {
     var fieldType = undefined;
@@ -340,6 +356,7 @@ export class Schema
 
     return fieldType;
   }
+  
   async validateField(
     spec: SchemaSpec, 
     fieldName: string | number, 
@@ -412,6 +429,7 @@ export class Schema
 
     return value;
   }
+  
   typeCast(requiredType: any, value, path?, meta: SchemaMapperMeta = {})
   {
     // If the spec specifies the value should be an object and the value is already an object, we do not need to typecast
@@ -448,12 +466,14 @@ export class Schema
 
     return result;
   }
+  
   static appendError(meta: SchemaMapperMeta, path, error)
   {
     var errors = Array.isArray(meta.errors[path]) ? meta.errors[path] : [];
     errors.push(error);
     meta.errors[path] = errors;
   }
+  
   static isNull(value: any)
   {
     var result = value === null || (
@@ -463,6 +483,7 @@ export class Schema
 
     return result;
   }
+  
   static mergeValidationResults(results: Array<SchemaValidationResult>): SchemaValidationResult
   {
     results = Array.isArray(results) ? results : [];

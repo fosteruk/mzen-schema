@@ -1,4 +1,4 @@
-import TypeCaster from '../type-caster';
+import TypeCaster from './type-caster';
 
 export class SchemaUtil
 {
@@ -34,14 +34,17 @@ export class SchemaUtil
 
     return spec;
   }
+  
   static isValidFieldName(fieldName)
   {
     return (Number.isInteger(fieldName) || !SchemaUtil.isQueryOperator(fieldName));
   }
+  
   static isQueryOperator(fieldName)
   {
     return (typeof fieldName == 'string' && fieldName.charAt(0) == '$');
   }
+  
   static canValidateQueryOperator(fieldName)
   {
     var cantValidateOperators = ['$near'];

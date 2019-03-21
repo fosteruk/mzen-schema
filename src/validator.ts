@@ -1,4 +1,4 @@
-import TypeCaster from '../type-caster';
+import TypeCaster from './type-caster';
 
 export class Validator
 {
