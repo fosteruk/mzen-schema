@@ -1,3 +1,43 @@
+export interface SchemaSpecValidateOptions
+{
+  name?: string;
+  message?: string;
+}
+
+export interface SchemaSpecValidateOptionsValueLength extends SchemaSpecValidateOptions
+{
+  min?: number;
+  max?: number;
+}
+
+export interface SchemaSpecValidateOptionsEquality extends SchemaSpecValidateOptions
+{
+  path: string;
+  root: any;
+}
+
+export interface SchemaSpecValidateOptionsEnumeration extends SchemaSpecValidateOptions
+{
+  values?: Array<any>;
+}
+
+export interface SchemaSpecValidateOptionsRegex extends SchemaSpecValidateOptions
+{
+  pattern?: any;
+}
+
+export interface SchemaSpecValidate
+{
+  notNull?: boolean | SchemaSpecValidateOptions,
+  required?: boolean | SchemaSpecValidateOptions
+  notEmpty?: boolean | SchemaSpecValidateOptions,
+  email?: boolean | SchemaSpecValidateOptions,
+  valueLength?: SchemaSpecValidateOptionsValueLength | Array<SchemaSpecValidateOptionsValueLength>,
+  equality?: SchemaSpecValidateOptionsEquality | Array<SchemaSpecValidateOptionsEquality>,
+  enumeration?: SchemaSpecValidateOptionsEnumeration,
+  regex?: SchemaSpecValidateOptionsRegex | Array<SchemaSpecValidateOptionsRegex>
+}
+
 export interface SchemaSpec 
 {
   $type?: any,
@@ -13,15 +53,7 @@ export interface SchemaSpec
     private?: boolean,
     privateValue?: boolean
   },
-  $validate?: {
-    notNull?: boolean | {name?: string, message?: string},
-    required?: boolean | {name?: string, message?: string},
-    notEmpty?: boolean | {name?: string, message?: string},
-    email?: boolean | {name?: string, message?: string},
-    valueLength?: {min?: number, max?: number, name?: string, message?: string} ,
-    equality?: {path: string, root: any, name?: string, message?: string},
-    enumeration?: {values?: Array<any>, name?: string, message?: string}
-  }
+  $validate?: SchemaSpecValidate,
   $displayName?: string,
   $strict?: boolean,
   [key: string]: SchemaSpec | any
