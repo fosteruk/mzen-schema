@@ -1,5 +1,5 @@
 import should = require('should');
-import Schema, { SchemaQuery } from '../../lib/schema';
+import Schema, { SchemaQuery } from '../lib/schema';
 
 describe('Schema', function() {
   describe('validateQuery', function() {

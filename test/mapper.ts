@@ -1,6 +1,6 @@
 import should = require('should');
-import Schema from '../../lib/schema';
-import SchemaMapper from '../../lib/mapper';
+import Schema from '../lib/schema';
+import SchemaMapper from '../lib/mapper';
 
 describe('SchemaMapper', function () {
   describe('map', function () {

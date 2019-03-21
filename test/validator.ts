@@ -1,5 +1,5 @@
 import should = require('should');
-import Validator from '../../lib/validator';
+import Validator from '../lib/validator';
 
 describe('Schema', function () {
   describe('validator', function () {

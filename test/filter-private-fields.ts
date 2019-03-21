@@ -1,5 +1,5 @@
 import should = require('should');
-import Schema from '../../lib/schema';
+import Schema from '../lib/schema';
 
 describe('Schema', function () {
   describe('filterPrivate', function () {
