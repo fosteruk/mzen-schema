@@ -1,3 +1,40 @@
+
+export interface SchemaSpec 
+{
+  $type?: any;
+  $spec?: SchemaSpec;
+  $pathRef?: string;
+  $construct?: any;
+  $filter?: SchemaSpecFilter;
+  $validate?: SchemaSpecValidate;
+  $displayName?: string;
+  $strict?: boolean;
+  [key: string]: SchemaSpec | any;
+}
+
+export interface SchemaSpecFilter
+{
+  trim?: boolean;
+  uppercase?: boolean;
+  lowercase?: boolean;
+  defaultValue?: any;
+  custom?: (value: any) => boolean|string;
+  private?: boolean;
+  privateValue?: boolean;
+}
+
+export interface SchemaSpecValidate
+{
+  notNull?: boolean | SchemaSpecValidateOptions,
+  required?: boolean | SchemaSpecValidateOptions
+  notEmpty?: boolean | SchemaSpecValidateOptions,
+  email?: boolean | SchemaSpecValidateOptions,
+  valueLength?: SchemaSpecValidateOptionsValueLength | Array<SchemaSpecValidateOptionsValueLength>,
+  equality?: SchemaSpecValidateOptionsEquality | Array<SchemaSpecValidateOptionsEquality>,
+  enumeration?: SchemaSpecValidateOptionsEnumeration,
+  regex?: SchemaSpecValidateOptionsRegex | Array<SchemaSpecValidateOptionsRegex>
+}
+
 export interface SchemaSpecValidateOptions
 {
   name?: string;
@@ -24,39 +61,6 @@ export interface SchemaSpecValidateOptionsEnumeration extends SchemaSpecValidate
 export interface SchemaSpecValidateOptionsRegex extends SchemaSpecValidateOptions
 {
   pattern?: any;
-}
-
-export interface SchemaSpecValidate
-{
-  notNull?: boolean | SchemaSpecValidateOptions,
-  required?: boolean | SchemaSpecValidateOptions
-  notEmpty?: boolean | SchemaSpecValidateOptions,
-  email?: boolean | SchemaSpecValidateOptions,
-  valueLength?: SchemaSpecValidateOptionsValueLength | Array<SchemaSpecValidateOptionsValueLength>,
-  equality?: SchemaSpecValidateOptionsEquality | Array<SchemaSpecValidateOptionsEquality>,
-  enumeration?: SchemaSpecValidateOptionsEnumeration,
-  regex?: SchemaSpecValidateOptionsRegex | Array<SchemaSpecValidateOptionsRegex>
-}
-
-export interface SchemaSpec 
-{
-  $type?: any,
-  $spec?: SchemaSpec,
-  $pathRef?: string,
-  $construct?: any,
-  $filter?: {
-    trim?: boolean,
-    uppercase?: boolean,
-    lowercase?: boolean,
-    defaultValue?: any,
-    custom?: (value: any) => boolean|string,
-    private?: boolean,
-    privateValue?: boolean
-  },
-  $validate?: SchemaSpecValidate,
-  $displayName?: string,
-  $strict?: boolean,
-  [key: string]: SchemaSpec | any
 }
 
 export default SchemaSpec;
