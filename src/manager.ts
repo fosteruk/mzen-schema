@@ -1,17 +1,20 @@
-interface SchemaManagerConfig {
-  constructors: object;
-  schemas: object;
+import Schema from './schema'
+
+export interface SchemaManagerConfig 
+{
+  constructors?: {[key: string]: any} | Array<any>;
+  schemas?: {[key: string]: Schema} | Array<Schema>;
 }
 
 export class SchemaManager
 {
   config: SchemaManagerConfig;
   constructors: {[key: string]: any};
-  schemas: {[key: string]: any};
+  schemas: {[key: string]: Schema};
   
-  constructor(options?)
+  constructor(options?: SchemaManagerConfig)
   {
-    this.config = (options == undefined) ? {} : options;
+    this.config = options ? options : {};
     this.config.constructors = this.config.constructors ? this.config.constructors : {};
     this.config.schemas = this.config.schemas ? this.config.schemas : {};
 
@@ -35,19 +38,11 @@ export class SchemaManager
   addConstructors(constructors)
   {
     if (constructors) {
-      if (Array.isArray(constructors)) {
-        constructors.forEach((construct) => {
-          if (typeof construct == 'function') {
-            this.addConstructor(construct);
-          }
-        });
-      } else {
-        Object.keys(constructors).forEach((constructorName) => {
-          if (typeof constructors[constructorName] == 'function') {
-            this.addConstructor(constructors[constructorName]);
-          }
-        });
-      }
+      // could be an array of constructor functions or a object map 
+      var constructorsArray = Array.isArray(constructors) ? constructors : Object.keys(constructors).map(name => constructors[name]);
+      constructorsArray.forEach(construct => {
+        if (typeof construct == 'function') this.addConstructor(construct);
+      });
     }
   }
   
@@ -58,18 +53,14 @@ export class SchemaManager
     }
   }
   
-  addSchemas(schemas)
+  addSchemas(schemas: Array<Schema> | {[key:string]: Schema})
   {
     if (schemas) {
-      if (Array.isArray(schemas)) {
-        schemas.forEach((schema) => {
-          this.addSchema(schema);
-        });
-      } else {
-        Object.keys(schemas).forEach((schemaName) => {
-          this.addSchema(schemas[schemaName]);
-        });
-      }
+      // could be an array of schema objects functions or a object map
+      var schemasArray = Array.isArray(schemas) ? schemas : Object.keys(schemas).map(name => schemas[name]);
+      schemasArray.forEach((schema) => {
+        if (schema instanceof Schema) this.addSchema(schema);
+      });
     }
   }
   
