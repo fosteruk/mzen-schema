@@ -38,8 +38,8 @@ export class Schema
   name: string;
   spec: SchemaSpec;
   constructors: {[key: string]: any};
-  schemas: {[key: string]: any};
-  mapper: Mapper | null | undefined;
+  schemas: {[key:string]: Schema};
+  mapper: Mapper;
   
   constructor(spec?: SchemaSpec, options?: SchemaConfig)
   {
@@ -72,16 +72,16 @@ export class Schema
   {
     return this.name;
   }
-  setName(name)
+  setName(name: string)
   {
     this.name = name;
   }
-  getSpec()
+  getSpec(): SchemaSpec
   {
     this.init(); // we need the normalised spec so we must initialise the mapper
     return this.mapper.getSpec();
   }
-  setSpec(spec)
+  setSpec(spec: SchemaSpec)
   {
     this.spec = spec;
   }
@@ -96,44 +96,28 @@ export class Schema
   addConstructors(constructors)
   {
     if (constructors) {
-      if (Array.isArray(constructors)) {
-        constructors.forEach((construct) => {
-          if (typeof construct == 'function') {
-            this.addConstructor(construct);
-          }
-        });
-      } else {
-        Object.keys(constructors).forEach((constructorName) => {
-          if (typeof constructors[constructorName] == 'function') {
-            this.addConstructor(constructors[constructorName]);
-          }
-        });
-      }
+      // could be an array of constructor functions or a object map 
+      var constructorsArray = Array.isArray(constructors) ? constructors : Object.keys(constructors).map(name => constructors[name]);
+      constructorsArray.forEach(construct => {
+        if (typeof construct == 'function') this.addConstructor(construct);
+      });
     }
   }
-  addSchema(schema)
+  addSchema(schema: Schema)
   {
     this.schemas[schema.getName()] = schema;
   }
-  addSchemas(schemas)
+  addSchemas(schemas: Array<Schema> | {[key:string]: Schema})
   {
     if (schemas) {
-      if (Array.isArray(schemas)) {
-        schemas.forEach((schema) => {
-          if (schema instanceof Schema) {
-            this.addSchema(schema);
-          }
-        });
-      } else {
-        Object.keys(schemas).forEach((schemaName) => {
-          if (schemas[schemaName] instanceof Schema) {
-            this.addSchema(schemas[schemaName]);
-          }
-        });
-      }
+      // could be an array of schema objects functions or a object map
+      var schemasArray = Array.isArray(schemas) ? schemas : Object.keys(schemas).map(name => schemas[name]);
+      schemasArray.forEach((schema) => {
+        if (schema instanceof Schema) this.addSchema(schema);
+      });
     }
   }
-  applyTransients(object)
+  applyTransients(object: any)
   {
     this.init();
     return (object && this.constructors) ? this.mapper.map(object, (
@@ -141,7 +125,7 @@ export class Schema
       fieldName: string | number, 
       fieldContainer: object, 
       path: string | number, 
-      meta: any
+      meta: SchemaMapperMeta
     ) => {
       if (fieldContainer) {
         var pathRef = fieldSpec ? fieldSpec.$pathRef : null;
@@ -167,7 +151,7 @@ export class Schema
       }
     }) : object;
   }
-  stripTransients(object)
+  stripTransients(object: any)
   {
     this.init();
     return (object && this.constructors)  ? this.mapper.map(object, (
@@ -183,7 +167,7 @@ export class Schema
       }
     }) : object;
   }
-  validate(object, options?: SchemaConfig): Promise<SchemaValidationResult>
+  validate(object: any, options?: SchemaConfig): Promise<SchemaValidationResult>
   {
     this.init();
     var meta = {errors: {}, root: object} as SchemaMapperMeta;
@@ -220,7 +204,7 @@ export class Schema
 
     return promise;
   }
-  validatePaths(paths: SchemaPaths | Array<SchemaPaths>, options?, meta?): Promise<SchemaValidationResult>
+  validatePaths(paths: SchemaPaths | Array<SchemaPaths>, options?, meta?: SchemaMapperMeta): Promise<SchemaValidationResult>
   {
     this.init();
     var meta = meta ? meta : {errors: {}};
@@ -259,7 +243,7 @@ export class Schema
 
     return promise;
   }
-  validateQuery(query, options?: SchemaConfig): Promise<SchemaValidationResult>
+  validateQuery(query: any, options?: SchemaConfig): Promise<SchemaValidationResult>
   {
     this.init();
     var meta = meta ? meta : {errors: {}};
@@ -294,7 +278,7 @@ export class Schema
 
     return promise;
   }
-  filterPrivate(object: object, mode: boolean|string = true, mapperType: string = 'map')
+  filterPrivate(object: any, mode: boolean|string = true, mapperType: string = 'map')
   {
     this.init();
     mode = mode ? mode : true;
@@ -356,7 +340,14 @@ export class Schema
 
     return fieldType;
   }
-  async validateField(spec: SchemaSpec, fieldName: string | number, value: any, path: string | number, options?: SchemaConfig, meta: SchemaMapperMeta = {})
+  async validateField(
+    spec: SchemaSpec, 
+    fieldName: string | number, 
+    value: any, 
+    path: string | number, 
+    options?: SchemaConfig, 
+    meta: SchemaMapperMeta = {}
+  )
   {
     path = path ? path : fieldName;
     const validators = spec && spec.$validate ? spec.$validate : {};
@@ -421,7 +412,7 @@ export class Schema
 
     return value;
   }
-  typeCast(requiredType, value, path, meta = {})
+  typeCast(requiredType: any, value, path?, meta: SchemaMapperMeta = {})
   {
     // If the spec specifies the value should be an object and the value is already an object, we do not need to typecast
     // It is impossible for us to cast an object to any object type other than Object
@@ -457,13 +448,13 @@ export class Schema
 
     return result;
   }
-  static appendError(meta, path, error)
+  static appendError(meta: SchemaMapperMeta, path, error)
   {
     var errors = Array.isArray(meta.errors[path]) ? meta.errors[path] : [];
     errors.push(error);
     meta.errors[path] = errors;
   }
-  static isNull(value)
+  static isNull(value: any)
   {
     var result = value === null || (
       // The string value NULL or null are treated as a literal null

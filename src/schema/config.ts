@@ -1,9 +1,11 @@
+import Schema from '../schema';
+
 export interface SchemaConfig {
   name?: string;
   spec?: any;
   strict?: boolean;
-  constructors?: object;
-  schemas?: object;
+  constructors?: {[key:string]: any} | Array<any>;
+  schemas?: {[key:string]: Schema} | Array<Schema>;
   defaultNotNull?: boolean;
   skipTransients?: boolean;
 };

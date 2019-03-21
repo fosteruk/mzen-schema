@@ -214,7 +214,7 @@ describe('Schema', function() {
         $name: 'address',
         $construct: ConstructorTestAddress,
         street: {$type: 'String', $validate: {notNull: true}},
-      }) as ConstructorTestUser;
+      });
 
       var schema = new Schema({
         $construct: ConstructorTestUser,
