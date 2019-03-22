@@ -116,7 +116,7 @@ export class ObjectPathAccessor
       if ((currentNode == '*' || prop == currentNode) && subject[prop] === Object(subject[prop])) {
         ObjectPathAccessor.searchRescursive(pattern, subject[prop], mutatorFunc, {
           ...meta, 
-          currentPath:  elementPath,
+          currentPath: elementPath,
           currentDepth: depth,
           matches
         });
