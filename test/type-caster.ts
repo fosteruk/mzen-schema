@@ -1,6 +1,6 @@
 import should = require('should');
 import Schema from '../lib/schema';
-import Types from '../lib/types';
+import SchemaTypes from '../lib/types';
 
 describe('Schema', function() {
   describe('type cast', function() {
@@ -77,7 +77,7 @@ describe('Schema', function() {
     });
     it('should cast ObjectId to String', function(done) {
       var data = {
-        _id: new Types.ObjectID('5832969760e396039ced6082')
+        _id: new SchemaTypes.ObjectID('5832969760e396039ced6082')
       };
 
       var schema = new Schema({
@@ -230,11 +230,11 @@ describe('Schema', function() {
       };
 
       var schema = new Schema({
-        _id: Types.ObjectID
+        _id: SchemaTypes.ObjectID
       });
 
       schema.validate(data).then(() => {
-        should(data._id.constructor).eql(Types.ObjectID);
+        should(data._id.constructor).eql(SchemaTypes.ObjectID);
         should(data._id.toString()).eql('5832969760e396039ced6082');
         done();
       });
@@ -271,7 +271,7 @@ describe('Schema', function() {
       });
 
       schema.validate(data).then(() => {
-        should(data._id.constructor).eql(Types.ObjectID);
+        should(data._id.constructor).eql(SchemaTypes.ObjectID);
         should(data._id.toString()).eql('5832969760e396039ced6082');
         should(data.name.constructor).eql(String);
         should(data.name).eql('123');
@@ -285,7 +285,7 @@ describe('Schema', function() {
         // @ts-ignore - 'toJSON' does not exist on type 'number'
         should(data.created.toJSON()).eql('2016-11-21T08:34:04.995Z');
         
-        should(data._idB.constructor).eql(Types.ObjectID);
+        should(data._idB.constructor).eql(SchemaTypes.ObjectID);
         should(data._idB.toString()).eql('5832969760e396039ced6082');
         should(data.nameB.constructor).eql(String);
         should(data.nameB).eql('123');

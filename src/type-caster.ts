@@ -1,6 +1,6 @@
 import ObjectID from 'bson-objectid';
 
-export class TypeCaster
+export class SchemaTypeCaster
 {
   static type: {[key: string]: any};
   
@@ -16,25 +16,25 @@ export class TypeCaster
 
   static getTypeName(value)
   {
-    return TypeCaster.getType(value).name;
+    return SchemaTypeCaster.getType(value).name;
   }
 
   static cast(toType, value)
   {
-    const fromTypeName = TypeCaster.getTypeName(value);
-    const fromTypeCaster = TypeCaster.type[fromTypeName];
-    if (fromTypeCaster == undefined) throw new Error('Can not cast from unknown type "' + fromTypeName + '"');
+    const fromTypeName = SchemaTypeCaster.getTypeName(value);
+    const fromSchemaTypeCaster = SchemaTypeCaster.type[fromTypeName];
+    if (fromSchemaTypeCaster == undefined) throw new Error('Can not cast from unknown type "' + fromTypeName + '"');
 
-    const toTypeName = TypeCaster.getTypeName(toType);
-    const toTypeCaster = TypeCaster.type[TypeCaster.getTypeName(toType)];
-    if (toTypeCaster == undefined) throw new Error('Can not cast to unknown type "' + toTypeName + '"');
+    const toTypeName = SchemaTypeCaster.getTypeName(toType);
+    const toSchemaTypeCaster = SchemaTypeCaster.type[SchemaTypeCaster.getTypeName(toType)];
+    if (toSchemaTypeCaster == undefined) throw new Error('Can not cast to unknown type "' + toTypeName + '"');
 
     var result = value;
     // If there is a cast function for toType then we cast the value
     // - otherwise the case is not supported so we simply return the original value
-    const castFunctionName = TypeCaster.getCastFunctionName(fromTypeName);
-    if (typeof toTypeCaster[castFunctionName] == 'function') {
-      result = toTypeCaster[castFunctionName](value);
+    const castFunctionName = SchemaTypeCaster.getCastFunctionName(fromTypeName);
+    if (typeof toSchemaTypeCaster[castFunctionName] == 'function') {
+      result = toSchemaTypeCaster[castFunctionName](value);
     }
 
     return result;
@@ -46,7 +46,7 @@ export class TypeCaster
   }
 }
 
-class TypeCasterString
+class SchemaTypeCasterString
 {
   static castNumber(value)
   {
@@ -64,7 +64,7 @@ class TypeCasterString
   }
 }
 
-class TypeCasterNumber
+class SchemaTypeCasterNumber
 {
   static castString(value)
   {
@@ -77,7 +77,7 @@ class TypeCasterNumber
   }
 }
 
-class TypeCasterBoolean
+class SchemaTypeCasterBoolean
 {
   static castString(value)
   {
@@ -91,7 +91,7 @@ class TypeCasterBoolean
   }
 }
 
-class TypeCasterDate
+class SchemaTypeCasterDate
 {
   static castString(value)
   {
@@ -110,7 +110,7 @@ class TypeCasterDate
   }
 }
 
-class TypeCasterObjectID
+class SchemaTypeCasterObjectID
 {
   static castString(value)
   {
@@ -120,14 +120,14 @@ class TypeCasterObjectID
   }
 }
 
-TypeCaster.type = {
-  String: TypeCasterString,
-  Number: TypeCasterNumber,
-  Boolean: TypeCasterBoolean,
+SchemaTypeCaster.type = {
+  String: SchemaTypeCasterString,
+  Number: SchemaTypeCasterNumber,
+  Boolean: SchemaTypeCasterBoolean,
   Object: {}, // Object is a valid type but we can not cast a primitive to an object so it has no cast methods
   Array: {}, // Array is a valid type but we can not cast a primitive to an object so it has no cast methods
-  Date: TypeCasterDate,
-  ObjectID: TypeCasterObjectID, // This is a mongodb specific type
+  Date: SchemaTypeCasterDate,
+  ObjectID: SchemaTypeCasterObjectID, // This is a mongodb specific type
 };
 
-export default TypeCaster;
+export default SchemaTypeCaster;
