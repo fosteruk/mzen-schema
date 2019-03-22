@@ -9,17 +9,17 @@ export class SchemaTypeCaster
    *
    * If value is a function that will be returned otherwise the values constructor will be returned.
    */
-  static getType(value)
+  static getType(value: any)
   {
     return typeof value == 'function' ? value : ((value === null || value === undefined) ? value : (value).constructor);
   }
 
-  static getTypeName(value)
+  static getTypeName(value: any)
   {
     return SchemaTypeCaster.getType(value).name;
   }
 
-  static cast(toType, value)
+  static cast(toType: any, value: any)
   {
     const fromTypeName = SchemaTypeCaster.getTypeName(value);
     const fromSchemaTypeCaster = SchemaTypeCaster.type[fromTypeName];
@@ -40,7 +40,7 @@ export class SchemaTypeCaster
     return result;
   }
 
-  static getCastFunctionName(typeName)
+  static getCastFunctionName(typeName: string)
   {
     return 'cast' + typeName.charAt(0).toUpperCase() + typeName.slice(1);
   }
@@ -48,17 +48,17 @@ export class SchemaTypeCaster
 
 class SchemaTypeCasterString
 {
-  static castNumber(value)
+  static castNumber(value: number): string
   {
     return (value).toString();
   }
 
-  static castBoolean(value)
+  static castBoolean(value: boolean): string
   {
     return (value) ? '1' : '0';
   }
 
-  static castObjectID(value)
+  static castObjectID(value: ObjectID): string
   {
     return value.toString();
   }
@@ -66,12 +66,12 @@ class SchemaTypeCasterString
 
 class SchemaTypeCasterNumber
 {
-  static castString(value)
+  static castString(value: string): number
   {
     return (+value);
   }
 
-  static castBoolean(value)
+  static castBoolean(value: boolean): number
   {
     return (value) ? 1 : 0;
   }
@@ -79,13 +79,13 @@ class SchemaTypeCasterNumber
 
 class SchemaTypeCasterBoolean
 {
-  static castString(value)
+  static castString(value: string): boolean
   {
     value = value.trim().toLowerCase();
     return (value == '1' || value == 'true');
   }
 
-  static castNumber(value)
+  static castNumber(value: number): boolean
   {
     return (value > 0);
   }
@@ -93,7 +93,7 @@ class SchemaTypeCasterBoolean
 
 class SchemaTypeCasterDate
 {
-  static castString(value)
+  static castString(value: string): Date
   {
     var result = undefined;
     if (value == '' || value.toLowerCase() == 'now') {
@@ -104,15 +104,15 @@ class SchemaTypeCasterDate
     return result;
   }
 
-  static castNumber(value)
+  static castNumber(value: number): Date
   {
     return new Date(value);
   }
 }
 
-class SchemaTypeCasterObjectID
+class SchemaTypeCasterObjectID 
 {
-  static castString(value)
+  static castString(value: string): ObjectID
   {
     // The string 'new' can be used request a new object id
     value = value == 'new' ? undefined :  value;
@@ -127,7 +127,7 @@ SchemaTypeCaster.type = {
   Object: {}, // Object is a valid type but we can not cast a primitive to an object so it has no cast methods
   Array: {}, // Array is a valid type but we can not cast a primitive to an object so it has no cast methods
   Date: SchemaTypeCasterDate,
-  ObjectID: SchemaTypeCasterObjectID, // This is a mongodb specific type
+  ObjectID: SchemaTypeCasterObjectID // This is a mongodb specific type
 };
 
 export default SchemaTypeCaster;
