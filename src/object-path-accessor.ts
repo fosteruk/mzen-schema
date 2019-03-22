@@ -17,7 +17,7 @@ export class ObjectPathAccessor
    *
    * Returns all elements matching 'path' in 'subject'.
    */
-  static getPath(path, subject)
+  static getPath(path: string, subject: any)
   {
     return ObjectPathAccessor.searchRescursive(path, subject);
   }
@@ -27,7 +27,7 @@ export class ObjectPathAccessor
   * Sets all elements matching 'path' in the given 'subject'.
   * Returns all matching elements with updated values.
   */
-  static setPath(path, value, subject)
+  static setPath(path: string, value: any, subject: any)
   {
     return ObjectPathAccessor.searchRescursive(path, subject, function(){
       return value;
@@ -38,7 +38,7 @@ export class ObjectPathAccessor
   *
   * Unsets all elements matching 'path' in the given 'subject'.
   */
-  static unsetPath(path, subject)
+  static unsetPath(path: string, subject: any)
   {
     return ObjectPathAccessor.searchRescursive(path, subject, function(){
       return undefined; // changing value to undefined causes the prop to be unset
@@ -50,7 +50,7 @@ export class ObjectPathAccessor
   * Mutates all elements matching 'path' in 'subject' using 'mutator' function.
   * Returns all matching elements with updated values.
   */
-  static mutatePath(path, subject, mutator)
+  static mutatePath(path: string, subject: any, mutator: (value: any) => any)
   {
     return ObjectPathAccessor.searchRescursive(path, subject, mutator);
   }
@@ -61,12 +61,21 @@ export class ObjectPathAccessor
    * Matched values may be modifed using optional mutatorFunc.
    * Returns matched value(s).
    */
-  static searchRescursive(pattern, subject, mutatorFunc?, options?)
+  static searchRescursive(
+    pattern: string, 
+    subject: any, 
+    mutatorFunc?: (value: any) => any, 
+    meta?: {
+      currentPath?: string,
+      currentDepth?: number,
+      matches?: Array<any>
+    }
+  )
   {
-    options = options ? options : {};
-    const currentPath = options.currentPath ? options.currentPath : null;
-    const currentDepth = options.currentDepth ? options.currentDepth : 1;
-    var matches = options.matches ? options.matches : [];
+    meta = meta ? meta : {};
+    const currentPath = meta.currentPath ? meta.currentPath : null;
+    const currentDepth = meta.currentDepth ? meta.currentDepth : 1;
+    var matches = meta.matches ? meta.matches : [];
 
 
     const patternParts = pattern.split('.');
@@ -88,7 +97,7 @@ export class ObjectPathAccessor
       }
     }
 
-    function processElement(prop)
+    function processElement(prop: string | number)
     {
       // Element path is the full path to the current element
       let elementPath = currentPath ? currentPath + '.' + prop : String(prop);
@@ -105,12 +114,12 @@ export class ObjectPathAccessor
 
       // Only recurse into objects - can be an array object but not a primitive
       if ((currentNode == '*' || prop == currentNode) && subject[prop] === Object(subject[prop])) {
-        let nextOptions = Object.assign({}, options, {
+        ObjectPathAccessor.searchRescursive(pattern, subject[prop], mutatorFunc, {
+          ...meta, 
           currentPath:  elementPath,
           currentDepth: depth,
           matches
         });
-        ObjectPathAccessor.searchRescursive(pattern, subject[prop], mutatorFunc, nextOptions);
       }
     }
 
@@ -125,7 +134,7 @@ export class ObjectPathAccessor
    * The second path argument is assumed to be the real path and so wild cards are ignored
    * - the value '*' is treated a literal rather than a wild card
    */
-  static pathsMatch(path, realPath)
+  static pathsMatch(path: string, realPath: string)
   {
     var p1Parts = path.split('.');
     var p2Parts = realPath.split('.');
