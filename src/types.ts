@@ -2,7 +2,7 @@ import ObjectID from 'bson-objectid';
 
 class Mixed {}
 
-export const Types = {
+export const SchemaTypes = {
   String: String,
   Number: Number,
   Boolean: Boolean,
@@ -13,4 +13,4 @@ export const Types = {
   Mixed: Mixed
 };
 
-export default Types;
+export default SchemaTypes;

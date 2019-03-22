@@ -1,8 +1,8 @@
 import SchemaUtil from './util';
-import Mapper, { SchemaMapperMeta } from './mapper';
+import { SchemaMapper, SchemaMapperMeta } from './mapper';
 import Validator from './validator';
 import Filter from './filter';
-import Types from './types';
+import SchemaTypes from './types';
 import TypeCaster from './type-caster';
 import ObjectPathAccessor from './object-path-accessor';
 import SchemaConfig from './config';
@@ -38,7 +38,7 @@ export class Schema
   spec: SchemaSpec;
   constructors: {[key: string]: any};
   schemas: {[key:string]: Schema};
-  mapper: Mapper;
+  SchemaMapper: SchemaMapper;
   
   constructor(spec?: SchemaSpec, options?: SchemaConfig)
   {
@@ -57,15 +57,15 @@ export class Schema
     this.schemas = {};
     if (this.config.schemas) this.addSchemas(this.config.schemas);
 
-    this.mapper = null;
+    this.SchemaMapper = null;
   }
   
   init()
   {
-    if (!this.mapper) {
-      this.mapper = new Mapper(this.spec, this.config);
-      this.mapper.addSchemas(this.schemas);
-      this.mapper.init();
+    if (!this.SchemaMapper) {
+      this.SchemaMapper = new SchemaMapper(this.spec, this.config);
+      this.SchemaMapper.addSchemas(this.schemas);
+      this.SchemaMapper.init();
     }
   }
   
@@ -81,8 +81,8 @@ export class Schema
   
   getSpec(): SchemaSpec
   {
-    this.init(); // we need the normalised spec so we must initialise the mapper
-    return this.mapper.getSpec();
+    this.init(); // we need the normalised spec so we must initialise the SchemaMapper
+    return this.SchemaMapper.getSpec();
   }
   
   setSpec(spec: SchemaSpec)
@@ -130,7 +130,7 @@ export class Schema
   applyTransients(object: any)
   {
     this.init();
-    return (object && this.constructors) ? this.mapper.map(object, (
+    return (object && this.constructors) ? this.SchemaMapper.map(object, (
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object, 
@@ -165,7 +165,7 @@ export class Schema
   stripTransients(object: any)
   {
     this.init();
-    return (object && this.constructors)  ? this.mapper.map(object, (
+    return (object && this.constructors)  ? this.SchemaMapper.map(object, (
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object
@@ -186,7 +186,7 @@ export class Schema
     options = options ?  options : {};
 
     var promises = [];
-    this.mapper.map(object, (     
+    this.SchemaMapper.map(object, (     
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object, 
@@ -225,7 +225,7 @@ export class Schema
     options = options ?  options : {};
 
     var promises = [];
-    this.mapper.mapPaths(objects, (      
+    this.SchemaMapper.mapPaths(objects, (      
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object, 
@@ -267,10 +267,10 @@ export class Schema
     options.strict = false;
 
     var promises = [];
-    this.mapper.mapQueryPaths(query, (path, queryPathFieldName, container) => {
+    this.SchemaMapper.mapQueryPaths(query, (path, queryPathFieldName, container) => {
       var paths = {};
       paths[path] = container[queryPathFieldName];
-      this.mapper.mapPaths(paths, (fieldSpec, fieldName, fieldContainer, path) => {
+      this.SchemaMapper.mapPaths(paths, (fieldSpec, fieldName, fieldContainer, path) => {
         let promise = this.validateField(
           fieldSpec,
           fieldName,
@@ -293,14 +293,14 @@ export class Schema
     return promise;
   }
   
-  filterPrivate(object: any, mode: boolean|string = true, mapperType: string = 'map')
+  filterPrivate(object: any, mode: boolean|string = true, SchemaMapperType: string = 'map')
   {
     this.init();
     mode = mode ? mode : true;
     var deleteRefs = [];
     var valueReplaceRefs = [];
-    var mapperType = (mapperType == 'mapPaths') ? 'mapPaths' : 'map';
-    this.mapper[mapperType](object, (      
+    var SchemaMapperType = (SchemaMapperType == 'mapPaths') ? 'mapPaths' : 'map';
+    this.SchemaMapper[SchemaMapperType](object, (      
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object
@@ -351,7 +351,7 @@ export class Schema
     if (fieldType && fieldType.constructor == String) {
       // The fieldType was specified with a String value (not a string constructor)
       // Attempt to covert the field type to a constructor
-      fieldType = Types[fieldType];
+      fieldType = SchemaTypes[fieldType];
     }
 
     return fieldType;
@@ -385,9 +385,9 @@ export class Schema
       defaultValue = {};
     } else if (fieldType == Array) {
       defaultValue = [];
-    } else if (fieldName == '_id' && fieldType == Types.ObjectID) {
+    } else if (fieldName == '_id' && fieldType == SchemaTypes.ObjectID) {
       defaultValue = function() {
-        return new Types.ObjectID;
+        return new SchemaTypes.ObjectID;
       };
     }
     // Default value must be applied before type-casting - because the default value may need to be type-casted
@@ -400,7 +400,7 @@ export class Schema
       // We only attempt to type cast if the type was specified, the value is not null and not undefined
       // - a type cast failure would result in an error which we do not want in the case of undefined or null
       // - these indicate no-value, and so there is nothing to cast
-      if (fieldType && fieldType != Types.Mixed) value = this.typeCast(fieldType, value, path, meta);
+      if (fieldType && fieldType != SchemaTypes.Mixed) value = this.typeCast(fieldType, value, path, meta);
     }
 
     if (fieldType == Object && (strict || options.strict)) {

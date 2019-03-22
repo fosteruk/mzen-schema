@@ -1,6 +1,6 @@
 import clone = require('clone');
 import SchemaUtil from './util';
-import Types from './types';
+import SchemaTypes from './types';
 import TypeCaster from './type-caster';
 import Schema from './schema';
 import SchemaConfig from './config';
@@ -292,7 +292,7 @@ export class SchemaMapper
     if (fieldType && fieldType.constructor == String) {
       // The fieldType was specified with a string value (not a String constructor)
       // Attempt to covert the field type to a constructor
-      fieldType = Types[fieldType];
+      fieldType = SchemaTypes[fieldType];
     }
 
     var defaultValue = undefined;
