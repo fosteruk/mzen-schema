@@ -295,6 +295,78 @@ describe('ObjectPathAccessor', function () {
       should(data.planet.c.three).eql({name: 'Pluto'});
     });
   });
+  describe('unsetPath()', function () {
+    it('should unset value at given path', function () {
+      var data = {
+        planet: 'Earth'
+      };
+
+      ObjectPathAccessor.unsetPath('planet',  data);
+
+      should(data).eql({});
+      should(data.planet).eql(undefined);
+    });
+    it('should unset value at given deep path', function () {
+      var data = {
+        planet: {
+          name: 'Earth',
+          continent: {
+            name: 'Europe',
+            country: {
+              name: 'UK',
+              city: {
+                name: 'London',
+              }
+            }
+          }
+        }
+      };
+
+      ObjectPathAccessor.unsetPath('planet.continent.country', data);
+
+      should(data).eql({
+        planet: {
+          name: 'Earth',
+          continent: {
+            name: 'Europe'
+          }
+        }
+      });
+      should(data.planet.continent.country).eql(undefined);
+    });
+    it('should unset value at given array path', function () {
+      var data = [
+        {
+          planet: {
+            name: 'Earth',
+            continent: {
+              name: 'Europe',
+              country: {
+                name: 'UK',
+                city: {
+                  name: 'London',
+                }
+              }
+            }
+          }
+        }
+      ];
+
+      ObjectPathAccessor.unsetPath('0.planet.continent.country', data);
+
+      should(data).eql( [
+        {
+          planet: {
+            name: 'Earth',
+            continent: {
+              name: 'Europe'
+            }
+          }
+        }
+      ]);
+      should(data[0].planet.continent.country).eql(undefined);
+    });
+  });
   describe('mutatePath()', function () {
     it('should mutate value at given path', function () {
       var data = {
