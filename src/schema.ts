@@ -38,7 +38,7 @@ export class Schema
   spec: SchemaSpec;
   constructors: {[key: string]: any};
   schemas: {[key:string]: Schema};
-  SchemaMapper: SchemaMapper;
+  schemaMapper: SchemaMapper;
   
   constructor(spec?: SchemaSpec, options?: SchemaConfig)
   {
@@ -57,15 +57,15 @@ export class Schema
     this.schemas = {};
     if (this.config.schemas) this.addSchemas(this.config.schemas);
 
-    this.SchemaMapper = null;
+    this.schemaMapper = null;
   }
   
   init()
   {
-    if (!this.SchemaMapper) {
-      this.SchemaMapper = new SchemaMapper(this.spec, this.config);
-      this.SchemaMapper.addSchemas(this.schemas);
-      this.SchemaMapper.init();
+    if (!this.schemaMapper) {
+      this.schemaMapper = new SchemaMapper(this.spec, this.config);
+      this.schemaMapper.addSchemas(this.schemas);
+      this.schemaMapper.init();
     }
   }
   
@@ -82,7 +82,7 @@ export class Schema
   getSpec(): SchemaSpec
   {
     this.init(); // we need the normalised spec so we must initialise the SchemaMapper
-    return this.SchemaMapper.getSpec();
+    return this.schemaMapper.getSpec();
   }
   
   setSpec(spec: SchemaSpec)
@@ -130,7 +130,7 @@ export class Schema
   applyTransients(object: any)
   {
     this.init();
-    return (object && this.constructors) ? this.SchemaMapper.map(object, (
+    return (object && this.constructors) ? this.schemaMapper.map(object, (
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object, 
@@ -165,7 +165,7 @@ export class Schema
   stripTransients(object: any)
   {
     this.init();
-    return (object && this.constructors)  ? this.SchemaMapper.map(object, (
+    return (object && this.constructors)  ? this.schemaMapper.map(object, (
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object
@@ -186,7 +186,7 @@ export class Schema
     options = options ?  options : {};
 
     var promises = [];
-    this.SchemaMapper.map(object, (     
+    this.schemaMapper.map(object, (     
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object, 
@@ -225,7 +225,7 @@ export class Schema
     options = options ?  options : {};
 
     var promises = [];
-    this.SchemaMapper.mapPaths(objects, (      
+    this.schemaMapper.mapPaths(objects, (      
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object, 
@@ -267,10 +267,10 @@ export class Schema
     options.strict = false;
 
     var promises = [];
-    this.SchemaMapper.mapQueryPaths(query, (path, queryPathFieldName, container) => {
+    this.schemaMapper.mapQueryPaths(query, (path, queryPathFieldName, container) => {
       var paths = {};
       paths[path] = container[queryPathFieldName];
-      this.SchemaMapper.mapPaths(paths, (fieldSpec, fieldName, fieldContainer, path) => {
+      this.schemaMapper.mapPaths(paths, (fieldSpec, fieldName, fieldContainer, path) => {
         let promise = this.validateField(
           fieldSpec,
           fieldName,
@@ -300,7 +300,7 @@ export class Schema
     var deleteRefs = [];
     var valueReplaceRefs = [];
     var mapperType = (mapperType == 'mapPaths') ? 'mapPaths' : 'map';
-    this.SchemaMapper[mapperType](object, (      
+    this.schemaMapper[mapperType](object, (      
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object
