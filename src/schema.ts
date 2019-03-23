@@ -293,14 +293,14 @@ export class Schema
     return promise;
   }
   
-  filterPrivate(object: any, mode: boolean|string = true, SchemaMapperType: string = 'map')
+  filterPrivate(object: any, mode?: boolean | string, mapperType?: string)
   {
     this.init();
     mode = mode ? mode : true;
     var deleteRefs = [];
     var valueReplaceRefs = [];
-    var SchemaMapperType = (SchemaMapperType == 'mapPaths') ? 'mapPaths' : 'map';
-    this.SchemaMapper[SchemaMapperType](object, (      
+    var mapperType = (mapperType == 'mapPaths') ? 'mapPaths' : 'map';
+    this.SchemaMapper[mapperType](object, (      
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object
