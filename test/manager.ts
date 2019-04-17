@@ -2,9 +2,9 @@ import should = require('should');
 import SchemaManager from '../lib/manager';
 import Schema from '../lib/schema';
 
-describe('SchemaManager', function () {
-  describe('init()', function () {
-    it('should inject schemas into each schema', function (done) {
+describe('SchemaManager', function(){
+  describe('init()', function(){
+    it('should inject schemas into each schema', async () => {
       var userSchema = new Schema({$name: 'user'});
       var orderSchema = new Schema({$name: 'order'});
 
@@ -17,17 +17,14 @@ describe('SchemaManager', function () {
       schemaManager.addSchema(userSchema);
       schemaManager.addSchema(orderSchema);
 
-      schemaManager.init().then(function(){
-        should(userSchema.schemas.user).eql(userSchema);
-        should(userSchema.schemas.order).eql(orderSchema);
-        should(orderSchema.schemas.user).eql(userSchema);
-        should(orderSchema.schemas.order).eql(orderSchema);
-        done();
-      }).catch(function(err){
-        done(err);
-      });
+      await schemaManager.init();
+
+      should(userSchema.schemas.user).eql(userSchema);
+      should(userSchema.schemas.order).eql(orderSchema);
+      should(orderSchema.schemas.user).eql(userSchema);
+      should(orderSchema.schemas.order).eql(orderSchema);
     });
-    it('should inject constructors into each schema', function (done) {
+    it('should inject constructors into each schema', async () => {
       var User = function(){};
       var Order = function(){};
 
@@ -45,15 +42,12 @@ describe('SchemaManager', function () {
       schemaManager.addConstructor(User);
       schemaManager.addConstructor(Order);
 
-      schemaManager.init().then(function(){
-        should(userSchema.constructors.User).eql(User);
-        should(userSchema.constructors.Order).eql(Order);
-        should(orderSchema.constructors.User).eql(User);
-        should(orderSchema.constructors.Order).eql(Order);
-        done();
-      }).catch(function(err){
-        done(err);
-      });
+      await schemaManager.init();
+
+      should(userSchema.constructors.User).eql(User);
+      should(userSchema.constructors.Order).eql(Order);
+      should(orderSchema.constructors.User).eql(User);
+      should(orderSchema.constructors.Order).eql(Order);
     });
   });
 });

@@ -1,31 +1,31 @@
 import should = require('should');
 import ObjectPathAccessor from '../lib/object-path-accessor';
 
-describe('ObjectPathAccessor', function () {
-  describe('pathsMatch()', function () {
-    it('should return true if two paths are exactly equal', function () {
+describe('ObjectPathAccessor', function(){
+  describe('pathsMatch()', function(){
+    it('should return true if two paths are exactly equal', function(){
       should(ObjectPathAccessor.pathsMatch('planet', 'planet')).be.true();
       should(ObjectPathAccessor.pathsMatch('planet.country', 'planet.country')).be.true();
       should(ObjectPathAccessor.pathsMatch('planet.country.city', 'planet.country.city')).be.true();
     });
-    it('should accept wildcard in first path argument', function () {
+    it('should accept wildcard in first path argument', function(){
       should(ObjectPathAccessor.pathsMatch('*', 'planet')).be.true();
       should(ObjectPathAccessor.pathsMatch('planet.*', 'planet.country')).be.true();
       should(ObjectPathAccessor.pathsMatch('planet.*.city', 'planet.country.city')).be.true();
     });
-    it('should treat wildcard in second path argument as a literal', function () {
+    it('should treat wildcard in second path argument as a literal', function(){
       should(ObjectPathAccessor.pathsMatch('*', '*')).be.true();
       should(ObjectPathAccessor.pathsMatch('planet.country', 'planet.*')).be.false();
       should(ObjectPathAccessor.pathsMatch('planet.country.city', 'planet.country.*')).be.false();
     });
-    it('should allow wildcard to be escaped with backslash', function () {
+    it('should allow wildcard to be escaped with backslash', function(){
       should(ObjectPathAccessor.pathsMatch('\*', '*')).be.true();
       should(ObjectPathAccessor.pathsMatch('planet.\*', 'planet.*')).be.true();
       should(ObjectPathAccessor.pathsMatch('planet.\*.city', 'planet.*.city')).be.true();
     });
   });
-  describe('getPath()', function () {
-    it('should return value at given path', function () {
+  describe('getPath()', function(){
+    it('should return value at given path', function(){
       var data = {
         planet: 'Earth'
       };
@@ -34,7 +34,7 @@ describe('ObjectPathAccessor', function () {
 
       should(result).eql('Earth');
     });
-    it('should return value at given deep path', function () {
+    it('should return value at given deep path', function(){
       var data = {
         planet: {
           name: 'Earth',
@@ -54,7 +54,7 @@ describe('ObjectPathAccessor', function () {
 
       should(result).eql({name: 'UK', city: {name: 'London'}});
     });
-    it('should return value at given array index', function () {
+    it('should return value at given array index', function(){
       var data = [
         'Earth',
         'Mars',
@@ -65,7 +65,7 @@ describe('ObjectPathAccessor', function () {
 
       should(result).eql('Mars');
     });
-    it('should return value at given deep array index', function () {
+    it('should return value at given deep array index', function(){
       var data = [
         ['Earth', 'Mars',],
         ['Venus']
@@ -75,7 +75,7 @@ describe('ObjectPathAccessor', function () {
 
       should(result).eql('Mars');
     });
-    it('should return value at given array path', function () {
+    it('should return value at given array path', function(){
       var data = [
           {
           planet: {
@@ -97,7 +97,7 @@ describe('ObjectPathAccessor', function () {
 
       should(result).eql({name: 'UK', city: {name: 'London'}});
     });
-    it('should return array of values for wildcard path', function () {
+    it('should return array of values for wildcard path', function(){
       var data = {
           planet: {
             one: {name: 'Earth'},
@@ -114,7 +114,7 @@ describe('ObjectPathAccessor', function () {
         {name: 'Venus'}
       ]);
     });
-    it('should return array of values for wildcard array path', function () {
+    it('should return array of values for wildcard array path', function(){
       var data = {
         planet: [
           {name: 'Earth'},
@@ -136,7 +136,7 @@ describe('ObjectPathAccessor', function () {
         {name: 'Venus'}
       ]);
     });
-    it('should return array of values for multiple wildcard path', function () {
+    it('should return array of values for multiple wildcard path', function(){
       var data = {
           planet: {
             a: {one: {name: 'Earth'}},
@@ -153,7 +153,7 @@ describe('ObjectPathAccessor', function () {
         {name: 'Venus'}
       ]);
     });
-    it('should return array of values for multiple wildcard array path', function () {
+    it('should return array of values for multiple wildcard array path', function(){
       var data = {
         planet: [
           [{name: 'Earth'}],
@@ -176,8 +176,8 @@ describe('ObjectPathAccessor', function () {
       ]);
     });
   });
-  describe('setPath()', function () {
-    it('should set value at given path', function () {
+  describe('setPath()', function(){
+    it('should set value at given path', function(){
       var data = {
         planet: 'Earth'
       };
@@ -187,7 +187,7 @@ describe('ObjectPathAccessor', function () {
       should(result).eql('Mars');
       should(data.planet).eql('Mars');
     });
-    it('should set value at given deep path', function () {
+    it('should set value at given deep path', function(){
       var data = {
         planet: {
           name: 'Earth',
@@ -208,7 +208,7 @@ describe('ObjectPathAccessor', function () {
       should(result).eql({name: 'Liverpool'});
       should(data.planet.continent.country.city).eql({name: 'Liverpool'});
     });
-    it('should set value at given array index', function () {
+    it('should set value at given array index', function(){
       var data = [
         'Earth',
         'Mars',
@@ -220,7 +220,7 @@ describe('ObjectPathAccessor', function () {
       should(result).eql('neptune');
       should(data[1]).eql('neptune');
     });
-    it('should set value at given deep array index', function () {
+    it('should set value at given deep array index', function(){
       var data = [
         ['Earth', 'Mars'],
         ['Venus']
@@ -231,7 +231,7 @@ describe('ObjectPathAccessor', function () {
       should(result).eql('neptune');
       should(data[0][1]).eql('neptune');
     });
-    it('should set value at given array path', function () {
+    it('should set value at given array path', function(){
       var data = [
           {
           planet: {
@@ -254,7 +254,7 @@ describe('ObjectPathAccessor', function () {
       should(result).eql({name: 'Liverpool'});
       should(data[0].planet.continent.country.city).eql({name: 'Liverpool'});
     });
-    it('should set value to array for wildcard path', function () {
+    it('should set value to array for wildcard path', function(){
       var data = {
           planet: {
             one: {name: 'Earth'},
@@ -274,7 +274,7 @@ describe('ObjectPathAccessor', function () {
       should(data.planet.two).eql({name: 'Pluto'});
       should(data.planet.other).eql({name: 'Pluto'});
     });
-    it('should set value to array for multiple wildcard path', function () {
+    it('should set value to array for multiple wildcard path', function(){
       var data = {
           planet: {
             a: {one: {name: 'Earth'}},
@@ -295,8 +295,8 @@ describe('ObjectPathAccessor', function () {
       should(data.planet.c.three).eql({name: 'Pluto'});
     });
   });
-  describe('unsetPath()', function () {
-    it('should unset value at given path', function () {
+  describe('unsetPath()', function(){
+    it('should unset value at given path', function(){
       var data = {
         planet: 'Earth'
       };
@@ -306,7 +306,7 @@ describe('ObjectPathAccessor', function () {
       should(data).eql({});
       should(data.planet).eql(undefined);
     });
-    it('should unset value at given deep path', function () {
+    it('should unset value at given deep path', function(){
       var data = {
         planet: {
           name: 'Earth',
@@ -334,7 +334,7 @@ describe('ObjectPathAccessor', function () {
       });
       should(data.planet.continent.country).eql(undefined);
     });
-    it('should unset value at given array path', function () {
+    it('should unset value at given array path', function(){
       var data = [
         {
           planet: {
@@ -367,8 +367,8 @@ describe('ObjectPathAccessor', function () {
       should(data[0].planet.continent.country).eql(undefined);
     });
   });
-  describe('mutatePath()', function () {
-    it('should mutate value at given path', function () {
+  describe('mutatePath()', function(){
+    it('should mutate value at given path', function(){
       var data = {
         planet: 'Earth'
       };
@@ -380,7 +380,7 @@ describe('ObjectPathAccessor', function () {
       should(result).eql('Earth X');
       should(data.planet).eql('Earth X');
     });
-    it('should mutate value at given deep path', function () {
+    it('should mutate value at given deep path', function(){
       var data = {
         planet: {
           name: 'Earth',
@@ -403,7 +403,7 @@ describe('ObjectPathAccessor', function () {
       should(result).eql('London X');
       should(data.planet.continent.country.city.name).eql('London X');
     });
-    it('should mutate value at given array index', function () {
+    it('should mutate value at given array index', function(){
       var data = [
         'Earth',
         'Mars',
@@ -418,7 +418,7 @@ describe('ObjectPathAccessor', function () {
       should(result).eql('Mars X');
       should(data[1]).eql('Mars X');
     });
-    it('should mutate value at given deep array index', function () {
+    it('should mutate value at given deep array index', function(){
       var data = [
         ['Earth', 'Mars'],
         ['Venus']
@@ -431,7 +431,7 @@ describe('ObjectPathAccessor', function () {
       should(result).eql('Mars X');
       should(data[0][1]).eql('Mars X');
     });
-    it('should mutate value at given array path', function () {
+    it('should mutate value at given array path', function(){
       var data = [
           {
           planet: {
@@ -456,7 +456,7 @@ describe('ObjectPathAccessor', function () {
       should(result).eql('London X');
       should(data[0].planet.continent.country.city.name).eql('London X');
     });
-    it('should mutate array for wildcard path', function () {
+    it('should mutate array for wildcard path', function(){
       var data = {
           planet: {
             one: {name: 'Earth'},
@@ -478,7 +478,7 @@ describe('ObjectPathAccessor', function () {
       should(data.planet.two).eql({name: 'Mars X'});
       should(data.planet.other).eql({name: 'Venus X'});
     });
-    it('should mutate array for multiple wildcard path', function () {
+    it('should mutate array for multiple wildcard path', function(){
       var data = {
           planet: {
             a: {one: {name: 'Earth'}},

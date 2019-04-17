@@ -2,35 +2,30 @@ import should = require('should');
 import Schema from '../lib/schema';
 import ObjectID from 'bson-objectid';
 
-
-describe('Schema', function() {
-  describe('default value', function() {
-    it('should inject default value when undefined', function(done) {
-      var data = {} as {house: number};
+describe('Schema', function(){
+  describe('default value', function(){
+    it('should inject default value when undefined', async () => {
+      var data: {house?: number} = {};
 
       var schema = new Schema({
         house: {$type: Number, $filter: {defaultValue: 5}}
       });
 
-      schema.validate(data).then(() => {
-        should(data.house).eql(5);
-        done();
-      });
+      await schema.validate(data);
+      should(data.house).eql(5);
     });
-    it('should inject default function value when undefined', function(done) {
-      var data = {} as {created: Date};
+    it('should inject default function value when undefined', async () => {
+      var data: {created?: Date} = {};
 
       var schema = new Schema({
         created: {$type: Date, $filter: {defaultValue: () => new Date}}
       });
 
-      schema.validate(data).then(() => {
-        should(data.created.constructor.name).eql('Date');
-        done();
-      });
+      await schema.validate(data);
+      should(data.created.constructor.name).eql('Date');
     });
-    it('should inject default value when undefined using $spec', function(done) {
-      var data = {} as {house: number};
+    it('should inject default value when undefined using $spec', async () => {
+      var data: {house?: number} = {};
 
       var schema = new Schema({
         $type: Object,
@@ -39,93 +34,75 @@ describe('Schema', function() {
         }
       });
 
-      schema.validate(data).then(() => {
-        should(data.house).eql(5);
-        done();
-      }).catch((e) => {
-        done(e);
-      });
+      await schema.validate(data);
+      should(data.house).eql(5);
     });
-    it('should typecast default string to date', function(done) {
-      var data = {} as {created: Date};
+    it('should typecast default string to date', async () => {
+      var data: {created?: Date} = {};
 
       var schema = new Schema({
         created: {$type: Date, $filter: {defaultValue: 'now'}}
       });
 
-      schema.validate(data).then(() => {
-        should(data.created.constructor.name).eql('Date');
-        done();
-      });
+      await schema.validate(data);
+      should(data.created.constructor.name).eql('Date');
     });
-    it('should inject default value when null', function(done) {
-      var data = {} as {house: number};
+    it('should inject default value when null', async () => {
+      var data: {house?: number} = {};
 
       var schema = new Schema({
         house: {$type: Number, $filter: {defaultValue: 5}}
       });
 
-      schema.validate(data).then(() => {
-        should(data.house).eql(5);
-        done();
-      });
+      await schema.validate(data);
+      should(data.house).eql(5);
     });
-    it('should inject default value when null, even when defined as not null', function(done) {
-      var data = {} as {house: number};
+    it('should inject default value when null, even when defined as not null', async () => {
+      var data: {house?: number} = {};
 
       var schema = new Schema({
         house: {$type: Number, $validate: {notNull: true}, $filter: {defaultValue: 5}}
       });
 
-      schema.validate(data).then(() => {
-        should(data.house).eql(5);
-        done();
-      });
+      await schema.validate(data);
+      should(data.house).eql(5);
     });
-    describe('should validate injected default value', function() {
-      it('valid not null', function(done) {
+    describe('should validate injected default value', function(){
+      it('valid not null', async () => {
         var schema = new Schema({
           house: {$type: Number, $validate: {notNull: true}, $filter: {defaultValue: 5}}
         });
 
-        schema.validate({}).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        });
+        const result = await schema.validate({});
+        should(result.isValid).eql(true);
       });
-      it('invalid not null', function(done) {
+      it('invalid not null', async () => {
         var schema = new Schema({
           house: {$type: Number, $validate: {notNull: true}, $filter: {defaultValue: null}}
         });
 
-        schema.validate({}).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        });
+        const result = await schema.validate({});
+        should(result.isValid).eql(false);
       });
-      it('invalid not empty', function(done) {
+      it('invalid not empty', async () => {
         var schema = new Schema({
           house: {$type: Number, $validate: {notEmpty: true}, $filter: {defaultValue: 0}}
         });
 
-        schema.validate({}).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        });
+        const result = await schema.validate({});
+        should(result.isValid).eql(false);
       });
-      it('invalid required', function(done) {
+      it('invalid required', async () => {
         var schema = new Schema({
           house: {$type: Number, $validate: {required: true}, $filter: {defaultValue: undefined}}
         });
 
-        schema.validate({}).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        });
+        const result = await schema.validate({});
+        should(result.isValid).eql(false);
       });
     });
-    it('should inject new ObjectID if field named _id and defined as ObjectID does not have a value', function(done) {
-      var data = {} as {_id: ObjectID};
+    it('should inject new ObjectID if field named _id and defined as ObjectID does not have a value', async () => {
+      var data: {_id?: ObjectID} = {};
 
       var schema = new Schema({
         _id: {
@@ -133,13 +110,11 @@ describe('Schema', function() {
         }
       });
 
-      schema.validate(data).then(() => {
-        should(data._id.constructor.name).eql('ObjectID');
-        done();
-      });
+      await schema.validate(data);
+      should(data._id.constructor.name).eql('ObjectID');
     });
-    it('should not inject new ObjectID if field name is something other than _id, defined as ObjectID and does not have a value', function(done) {
-      var data = {} as {other: ObjectID};
+    it('should not inject new ObjectID if field name is something other than _id, defined as ObjectID and does not have a value', async () => {
+      var data: {other?: ObjectID} = {};
 
       var schema = new Schema({
         other: {
@@ -147,15 +122,11 @@ describe('Schema', function() {
         }
       });
 
-      schema.validate(data).then(() => {
-        should(data.other).eql(undefined);
-        done();
-      }).catch((e) => {
-        done(e);
-      });
+      await schema.validate(data);
+      should(data.other).eql(undefined);
     });
-    it('should inject new ObjectID if field defined as ObjectID if default value is "new"', function(done) {
-      var data = {} as {other: ObjectID};
+    it('should inject new ObjectID if field defined as ObjectID if default value is "new"', async () => {
+      var data: {other?: ObjectID} = {};
 
       var schema = new Schema({
         other: {
@@ -164,15 +135,11 @@ describe('Schema', function() {
         }
       });
 
-      schema.validate(data).then(() => {
-        should(data.other.constructor.name).eql('ObjectID');
-        done();
-      }).catch((e) => {
-        done(e);
-      });
+      await schema.validate(data);
+      should(data.other.constructor.name).eql('ObjectID');
     });
-    it('should inject empty object if no default object value is provided', function(done) {
-      var data = {} as {user: ObjectID};
+    it('should inject empty object if no default object value is provided', async () => {
+      var data: {user?: ObjectID} = {};
 
       var schema = new Schema({
         user: {
@@ -180,14 +147,12 @@ describe('Schema', function() {
         }
       });
 
-      schema.validate(data).then(() => {
-        should(data.user).be.type('object');
-        should(data.user).eql({});
-        done();
-      });
+      await schema.validate(data);
+      should(data.user).be.type('object');
+      should(data.user).eql({});
     });
-    it('should inject empty nested object if no default object value is provided', function(done) {
-      var data = {} as {user: {address: {}}};
+    it('should inject empty nested object if no default object value is provided', async () => {
+      var data: {user?: {address: {}}} = {};
 
       var schema = new Schema({
         user: {
@@ -195,26 +160,22 @@ describe('Schema', function() {
         }
       });
 
-      schema.validate(data).then(() => {
-        should(data.user.address).be.type('object');
-        should(data.user.address).eql({});
-        done();
-      });
+      await schema.validate(data)
+      should(data.user.address).be.type('object');
+      should(data.user.address).eql({});
     });
-    it('should set field with primitive type to undefined if not provided', function(done) {
-      var data = {} as {name: string};
+    it('should set field with primitive type to undefined if not provided', async () => {
+      var data: {name?: string} = {};
 
       var schema = new Schema({
         name: {$type: String}
       });
       
-      schema.validate(data).then(() => {
-        should(data.name).be.type('undefined');
-        done();
-      });
+      await schema.validate(data);
+      should(data.name).be.type('undefined');
     });
-    it('should set field of nested object with primitive type to undefined if not provided', function(done) {
-      var data = {} as {user: {name: string}};
+    it('should set field of nested object with primitive type to undefined if not provided', async () => {
+      var data:  {user?: {name: string}} = {};
 
       var schema = new Schema({
         user: {
@@ -222,13 +183,11 @@ describe('Schema', function() {
         }
       });
 
-      schema.validate(data).then(() => {
-        should(data.user.name).be.type('undefined');
-        done();
-      });
+      await schema.validate(data);
+      should(data.user.name).be.type('undefined');
     });
-    it('should set default value on nested object even if parent object was not provided', function(done) {
-      var data = {} as {user: {name: string}};
+    it('should set default value on nested object even if parent object was not provided', async () => {
+      var data: {user?: {name: string}} = {};
 
       var schema = new Schema({
         user: {
@@ -236,11 +195,9 @@ describe('Schema', function() {
         }
       });
 
-      schema.validate(data).then(() => {
-        should(data.user.name).be.type('string');
-        should(data.user.name).eql('Kevin');
-        done();
-      });
+      await schema.validate(data);
+      should(data.user.name).be.type('string');
+      should(data.user.name).eql('Kevin');
     });
   });
 });

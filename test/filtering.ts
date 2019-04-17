@@ -1,74 +1,58 @@
 import should = require('should');
 import Schema from '../lib/schema';
 
-describe('Schema', function() {
-  describe('filtering', function() {
-    describe('trim', function() {
-      it('should trim string', function(done) {
+describe('Schema', function(){
+  describe('filtering', function(){
+    describe('trim', function(){
+      it('should trim string', async () => {
         var data = {name: ' Kevin '};
 
         var schema = new Schema({
           name: {$type: String, $filter: {trim: true}}
         });
 
-        schema.validate(data).then(() => {
-          should(data.name).eql('Kevin');
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        await schema.validate(data);
+        should(data.name).eql('Kevin');
       });
     });
-    describe('uppercase', function() {
-      it('should convert string to uppercase', function(done) {
+    describe('uppercase', function(){
+      it('should convert string to uppercase', async () => {
         var data = {name: 'kevin'};
 
         var schema = new Schema({
           name: {$type: String, $filter: {uppercase: true}}
         });
 
-        schema.validate(data).then(() => {
-          should(data.name).eql('KEVIN');
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        await schema.validate(data);
+        should(data.name).eql('KEVIN');
       });
     });
-    describe('lowercase', function() {
-      it('should convert string to lowercase', function(done) {
+    describe('lowercase', function(){
+      it('should convert string to lowercase', async () => {
         var data = {name: 'KEVIN'};
 
         var schema = new Schema({
           name: {$type: String, $filter: {lowercase: true}}
         });
 
-        schema.validate(data).then(() => {
-          should(data.name).eql('kevin');
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        await schema.validate(data);
+        should(data.name).eql('kevin');
       });
     });
-    describe('defaultValue', function() {
-      it('should set default value when field undefined', function(done) {
+    describe('defaultValue', function(){
+      it('should set default value when field undefined', async () => {
         var data = {name: undefined};
 
         var schema = new Schema({
           name: {$type: String, $filter: {defaultValue: 'Kevin'}}
         });
 
-        schema.validate(data).then(() => {
-          should(data.name).eql('Kevin');
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        await schema.validate(data);
+        should(data.name).eql('Kevin');
       });
     });
-    describe('custom', function() {
-      it('should filter via provided filter callback', function(done) {
+    describe('custom', function(){
+      it('should filter via provided filter callback', async () => {
         var data = {name: 'Kevin'};
 
         var schema = new Schema({
@@ -77,12 +61,8 @@ describe('Schema', function() {
           }}}
         });
 
-        schema.validate(data).then(() => {
-          should(data.name).eql('Kevin modified');
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        await schema.validate(data);
+        should(data.name).eql('Kevin modified');
       });
     });
   });

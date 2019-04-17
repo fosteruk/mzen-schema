@@ -1,9 +1,9 @@
 import should = require('should');
 import SchemaUtil from '../lib/util';
 
-describe('SchemaUtil', function () {
-  describe('getSpec()', function () {
-    it('should return spec', function () {
+describe('SchemaUtil', function(){
+  describe('getSpec()', function(){
+    it('should return spec', function(){
       var spec = {
         house: {
           rooms: [{
@@ -16,7 +16,7 @@ describe('SchemaUtil', function () {
       var result = SchemaUtil.getSpec('', spec);
       should(result).eql(spec);
     });
-    it('should return fields config for path field', function () {
+    it('should return fields config for path field', function(){
       var spec = {
         house: {
           rooms: [[{
@@ -29,7 +29,7 @@ describe('SchemaUtil', function () {
       var result = SchemaUtil.getSpec('house', spec);
       should(result).eql(spec.house);
     });
-    it('should return fields config for path deep field', function () {
+    it('should return fields config for path deep field', function(){
       var spec = {
         house: {
           rooms: [[{
@@ -42,7 +42,7 @@ describe('SchemaUtil', function () {
       var result = SchemaUtil.getSpec('house.rooms', spec);
       should(result).eql(spec.house.rooms);
     });
-    it('should return fields config for path deep array', function () {
+    it('should return fields config for path deep array', function(){
       var spec = {
         house: {
           rooms: [[{
@@ -55,7 +55,7 @@ describe('SchemaUtil', function () {
       var result = SchemaUtil.getSpec('house.rooms.*.*', spec);
       should(result).eql(spec.house.rooms[0][0]);
     });
-    it('should return fields config for path deep array using array index path', function () {
+    it('should return fields config for path deep array using array index path', function(){
       var spec = {
         house: {
           rooms: [[{
@@ -68,7 +68,7 @@ describe('SchemaUtil', function () {
       var result = SchemaUtil.getSpec('house.rooms.0.1', spec);
       should(result).eql(spec.house.rooms[0][0]);
     });
-    it('should return fields config for path deep array using array index path for array defined with object descriptor', function () {
+    it('should return fields config for path deep array using array index path for array defined with object descriptor', function(){
       var spec = {
         house: {
           rooms: {$type: Array, $spec: 
@@ -82,7 +82,7 @@ describe('SchemaUtil', function () {
       var result = SchemaUtil.getSpec('house.rooms.0', spec);
       should(result).eql(spec.house.rooms.$spec);
     });
-    it('should return fields config for path deep array field', function () {
+    it('should return fields config for path deep array field', function(){
       var spec = {
         house: {
           rooms: [[{

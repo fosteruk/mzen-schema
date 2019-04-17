@@ -2,9 +2,9 @@ import should = require('should');
 import Schema from '../lib/schema';
 import Types from '../lib/types';
 
-describe('Schema', function() {
-  describe('validation', function() {
-    it('should ignore schema of relations', function(done) {
+describe('Schema', function(){
+  describe('validation', function(){
+    it('should ignore schema of relations', async () => {
       // An empty field is any falsy value: undefined, null, false, 0, '', [], {}
       var data = {name: [1]};
 
@@ -19,45 +19,33 @@ describe('Schema', function() {
       });
       schema.addSchema(schemaAddress);
 
-      schema.validate(data).then((results) => {
-        should(results.isValid).eql(true);
-        done();
-      }).catch((error) => {
-        done(error);
-      });
+      const result = await schema.validate(data);
+      should(result.isValid).eql(true);
     });
-    describe('required', function() {
-      describe('should validate required field', function() {
-        it('valid', function(done) {
+    describe('required', function(){
+      describe('should validate required field', function(){
+        it('valid', async () => {
           var data = {house: 1};
 
           var schema = new Schema({
             house: {$type: Number, $validate: {required: true}}
           });
 
-          schema.validate(data).then((result) => {
-            should(result.isValid).eql(true);
-            done();
-          }).catch((error) => {
-            done(error);
-          });
+          const result = await schema.validate(data);
+          should(result.isValid).eql(true);
         });
-        it('invalid', function(done) {
+        it('invalid', async () => {
           var data = {other: 1};
 
           var schema = new Schema({
             house: {$type: Number, $validate: {required: true}}
           });
 
-          schema.validate(data).then((result) => {
-            should(result.isValid).eql(false);
-            done();
-          }).catch((error) => {
-            done(error);
-          });
+          const result = await schema.validate(data);
+          should(result.isValid).eql(false);
         });
       });
-      it('should accept a null value to satisfy required setting', function(done) {
+      it('should accept a null value to satisfy required setting', async () => {
         // The 'required' option simply specifies that the field exists regardless of its value
         var data = {name: null};
 
@@ -65,15 +53,11 @@ describe('Schema', function() {
           name: {$validate: {required: true}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      describe('should validate required embedded field', function() {
-        it('valid', function(done) {
+      describe('should validate required embedded field', function(){
+        it('valid', async () => {
           var data = {house: {bedRooms: '3', discounted: '1'}};
 
           var schema = new Schema({
@@ -83,14 +67,10 @@ describe('Schema', function() {
             }
           });
 
-          schema.validate(data).then((result) => {
-            should(result.isValid).eql(true);
-            done();
-          }).catch((error) => {
-            done(error);
-          });
+          const result = await schema.validate(data);
+          should(result.isValid).eql(true);
         });
-        it('invalid', function(done) {
+        it('invalid', async () => {
           var data = {house: {bedRooms: '2'}};
 
           var schema = new Schema({
@@ -100,16 +80,12 @@ describe('Schema', function() {
             }
           });
 
-          schema.validate(data).then((result) => {
-            should(result.isValid).eql(false);
-            done();
-          }).catch((error) => {
-            done(error);
-          });
+          const result = await schema.validate(data);
+          should(result.isValid).eql(false);
         });
       });
-      describe('should validate required embedded field when given array of objects', function() {
-        it('valid', function(done) {
+      describe('should validate required embedded field when given array of objects', function(){
+        it('valid', async () => {
           var data = [
             {house: {bedRooms: '3', discounted: '1'}},
             {house: {bedRooms: '2', discounted: '0'}}
@@ -122,14 +98,10 @@ describe('Schema', function() {
             }
           });
 
-          schema.validate(data).then((result) => {
-            should(result.isValid).eql(true);
-            done();
-          }).catch((error) => {
-            done(error);
-          });
+          const result = await schema.validate(data);
+          should(result.isValid).eql(true);
         });
-        it('invalid', function(done) {
+        it('invalid', async () => {
           var data = [
             {house: {bedRooms: '3', discounted: '1'}},
             {house: {bedRooms: '2'}}
@@ -142,89 +114,65 @@ describe('Schema', function() {
             }
           });
 
-          schema.validate(data).then((result) => {
-            should(result.isValid).eql(false);
-            done();
-          }).catch((error) => {
-            done(error);
-          });
+          const result = await schema.validate(data);
+          should(result.isValid).eql(false);
         });
       });
     });
-    describe('should validate notNull field', function() {
-      it('valid', function(done) {
+    describe('should validate notNull field', function(){
+      it('valid', async () => {
         var data = {name: 'Kevin'};
 
         var schema = new Schema({
           name: {$type: String, $validate: {notNull: true}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('invalid', function(done) {
+      it('invalid', async () => {
         var data = {name: null};
 
         var schema = new Schema({
           name: {$type: String, $validate: {notNull: true}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('falsey value disables validator - false', function(done) {
+      it('falsey value disables validator - false', async () => {
         var data = {name: null};
 
         var schema = new Schema({
           name: {$type: String, $validate: {notNull: false}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('falsey value disables validator - undefined', function(done) {
+      it('falsey value disables validator - undefined', async () => {
         var data = {name: null};
 
         var schema = new Schema({
           name: {$type: String, $validate: {notNull: undefined}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('falsey value disables validator - null', function(done) {
+      it('falsey value disables validator - null', async () => {
         var data = {name: null};
 
         var schema = new Schema({
           name: {$type: String, $validate: {notNull: null}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
     });
-    describe('should validate notEmpty field', function() {
-      it('valid - not empty string', function(done) {
+    describe('should validate notEmpty field', function(){
+      it('valid - not empty string', async () => {
         // An empty field is any falsy value: undefined, null, false, 0, '', [], {}
         var data = {name: 'Kevin'};
 
@@ -232,14 +180,10 @@ describe('Schema', function() {
           name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('invalid - undefined', function(done) {
+      it('invalid - undefined', async () => {
         // An empty field is any falsy value: undefined, null, false, 0, '', [], {}
         var data = {name: undefined};
 
@@ -247,140 +191,102 @@ describe('Schema', function() {
           name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('invalid - null', function(done) {
+      it('invalid - null', async () => {
         var data = {name: null};
 
         var schema = new Schema({
           name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('invalid - false', function(done) {
+      it('invalid - false', async () => {
         var data = {name: false};
 
         var schema = new Schema({
           name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('invalid - zero', function(done) {
+      it('invalid - zero', async () => {
         var data = {name: 0};
 
         var schema = new Schema({
           name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('invalid - empty string', function(done) {
+      it('invalid - empty string', async () => {
         var data = {name: ''};
 
         var schema = new Schema({
           name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('valid - not empty array', function(done) {
+      it('valid - not empty array', async () => {
         var data = {name: [1]};
 
         var schema = new Schema({
           name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((result) => {
-          should(result.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('invalid - empty array', function(done) {
+      it('invalid - empty array', async () => {
         var data = {name: []};
 
         var schema = new Schema({
           name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('valid - empty array contains empty array', function(done) {
+      it('valid - empty array contains empty array', async () => {
         var data = {name: [[]]};
 
         var schema = new Schema({
           name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('valid - not empty object', function(done) {
+      it('valid - not empty object', async () => {
         var validDataNotEmptyObject = {name: {test: 1}};
 
         var schema = new Schema({
           name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
-        schema.validate(validDataNotEmptyObject).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        });
+        const result = await schema.validate(validDataNotEmptyObject);
+        should(result.isValid).eql(true);
       });
-      it('invalid - empty object', function(done) {
+      it('invalid - empty object', async () => {
         var data = {name: {}};
 
         var schema = new Schema({
           name: {$type: Types.Mixed, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
     });
-    describe('should validate notEmpty object with spec', function() {
-      it('valid', function(done) {
+    describe('should validate notEmpty object with spec', function(){
+      it('valid', async () => {
         // An empty object is an object with zero fields
         var data = {name: {first: 'Kevin'}};
 
@@ -390,14 +296,10 @@ describe('Schema', function() {
           }}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('invalid - undefined', function(done) {
+      it('invalid - undefined', async () => {
         var data = {name: undefined};
 
         var schema = new Schema({
@@ -406,14 +308,10 @@ describe('Schema', function() {
           }}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('invalid - null', function(done) {
+      it('invalid - null', async () => {
         var data = {name: undefined};
 
         var schema = new Schema({
@@ -422,14 +320,10 @@ describe('Schema', function() {
           }}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('valid - not empty object', function(done) {
+      it('valid - not empty object', async () => {
         var data = {name: {other: 1}};
 
         var schema = new Schema({
@@ -438,14 +332,10 @@ describe('Schema', function() {
           }}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('invalid - empty object', function(done) {
+      it('invalid - empty object', async () => {
         var data = {name: {}};
 
         var schema = new Schema({
@@ -453,16 +343,12 @@ describe('Schema', function() {
           }}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
     });
-    describe('should validate notEmpty array with spec', function() {
-      it('valid', function(done) {
+    describe('should validate notEmpty array with spec', function(){
+      it('valid', async () => {
         // An empty field is any falsy value: undefined, null, false, 0, '', [], {}
         var data = {name: [1]};
 
@@ -470,114 +356,82 @@ describe('Schema', function() {
           name: {$type: Array, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('valid - array of array', function(done) {
+      it('valid - array of array', async () => {
         var data = {name: [[1]]};
 
         var schema = new Schema({
           name: {$type: Array, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('valid - array of zero', function(done) {
+      it('valid - array of zero', async () => {
         var data = {name: [0]};
 
         var schema = new Schema({
           name: {$type: Array, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('valid - array of null', function(done) {
+      it('valid - array of null', async () => {
         var data = {name: [null]};
 
         var schema = new Schema({
           name: {$type: Array, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('valid - array of undefined', function(done) {
+      it('valid - array of undefined', async () => {
         var data = {name: [undefined]};
 
         var schema = new Schema({
           name: {$type: Array, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('valid - array of false', function(done) {
+      it('valid - array of false', async () => {
         var data = {name: [false]};
 
         var schema = new Schema({
           name: {$type: Array, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('valid - array of empty array', function(done) {
+      it('valid - array of empty array', async () => {
         var data = {name: [[]]};
 
         var schema = new Schema({
           name: {$type: Array, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('invalid - empty array', function(done) {
+      it('invalid - empty array', async () => {
         var data = {name: []};
 
         var schema = new Schema({
           name: {$type: Array, $validate: {notEmpty: true}}
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
     });
-    describe('should validate notEmpty on array elements with mixed type values', function() {
-      it('valid - array of 1', function(done) {
+    describe('should validate notEmpty on array elements with mixed type values', function(){
+      it('valid - array of 1', async () => {
         // An empty field is any falsy value: undefined, null, false, 0, '', [], {}
         var data = {name: [1]};
 
@@ -585,14 +439,10 @@ describe('Schema', function() {
           name: [{$type: 'Mixed', $validate: {notEmpty: true}}]
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('valid - array of array of 1', function(done) {
+      it('valid - array of array of 1', async () => {
 
         var data = {name: [[1]]};
 
@@ -600,84 +450,62 @@ describe('Schema', function() {
           name: [{$type: 'Mixed', $validate: {notEmpty: true}}]
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('invalid - array of zero', function(done) {
+      it('invalid - array of zero', async () => {
         var data = {name: [0]};
 
         var schema = new Schema({
           name: [{$type: 'Mixed', $validate: {notEmpty: true}}]
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('invalid - array of null', function(done) {
+      it('invalid - array of null', async () => {
         var data = {name: [null]};
 
         var schema = new Schema({
           name: [{$type: 'Mixed', $validate: {notEmpty: true}}]
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('invalid - array of undefined', function(done) {
+      it('invalid - array of undefined', async () => {
         var data = {name: [undefined]};
 
         var schema = new Schema({
           name: [{$type: 'Mixed', $validate: {notEmpty: true}}]
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('invalid - array of false', function(done) {
+      it('invalid - array of false', async () => {
         var data = {name: [false]};
 
         var schema = new Schema({
           name: [{$type: 'Mixed', $validate: {notEmpty: true}}]
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
-      it('invalid - array of empty array', function(done) {
+      it('invalid - array of empty array', async () => {
         var data = {name: [[]]};
 
         var schema = new Schema({
           name: [{$type: 'Mixed', $validate: {notEmpty: true}}]
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
     });
-    describe('should validate notNull on array elements with mixed type values', function() {
-      it('valid - valid array of 1', function(done) {
+    describe('should validate notNull on array elements with mixed type values', function(){
+      it('valid - valid array of 1', async () => {
         // An empty field is any falsy value: undefined, null, false, 0, '', [], {}
         var data = {name: [1]};
 
@@ -685,55 +513,41 @@ describe('Schema', function() {
           name: [{$type: 'Mixed', $validate: {notNull: true}}]
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('valid - valid array of array of 1', function(done) {
+      it('valid - valid array of array of 1', async () => {
         var data = {name: [[1]]};
 
         var schema = new Schema({
           name: [{$type: 'Mixed', $validate: {notNull: true}}]
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(true);
-          done();
-        }).catch((error) => {
-          done(error);
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(true);
       });
-      it('invalid - array of null', function(done) {
+      it('invalid - array of null', async () => {
         var data = {name: [null]};
 
         var schema = new Schema({
           name: [{$type: 'Mixed', $validate: {notNull: true}}]
         });
 
-        schema.validate(data).then((results) => {
-          should(results.isValid).eql(false);
-          done();
-        });
+        const result = await schema.validate(data);
+        should(result.isValid).eql(false);
       });
     });
-    it('should fail validation if attempt to cast object to primitive', function(done) {
+    it('should fail validation if attempt to cast object to primitive', async () => {
       var data = {person: {age: '33'}};
 
       var schema = new Schema({
         person: String
       });
 
-      schema.validate(data).then((results) => {
-        should(results.isValid).eql(false);
-        done();
-      }).catch((error) => {
-        done(error);
-      });
+      const result = await schema.validate(data);
+      should(result.isValid).eql(false);
     });
-    it('should fail validation in strict mode if unspecified field exists', function(done) {
+    it('should fail validation in strict mode if unspecified field exists', async () => {
       var data = {age: '33', pi: '3.14159265359'};
 
       var schema = new Schema({
@@ -741,14 +555,10 @@ describe('Schema', function() {
         age: Number
       });
 
-      schema.validate(data).then((results) => {
-        should(results.isValid).eql(false);
-        done();
-      }).catch((error) => {
-        done(error);
-      });
+      const result = await schema.validate(data);
+      should(result.isValid).eql(false);
     });
-    it('should fail validation in strict mode should propagate', function(done) {
+    it('should fail validation in strict mode should propagate', async () => {
       var data = {
         name: 'Kevin',
         address: {
@@ -765,14 +575,10 @@ describe('Schema', function() {
         }
       });
 
-      schema.validate(data).then((results) => {
-        should(results.isValid).eql(false);
-        done();
-      }).catch((error) => {
-        done(error);
-      });
+      const result = await schema.validate(data);
+      should(result.isValid).eql(false);
     });
-    it('should fail validation in strict mode should propagation can be overriden', function(done) {
+    it('should fail validation in strict mode should propagation can be overriden', async () => {
       var data = {
         name: 'Kevin',
         address: {
@@ -790,83 +596,61 @@ describe('Schema', function() {
         }
       });
 
-      schema.validate(data).then((results) => {
-        should(results.isValid).eql(false);
-        done();
-      }).catch((error) => {
-        done(error);
-      });
+      const result = await schema.validate(data);
+      should(result.isValid).eql(false);
     });
-    it('should honour defaultNotNull value', function(done) {
+    it('should honour defaultNotNull value', async () => {
       var data = {name: null};
 
       var schema = new Schema({name: String}, {defaultNotNull: true});
 
-      schema.validate(data).then((results) => {
-        should(results.isValid).eql(false);
-        done();
-      });
+      const result = await schema.validate(data);
+      should(result.isValid).eql(false);
     });
-    it('should honour defaultNotNull value even if field is not defined in spec', function(done) {
+    it('should honour defaultNotNull value even if field is not defined in spec', async () => {
       var data = {name: {first: null}};
 
       var schema = new Schema({name: {last: String}}, {defaultNotNull: true});
 
-      schema.validate(data).then((results) => {
-        should(results.isValid).eql(false);
-        done();
-      }).catch((error) => {
-        done(error);
-      });
+      const result = await schema.validate(data);
+      should(result.isValid).eql(false);
     });
-    it('should populate errors object on failure', function(done) {
+    it('should populate errors object on failure', async () => {
       var data = {other: 1};
 
       var schema = new Schema({
         house: {$type: Number, $validate: {required: true}}
       });
 
-      schema.validate(data).then((results) => {
-        should(results.isValid).eql(false);
-        should(results.errors).is.Object();
-        // @ts-ignore - 'house' does not exist on type 'object'
-        should(results.errors.house).is.Array(); // Error messages are returned as an array of strings
-        done();
-      }).catch((error) => {
-        done(error);
-      });
+      const result = await schema.validate(data);
+      should(result.isValid).eql(false);
+      should(result.errors).is.Object();
+      // @ts-ignore - 'house' does not exist on type 'object'
+      should(result.errors.house).is.Array(); // Error messages are returned as an array of strings
     });
-    it('should populate custom error message on failure', function(done) {
+    it('should populate custom error message on failure', async () => {
       var data = {other: 1};
 
       var schema = new Schema({
         house: {$type: Number, $validate: {required: true}}
       });
 
-      schema.validate(data).then((results) => {
-        should(results.isValid).eql(false);
-        // @ts-ignore - 'house' does not exist on type 'object'
-        should(results.errors.house[0]).equal('house is required'); // Error messages are returned as an array of strings
-        done();
-      }).catch((error) => {
-        done(error);
-      });
+      const result = await schema.validate(data);
+      should(result.isValid).eql(false);
+      // @ts-ignore - 'house' does not exist on type 'object'
+      should(result.errors.house[0]).equal('house is required'); // Error messages are returned as an array of strings
     });
-    it('should use custom name in error message', function(done) {
+    it('should use custom name in error message', async () => {
       var data = {other: 1};
 
       var schema = new Schema({
         house: {$displayName: 'House number', $type: Number, $validate: {required: true}}
       });
 
-      schema.validate(data).then((results) => {
-        should(results.isValid).eql(false);
-        // @ts-ignore - 'house' does not exist on type 'object'
-        should(results.errors.house[0]).equal('House number is required'); // Error messages are returned as an array of strings
-        done();
-      }).catch((error) => {
-        done(error);
-      });
+      const result = await schema.validate(data);
+      should(result.isValid).eql(false);
+      // @ts-ignore - 'house' does not exist on type 'object'
+      should(result.errors.house[0]).equal('House number is required'); // Error messages are returned as an array of strings
     });
   });
 });

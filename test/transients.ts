@@ -38,9 +38,9 @@ class ConstructorTestBike
 }
 ConstructorTestBike.alias = 'Bicycle';
 
-describe('Schema', function() {
-  describe('applyTransients', function() {
-    it('should apply $construct function to the root object', function() {
+describe('Schema', function(){
+  describe('applyTransients', function(){
+    it('should apply $construct function to the root object', function(){
       var object = {nameFirst: 'John', nameLast: 'Smith'} as ConstructorTestUser;
 
       var schema = new Schema({
@@ -55,7 +55,7 @@ describe('Schema', function() {
       should(object.constructor).eql(ConstructorTestUser);
       should(object.getName()).eql('John Smith');
     });
-    it('should apply $construct function to the root object via constructorName', function() {
+    it('should apply $construct function to the root object via constructorName', function(){
       var object = {numWheels: 2} as ConstructorTestBike;
 
       var schema = new Schema({
@@ -69,7 +69,7 @@ describe('Schema', function() {
       should(object.constructor).eql(ConstructorTestBike);
       should(object.getNumWheels()).eql(2);
     });
-    it('should apply $construct function to the embedded objects', function() {
+    it('should apply $construct function to the embedded objects', function(){
       var object = {
         userMostPopular: {
           nameFirst: 'John',
@@ -102,7 +102,7 @@ describe('Schema', function() {
       should(object.userLeastPopular.constructor).eql(ConstructorTestUser);
       should(object.userLeastPopular.getName()).eql('Tom Jones');
     });
-    it('should apply $construct function to the root object as referenced by constrcutor name', function() {
+    it('should apply $construct function to the root object as referenced by constrcutor name', function(){
       var object = {nameFirst: 'John', nameLast: 'Smith'} as ConstructorTestUser;
 
       var schema = new Schema({
@@ -117,7 +117,7 @@ describe('Schema', function() {
       should(object.constructor).eql(ConstructorTestUser);
       should(object.getName()).eql('John Smith');
     });
-    it('should apply $construct function to the embedded objects as referenced by constrcutor name', function() {
+    it('should apply $construct function to the embedded objects as referenced by constrcutor name', function(){
       var object = {
         userMostPopular: {
           nameFirst: 'John',
@@ -150,7 +150,7 @@ describe('Schema', function() {
       should(object.userLeastPopular.constructor).eql(ConstructorTestUser);
       should(object.userLeastPopular.getName()).eql('Tom Jones');
     });
-    it('should apply $construct function according to array spec', function() {
+    it('should apply $construct function according to array spec', function(){
       var object = {
         users: [
           {nameFirst: 'John', nameLast: 'Smith'} as ConstructorTestUser,
@@ -176,7 +176,7 @@ describe('Schema', function() {
       should(object.users[1].constructor).eql(ConstructorTestUser);
       should(object.users[1].getName()).eql('Tom Jones');
     });
-    it('should apply $construct function according to array spec object', function() {
+    it('should apply $construct function according to array spec object', function(){
       var object = {
         users: [
           {nameFirst: 'John', nameLast: 'Smith'} as ConstructorTestUser,
@@ -203,7 +203,7 @@ describe('Schema', function() {
       should(object.users[1].constructor).eql(ConstructorTestUser);
       should(object.users[1].getName()).eql('Tom Jones');
     });
-    it('should apply $construct function to schemaRelation', function() {
+    it('should apply $construct function to schemaRelation', function(){
       var object = {
         nameFirst: 'John',
         nameLast: 'Smith',
@@ -232,7 +232,7 @@ describe('Schema', function() {
       should(object.address.constructor).eql(ConstructorTestAddress);
       should(object.address.getStreet()).eql('Picton Road');
     });
-    it('should apply $pathRef value', function() {
+    it('should apply $pathRef value', function(){
       var user = {
         _id: '123',
         address: {
@@ -251,7 +251,7 @@ describe('Schema', function() {
       user = schema.applyTransients(user);
       should(user.address.userId).eql('123');
     });
-    it('should apply $pathRef value deep', function() {
+    it('should apply $pathRef value deep', function(){
       var user = {
         _id: '123',
         address: {
@@ -274,8 +274,8 @@ describe('Schema', function() {
       should(user.a.b.c.userId).eql('123');
     });
   });
-  describe('stripTransients', function() {
-    it('should should strip $pathRef value', function() {
+  describe('stripTransients', function(){
+    it('should should strip $pathRef value', function(){
       var user = {
         _id: '123',
         address: {
@@ -296,7 +296,7 @@ describe('Schema', function() {
       user = schema.stripTransients(user);
       should(user.address.userId).eql(undefined);
     });
-    it('should should strip $pathRef value deep', function() {
+    it('should should strip $pathRef value deep', function(){
       var user = {
         _id: '123',
         address: {

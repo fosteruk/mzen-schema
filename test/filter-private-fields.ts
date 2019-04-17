@@ -1,9 +1,9 @@
 import should = require('should');
 import Schema from '../lib/schema';
 
-describe('Schema', function () {
-  describe('filterPrivate', function () {
-    it('filter private params', function () {
+describe('Schema', function(){
+  describe('filterPrivate', function(){
+    it('filter private params', function(){
       var data = {
         name: 123,
         age: 35
@@ -17,7 +17,7 @@ describe('Schema', function () {
 
       should(data).eql({age: 35});
     });
-    it('filter private params with mode write', function () {
+    it('filter private params with mode write', function(){
       var data = {
         name: 123,
         age: 35
@@ -31,7 +31,7 @@ describe('Schema', function () {
 
       should(data).eql({age: 35});
     });
-    it('filter private params with mode read', function () {
+    it('filter private params with mode read', function(){
       var data = {
         name: 123,
         age: 35
@@ -46,8 +46,8 @@ describe('Schema', function () {
       should(data).eql({age: 35});
     });
   });
-  describe('filterPrivateValue', function () {
-    it('filter private params', function () {
+  describe('filterPrivateValue', function(){
+    it('filter private params', function(){
       var data = {
         name: 123,
         age: 35
@@ -61,7 +61,7 @@ describe('Schema', function () {
 
       should(data).eql({name: true, age: 35});
     });
-    it('filter private params with mode write', function () {
+    it('filter private params with mode write', function(){
       var data = {
         name: 123,
         age: 35
@@ -75,7 +75,7 @@ describe('Schema', function () {
 
       should(data).eql({name: true, age: 35});
     });
-    it('filter private params with mode read', function () {
+    it('filter private params with mode read', function(){
       var data = {
         name: 123,
         age: 35

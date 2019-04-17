@@ -2,9 +2,9 @@ import should = require('should');
 import Schema from '../lib/schema';
 import SchemaMapper from '../lib/mapper';
 
-describe('SchemaMapper', function () {
-  describe('map', function () {
-    it('should callback with field spec', function () {
+describe('SchemaMapper', function(){
+  describe('map', function(){
+    it('should callback with field spec', function(){
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
 
@@ -15,7 +15,7 @@ describe('SchemaMapper', function () {
       should(results[0].fieldSpec).eql(spec);
       should(results[1].fieldSpec).eql(spec.name);
     });
-    it('should callback with field name', function () {
+    it('should callback with field name', function(){
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
 
@@ -28,7 +28,7 @@ describe('SchemaMapper', function () {
       should(results[0].fieldName).eql('root');
       should(results[1].fieldName).eql('name');
     });
-    it('should callback with field index of array value', function () {
+    it('should callback with field index of array value', function(){
       var spec = {names: [String]};
       var schemaIterator = new SchemaMapper(spec);
 
@@ -42,7 +42,7 @@ describe('SchemaMapper', function () {
       should(results[1].fieldName).eql('names');
       should(results[2].fieldName).eql(0);
     });
-    it('should callback with field container object', function () {
+    it('should callback with field container object', function(){
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
       var value = [{name: 'Kevin'}];
@@ -56,7 +56,7 @@ describe('SchemaMapper', function () {
       should(results[1].fieldContainer).eql(value);
       should(results[2].fieldContainer).eql(value[0]);
     });
-    it('should callback with field container array', function () {
+    it('should callback with field container array', function(){
       var spec = {names: [String]};
       var schemaIterator = new SchemaMapper(spec);
       var value = [{names: ['Kevin']}];
@@ -71,7 +71,7 @@ describe('SchemaMapper', function () {
       should(results[2].fieldContainer).eql(value[0]);
       should(results[3].fieldContainer).eql(value[0].names);
     });
-    it('should callback with field path', function () {
+    it('should callback with field path', function(){
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
 
@@ -84,7 +84,7 @@ describe('SchemaMapper', function () {
       should(results[0].path).eql('');
       should(results[1].path).eql('name');
     });
-    it('should callback with field path of nested array', function () {
+    it('should callback with field path of nested array', function(){
       var spec = {};
       var schemaIterator = new SchemaMapper(spec);
 
@@ -117,7 +117,7 @@ describe('SchemaMapper', function () {
       should(results[7].path).eql('2.name');
     });
   });
-  it('should callback with field spec from embedded schema reference', function () {
+  it('should callback with field spec from embedded schema reference', function(){
     var specAddress = {
       $name: 'address',  // this defines hte schema name
       buildingNumber: Number,
@@ -142,15 +142,15 @@ describe('SchemaMapper', function () {
 
     should(results[0].fieldSpec.address).eql(specAddress);
   });
-  describe('mapPaths', function () {
-    it('should callback with field spec', function () {
+  describe('mapPaths', function(){
+    it('should callback with field spec', function(){
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
       schemaIterator.mapPaths({'name': 'Kevin'}, function(fieldSpec){
         should(fieldSpec).eql(String);
       });
     });
-    it('should callback with field name', function () {
+    it('should callback with field name', function(){
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
       // @ts-ignore - unused fieldSpec
@@ -158,7 +158,7 @@ describe('SchemaMapper', function () {
         should(fieldName).eql('name');
       });
     });
-    it('should callback with field index of array value', function () {
+    it('should callback with field index of array value', function(){
       var spec = {names: [String]};
       var schemaIterator = new SchemaMapper(spec);
 
@@ -170,7 +170,7 @@ describe('SchemaMapper', function () {
       should(results[0].fieldName).eql('names');
       should(results[1].fieldName).eql(0);
     });
-    it('should callback with field container object', function () {
+    it('should callback with field container object', function(){
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
       var object = {name: 'Kevin'};
@@ -179,7 +179,7 @@ describe('SchemaMapper', function () {
         should(fieldContainer).eql(object);
       });
     });
-    it('should callback with field container array', function () {
+    it('should callback with field container array', function(){
       var spec = {names: [String]};
       var schemaIterator = new SchemaMapper(spec);
       var value = {names: ['Kevin']};
@@ -192,7 +192,7 @@ describe('SchemaMapper', function () {
       should(results[0].fieldContainer).eql(value);
       should(results[1].fieldContainer).eql(value.names);
     });
-    it('should callback with field path', function () {
+    it('should callback with field path', function(){
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
       // @ts-ignore - unused fieldSpec and fieldName and fieldContainer
