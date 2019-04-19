@@ -102,6 +102,12 @@ describe('Schema', function(){
 
         should(result).equal('Email does appears to be valid');
       });
+      it('should not allow multiple @ characters', function(){
+        var value = 'test@@gmai.com';
+        var result = Validator.email(value);
+
+        should(result).be.a.String();
+      });
     });
     describe('valueLength', function(){
       it('should return boolean true on success (min + max)', function(){

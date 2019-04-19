@@ -105,7 +105,7 @@ export class Validator
     // - have been supported by modern mail servers for several years
     // - https://tools.ietf.org/html/rfc6531
     // - https://en.wikipedia.org/wiki/International_email#Email_addresses
-    var regex = new RegExp(/^[^\s]+@[^\s]+\.[^\s]{2,9}$/);
+    var regex = new RegExp(/^([^\s@]+)@([^\s@]+\.[^\s@]{2,9})$/u);
     var message = options && options.message ? options.message : name + ' does not appear to be a valid address';
     var result = regex.test(value) ? true : message;
     return result;
