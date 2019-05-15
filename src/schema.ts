@@ -170,9 +170,11 @@ export class Schema
       fieldName: string | number, 
       fieldContainer: object
     ) => {
-      if (fieldContainer) {
-        var pathRef = fieldSpec ? fieldSpec.$pathRef : null;
-        if (pathRef){
+      if (fieldSpec && fieldContainer) {
+        if (
+            fieldSpec.$pathRef !== undefined ||
+            fieldSpec.$relation
+        ) {
           delete fieldContainer[fieldName];
         }
       }

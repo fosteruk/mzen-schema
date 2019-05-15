@@ -320,5 +320,51 @@ describe('Schema', function(){
       user = schema.stripTransients(user);
       should(user.a.b.c.userId).eql(undefined);
     });
+    it('should should strip $relation value', function(){
+      var user = {
+        _id: '123',
+        address: {
+          postcode: 'L1'
+        }
+      } as ConstructorTestUser;
+
+      var schema = new Schema({
+        _id: 'String',
+        address: {$relation: true}
+      });
+
+      should(user.address.postcode).eql('L1');
+      user = schema.stripTransients(user);
+      should(user.address).eql(undefined);
+    });
+    it('should should strip $relation value deep', function(){
+      var user = {
+        _id: '123',
+        a: {
+          b: {
+            c: {
+              userId: '123'
+            }
+          }
+        }
+      } as any;
+
+      var schema = new Schema({
+        _id: 'String',
+        a: {
+          b: {
+            c:  {
+              $relation: true,
+              userId: 'String'
+            }
+          }
+        }
+      });
+
+      user = schema.applyTransients(user);
+      should(user.a.b.c.userId).eql('123');
+      user = schema.stripTransients(user);
+      should(user.a.b.c).eql(undefined);
+    });
   });
 });
