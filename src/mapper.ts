@@ -19,9 +19,8 @@ export interface SchemaMapperMappingConfig
 export interface SchemaMapperMeta 
 {
   root?: object;
-  errors?: object;
-  isValid?: boolean
-  path?: string
+  specParent?: SchemaSpec;
+  path?: string;
 }
 
 export class SchemaMapper
@@ -243,6 +242,7 @@ export class SchemaMapper
 
     for (var fieldName in specTemp) {
       if (SchemaUtil.isQueryOperator(fieldName)) continue; // Descriptor proptery
+      meta.specParent = specTemp;
       meta.path = basePath.length ? basePath + '.' + fieldName : fieldName;
       this.mapField(specTemp[fieldName], fieldName, object, callback, options, meta);
     }

@@ -8,6 +8,12 @@ import ObjectPathAccessor from './object-path-accessor';
 import SchemaConfig from './config';
 import SchemaSpec from './spec';
 
+export interface SchemaValidationMeta 
+{
+  errors?: any;
+  isValid?: boolean;
+}
+
 export interface SchemaValidationResult 
 {
   errors?: object;
@@ -184,7 +190,7 @@ export class Schema
   validate(object: any, options?: SchemaConfig): Promise<SchemaValidationResult>
   {
     this.init();
-    var meta = {errors: {}, root: object} as SchemaMapperMeta;
+    var validationMeta: SchemaValidationMeta = {errors: {}};
     options = options ?  options : {};
 
     var promises = [];
@@ -192,7 +198,8 @@ export class Schema
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object, 
-      path: string | number
+      path: string | number,
+      mapperMeta: SchemaMapperMeta
     ) => {
       let promise = this.validateField(
         fieldSpec,
@@ -200,7 +207,8 @@ export class Schema
         fieldContainer ? fieldContainer[fieldName] : undefined,
         path,
         options,
-        meta
+        validationMeta,
+        mapperMeta
       ).then((value) => {
         if (fieldContainer) fieldContainer[fieldName] = value;
       });
@@ -212,14 +220,14 @@ export class Schema
     });
 
     var promise = Promise.all(promises).then(() => {
-      meta.isValid = (Object.keys(meta.errors).length == 0);
-      return meta;
+      validationMeta.isValid = (Object.keys(validationMeta.errors).length == 0);
+      return validationMeta;
     });
 
     return promise;
   }
   
-  validatePaths(paths: SchemaPaths | Array<SchemaPaths>, options?, meta?: SchemaMapperMeta): Promise<SchemaValidationResult>
+  validatePaths(paths: SchemaPaths | Array<SchemaPaths>, options?, meta?: SchemaValidationMeta): Promise<SchemaValidationResult>
   {
     this.init();
     var meta = meta ? meta : {errors: {}};
@@ -231,16 +239,18 @@ export class Schema
       fieldSpec: SchemaSpec, 
       fieldName: string | number, 
       fieldContainer: object, 
-      path: string | number
+      path: string | number,
+      mapperMeta: SchemaMapperMeta
     ) => {
-      meta.root = fieldContainer;
+      mapperMeta.root = fieldContainer;
       let promise = this.validateField(
         fieldSpec,
         fieldName,
         fieldContainer ? fieldContainer[fieldName] : undefined,
         path,
         options,
-        meta
+        meta,
+        mapperMeta
       ).then((value) => {
         if (fieldContainer) fieldContainer[fieldName] = value;
       });
@@ -365,14 +375,17 @@ export class Schema
     value: any, 
     path: string | number, 
     options?: SchemaConfig, 
-    meta: SchemaMapperMeta = {}
+    meta: SchemaValidationMeta = {},
+    mapperMeta: SchemaMapperMeta = {},
   )
   {
     path = path ? path : fieldName;
     const validators = spec && spec.$validate ? spec.$validate : {};
     const filters = spec && spec.$filter ? spec.$filter : {};
     const name = spec && spec.$displayName ? spec.$displayName : fieldName;
-    const strict = spec && spec.$strict ? spec.$strict : undefined;
+    const strict = spec && spec.$strict !== undefined ? spec.$strict : (
+      mapperMeta.specParent && mapperMeta.specParent.$strict !== undefined ? mapperMeta.specParent.$strict : undefined
+    );
     options = options ? options : {};
 
     if (!SchemaUtil.isValidFieldName(fieldName)) {
@@ -405,9 +418,7 @@ export class Schema
       if (fieldType && fieldType != SchemaTypes.Mixed) value = this.typeCast(fieldType, value, path, meta);
     }
 
-    if (fieldType == Object && (strict || options.strict)) {
-      // If strict option was specified (true or false) set to it options so it propagates
-      if (strict !== undefined) options.strict = strict;
+    if (fieldType == Object && strict) {
       // In strict mode we must ensure there are no fields which are not defined by the spec
       for (let fieldName in value) {
         if (spec[fieldName] == undefined) {
@@ -422,7 +433,7 @@ export class Schema
     // notNull can be defaulted via global option
     validators.notNull = validators.notNull !== undefined ? validators.notNull : this.config.defaultNotNull;
 
-    var validateResults = await Validator.validate(value, validators, {name, root: meta.root});
+    var validateResults = await Validator.validate(value, validators, {name, root: mapperMeta.root});
     if (Array.isArray(validateResults)) {
       validateResults.forEach((result) => {
         Schema.appendError(meta, path, result);
@@ -432,7 +443,7 @@ export class Schema
     return value;
   }
   
-  typeCast(requiredType: any, value, path?, meta: SchemaMapperMeta = {})
+  typeCast(requiredType: any, value, path?, meta: SchemaValidationMeta = {})
   {
     // If the spec specifies the value should be an object and the value is already an object, we do not need to typecast
     // It is impossible for us to cast an object to any object type other than Object
@@ -469,7 +480,7 @@ export class Schema
     return result;
   }
   
-  static appendError(meta: SchemaMapperMeta, path, error)
+  static appendError(meta: SchemaValidationMeta, path, error)
   {
     var errors = Array.isArray(meta.errors[path]) ? meta.errors[path] : [];
     errors.push(error);

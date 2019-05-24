@@ -5,7 +5,7 @@ import SchemaMapper from '../lib/mapper';
 describe('SchemaMapper', function(){
   describe('map', function(){
     it('should callback with field spec', function(){
-      var spec = {name: String};
+      var spec = {name: String, $strict: true};
       var schemaIterator = new SchemaMapper(spec);
 
       var results = [];
@@ -120,6 +120,7 @@ describe('SchemaMapper', function(){
   it('should callback with field spec from embedded schema reference', function(){
     var specAddress = {
       $name: 'address',  // this defines hte schema name
+      $strict: true,
       buildingNumber: Number,
       street: String,
       city: String,

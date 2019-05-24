@@ -558,7 +558,7 @@ describe('Schema', function(){
       const result = await schema.validate(data);
       should(result.isValid).eql(false);
     });
-    it('should fail validation in strict mode should propagate', async () => {
+    it('should fail validation, strict mode propagates', async () => {
       var data = {
         name: 'Kevin',
         address: {
@@ -578,7 +578,7 @@ describe('Schema', function(){
       const result = await schema.validate(data);
       should(result.isValid).eql(false);
     });
-    it('should fail validation in strict mode should propagation can be overriden', async () => {
+    it('should allow strict mode propagation to be overriden', async () => {
       var data = {
         name: 'Kevin',
         address: {
@@ -597,7 +597,7 @@ describe('Schema', function(){
       });
 
       const result = await schema.validate(data);
-      should(result.isValid).eql(false);
+      should(result.isValid).eql(true);
     });
     it('should honour defaultNotNull value', async () => {
       var data = {name: null};
