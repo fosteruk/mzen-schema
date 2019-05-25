@@ -136,20 +136,16 @@ export class Schema
   applyTransients(object: any)
   {
     this.init();
-    return (object && this.constructors) ? this.schemaMapper.map(object, (
-      fieldSpec: SchemaSpec, 
-      fieldName: string | number, 
-      fieldContainer: object, 
-      path: string | number, 
-      meta: SchemaMapperMeta
-    ) => {
-      if (fieldContainer) {
-        var pathRef = fieldSpec ? fieldSpec.$pathRef : null;
+    return (object && this.constructors) ? this.schemaMapper.map(object, (opts) => {
+      var { spec, fieldName, container, path, meta: mapperMeta } = opts;
+
+      if (container) {
+        var pathRef = spec ? spec.$pathRef : null;
         if (pathRef){
-          fieldContainer[fieldName] = ObjectPathAccessor.getPath(pathRef, meta.root);
+          container[fieldName] = ObjectPathAccessor.getPath(pathRef, mapperMeta.root);
         }
 
-        var construct = fieldSpec ? fieldSpec.$construct : null;
+        var construct = spec ? spec.$construct : null;
         if (construct){
           var constructorFunction = null;
           if (typeof construct === 'string' && this.constructors[construct]) {
@@ -160,8 +156,8 @@ export class Schema
             // constructor not found
             throw new Error('Constructor not found for ' + path);
           }
-          if (constructorFunction && !Array.isArray(fieldContainer[fieldName])) {
-            fieldContainer[fieldName] = Object.assign(Object.create(constructorFunction.prototype), fieldContainer[fieldName]);
+          if (constructorFunction && !Array.isArray(container[fieldName])) {
+            container[fieldName] = Object.assign(Object.create(constructorFunction.prototype), container[fieldName]);
           }
         }
       }
@@ -171,88 +167,38 @@ export class Schema
   stripTransients(object: any)
   {
     this.init();
-    return (object && this.constructors)  ? this.schemaMapper.map(object, (
-      fieldSpec: SchemaSpec, 
-      fieldName: string | number, 
-      fieldContainer: object
-    ) => {
-      if (fieldSpec && fieldContainer) {
+    return (object && this.constructors)  ? this.schemaMapper.map(object, (opts) => {
+      var {spec, fieldName, container} = opts;
+      if (spec && container) {
         if (
-            fieldSpec.$pathRef !== undefined ||
-            fieldSpec.$relation
+          spec.$pathRef !== undefined ||
+          spec.$relation
         ) {
-          delete fieldContainer[fieldName];
+          delete container[fieldName];
         }
       }
     }) : object;
   }
   
-  validate(object: any, options?: SchemaConfig): Promise<SchemaValidationResult>
+  validate(object: any, config?: SchemaConfig): Promise<SchemaValidationResult>
   {
     this.init();
-    var validationMeta: SchemaValidationMeta = {errors: {}};
-    options = options ?  options : {};
+    var meta: SchemaValidationMeta = {errors: {}};
+    config = config ?  config : {};
 
     var promises = [];
-    this.schemaMapper.map(object, (     
-      fieldSpec: SchemaSpec, 
-      fieldName: string | number, 
-      fieldContainer: object, 
-      path: string | number,
-      mapperMeta: SchemaMapperMeta
-    ) => {
-      let promise = this.validateField(
-        fieldSpec,
+    this.schemaMapper.map(object, (opts) => {
+      let { spec, fieldName, container, path, meta: mapperMeta } = opts;
+      let promise = this.validateField({
+        spec,
         fieldName,
-        fieldContainer ? fieldContainer[fieldName] : undefined,
+        value: container ? container[fieldName] : undefined,
         path,
-        options,
-        validationMeta,
-        mapperMeta
-      ).then((value) => {
-        if (fieldContainer) fieldContainer[fieldName] = value;
-      });
-      promises.push(promise);
-    }, {
-      // If the spec is for related data we do not validate
-      // - this data will be stripped before any insertion or updating to persistance
-      skipTransients: true
-    });
-
-    var promise = Promise.all(promises).then(() => {
-      validationMeta.isValid = (Object.keys(validationMeta.errors).length == 0);
-      return validationMeta;
-    });
-
-    return promise;
-  }
-  
-  validatePaths(paths: SchemaPaths | Array<SchemaPaths>, options?, meta?: SchemaValidationMeta): Promise<SchemaValidationResult>
-  {
-    this.init();
-    var meta = meta ? meta : {errors: {}};
-    var objects = Array.isArray(paths) ? paths : [paths];
-    options = options ?  options : {};
-
-    var promises = [];
-    this.schemaMapper.mapPaths(objects, (      
-      fieldSpec: SchemaSpec, 
-      fieldName: string | number, 
-      fieldContainer: object, 
-      path: string | number,
-      mapperMeta: SchemaMapperMeta
-    ) => {
-      mapperMeta.root = fieldContainer;
-      let promise = this.validateField(
-        fieldSpec,
-        fieldName,
-        fieldContainer ? fieldContainer[fieldName] : undefined,
-        path,
-        options,
+        config,
         meta,
         mapperMeta
-      ).then((value) => {
-        if (fieldContainer) fieldContainer[fieldName] = value;
+      }).then((value) => {
+        if (container) container[fieldName] = value;
       });
       promises.push(promise);
     }, {
@@ -269,29 +215,67 @@ export class Schema
     return promise;
   }
   
-  validateQuery(query: any, options?: SchemaConfig): Promise<SchemaValidationResult>
+  validatePaths(paths: SchemaPaths | Array<SchemaPaths>, config?: SchemaConfig, meta?: SchemaValidationMeta): Promise<SchemaValidationResult>
   {
     this.init();
     var meta = meta ? meta : {errors: {}};
-    options = options ?  options : {};
-    // This is a query - we are expecting fields which are not defined
-    // - We dont want those to trigger an error so disabled strict validation
-    options.strict = false;
+    var objects = Array.isArray(paths) ? paths : [paths];
+    config = config ?  config : {};
 
     var promises = [];
-    this.schemaMapper.mapQueryPaths(query, (path, queryPathFieldName, container) => {
+    this.schemaMapper.mapPaths(objects, (opts) => {
+      let { spec, fieldName, container, path, meta: mapperMeta } = opts;
+      mapperMeta.root = container;
+      let promise = this.validateField({
+        spec,
+        fieldName,
+        value: container ? container[fieldName] : undefined,
+        path,
+        config,
+        meta,
+        mapperMeta
+      }).then((value) => {
+        if (container) container[fieldName] = value;
+      });
+      promises.push(promise);
+    }, {
+      // If the spec is for related data we do not validate
+      // - this data will be stripped before any insertion or updating to persistance
+      skipTransients: true
+    });
+
+    var promise = Promise.all(promises).then(() => {
+      meta.isValid = (Object.keys(meta.errors).length == 0);
+      return meta;
+    });
+
+    return promise;
+  }
+  
+  validateQuery(query: any, config?: SchemaConfig): Promise<SchemaValidationResult>
+  {
+    this.init();
+    var meta = meta ? meta : {errors: {}};
+    config = config ?  config : {};
+    // This is a query - we are expecting fields which are not defined
+    // - We dont want those to trigger an error so disabled strict validation
+    config.strict = false;
+
+    var promises = [];
+    this.schemaMapper.mapQueryPaths(query, (path, queryPathFieldName, queryPathContainer) => {
       var paths = {};
-      paths[path] = container[queryPathFieldName];
-      this.schemaMapper.mapPaths(paths, (fieldSpec, fieldName, fieldContainer, path) => {
-        let promise = this.validateField(
-          fieldSpec,
+      paths[path] = queryPathContainer[queryPathFieldName];
+      this.schemaMapper.mapPaths(paths, (opts) => {
+        let { spec, fieldName, container, path } = opts;
+        let promise = this.validateField({
+          spec,
           fieldName,
-          fieldContainer ? fieldContainer[fieldName] : undefined,
+          value: container ? container[fieldName] : undefined,
           path,
-          options,
+          config,
           meta
-        ).then((value) => {
-          if (container) container[queryPathFieldName] = value;
+        }).then((value) => {
+          if (queryPathContainer) queryPathContainer[queryPathFieldName] = value;
         });
         promises.push(promise);
       }, {skipTransients: true});
@@ -312,22 +296,19 @@ export class Schema
     var deleteRefs = [];
     var valueReplaceRefs = [];
     var mapperType = (mapperType == 'mapPaths') ? 'mapPaths' : 'map';
-    this.schemaMapper[mapperType](object, (      
-      fieldSpec: SchemaSpec, 
-      fieldName: string | number, 
-      fieldContainer: object
-    ) => {
-      const filters = fieldSpec && fieldSpec.$filter ? fieldSpec.$filter : {};
+    this.schemaMapper[mapperType](object, (opts) => {
+      let { spec, fieldName, container } = opts;
+      const filters = spec && spec.$filter ? spec.$filter : {};
       if (filters.private === true || filters.private == mode){
         // We cant simply delete here because if we delete a parent of a structure we are already
         // - iterating we will get errors. Instead make a list of references to delete.
         // Once we have all the references we can safely delete them.
-        if (fieldContainer) deleteRefs.push({fieldContainer, fieldName});
+        if (container) deleteRefs.push({fieldContainer: container, fieldName});
       }
       if (filters.privateValue === true || filters.privateValue == mode) {
         // The privateValue replaces any non null values as true and otherwise false
         // - this allows the removal of the private value while still indicating if a value exists or not
-        if (fieldContainer) valueReplaceRefs.push({fieldContainer, fieldName});
+        if (container) valueReplaceRefs.push({fieldContainer: container, fieldName});
       }
     });
 
@@ -370,23 +351,31 @@ export class Schema
   }
   
   async validateField(
-    spec: SchemaSpec, 
-    fieldName: string | number, 
-    value: any, 
-    path: string | number, 
-    options?: SchemaConfig, 
-    meta: SchemaValidationMeta = {},
-    mapperMeta: SchemaMapperMeta = {},
+    opts: {
+      spec: SchemaSpec, 
+      fieldName: string | number, 
+      value: any, 
+      path: string | number, 
+      config?: SchemaConfig, 
+      meta?: SchemaValidationMeta,
+      mapperMeta?: SchemaMapperMeta
+    }
   )
   {
+    var { spec, fieldName, value, path, config, meta, mapperMeta } = opts;
+
     path = path ? path : fieldName;
+    config = config ? config : {};
+    meta = meta ? meta : {};
+    mapperMeta = mapperMeta ? mapperMeta : {};
+
     const validators = spec && spec.$validate ? spec.$validate : {};
     const filters = spec && spec.$filter ? spec.$filter : {};
     const name = spec && spec.$displayName ? spec.$displayName : fieldName;
     const strict = spec && spec.$strict !== undefined ? spec.$strict : (
       mapperMeta.specParent && mapperMeta.specParent.$strict !== undefined ? mapperMeta.specParent.$strict : undefined
     );
-    options = options ? options : {};
+
 
     if (!SchemaUtil.isValidFieldName(fieldName)) {
       Schema.appendError(meta, path, 'Invalid field name');

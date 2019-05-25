@@ -6,9 +6,17 @@ import Schema from './schema';
 import SchemaConfig from './config';
 import SchemaSpec from './spec';
 
-interface SchemaMapperCallback 
+export interface SchemaMapperCallback 
 {
-  (spec: SchemaSpec, fieldName: string | number, container: object, metaPath: string, meta: object): void
+  (
+    opts: {
+      spec: SchemaSpec, 
+      fieldName: string | number, 
+      container: object, 
+      path: string, 
+      meta: SchemaMapperMeta
+    }
+  ): void
 }
 
 export interface SchemaMapperMappingConfig 
@@ -106,7 +114,7 @@ export class SchemaMapper
     return spec;
   }
   
-  map(data: Array<object>|any, callback: SchemaMapperCallback, options?: SchemaMapperMappingConfig)
+  map(data: Array<object>|any, callback: SchemaMapperCallback, config?: SchemaMapperMappingConfig)
   {
     this.init();
     const meta = {path: '', errors: {}, root: data} as SchemaMapperMeta;
@@ -114,30 +122,44 @@ export class SchemaMapper
     // If the data is an array we must present the spec as an array also
     var spec = Array.isArray(data) ? [clone(this.specNormalised)] : clone(this.specNormalised);
 
-    if (SchemaMapper.specIsTransient(spec) && options && options.skipTransients) return;
+    if (SchemaMapper.specIsTransient(spec) && config && config.skipTransients) return;
 
     // We have to pass the data in as a object property as that is the only way to reference data
-    return this.mapField(spec, 'root', {root: data}, callback, options, meta);
+    return this.mapField({
+      spec, 
+      fieldName: 'root', 
+      container: {root: data}, 
+      callback, 
+      config, 
+      meta
+    });
   }
   
-  mapPaths(paths: any, callback: SchemaMapperCallback, options?: object, meta?: SchemaMapperMeta)
+  mapPaths(paths: any, callback: SchemaMapperCallback, config?: SchemaMapperMappingConfig, meta?: SchemaMapperMeta)
   {
     this.init();
     var meta = meta ? meta : {path: '', errors: {}} as SchemaMapperMeta;
     var objects = Array.isArray(paths) ? paths : [paths];
 
     meta.path = this.initPath(meta.path);
-    objects.forEach((object) => {
-      for (var fieldPath in object) {
-        meta.path = fieldPath;
-        var spec = SchemaUtil.getSpec(fieldPath, this.specNormalised);
-        this.mapField(spec, fieldPath, object, callback, options, meta);
+    objects.forEach(container => {
+      for (var fieldName in container) {
+        meta.path = fieldName;
+        var spec = SchemaUtil.getSpec(fieldName, this.specNormalised);
+        this.mapField({
+          spec, 
+          fieldName, 
+          container, 
+          callback, 
+          config, 
+          meta
+        });
       }
     });
   }
   
   // @ts-ignore - unused options
-  mapQueryPaths(query, callback, options = {})
+  mapQueryPaths(query, callback, config?: SchemaMapperMappingConfig)
   {
     // When validating a query its assumed that all fields-names of the query object, other than operators, are data object paths
     // - operators are skipped and their values are passed to the validator for validation - ( {$and: [{path: value}, {path: value}] )
@@ -208,17 +230,21 @@ export class SchemaMapper
   }
   
   mapRecursive(
-    spec: SchemaSpec, 
-    object: any, 
-    callback: SchemaMapperCallback, 
-    options?: SchemaMapperMappingConfig, 
-    meta: SchemaMapperMeta = {}
+    opts: {
+      spec: SchemaSpec, 
+      object: any, 
+      callback: SchemaMapperCallback, 
+      config?: SchemaMapperMappingConfig, 
+      meta?: SchemaMapperMeta
+    }
   )
   {
+    var {spec, object, callback, config, meta} = opts;
+
     this.init();
     meta.path = this.initPath(meta.path);
 
-    if (SchemaMapper.specIsTransient(spec) && options && options.skipTransients) return;
+    if (SchemaMapper.specIsTransient(spec) && config && config.skipTransients) return;
 
     var specTemp = clone(spec);
     // If match all spec is defined, newSpec defaults to an empty object since any spec rules should be replaced by
@@ -244,45 +270,67 @@ export class SchemaMapper
       if (SchemaUtil.isQueryOperator(fieldName)) continue; // Descriptor proptery
       meta.specParent = specTemp;
       meta.path = basePath.length ? basePath + '.' + fieldName : fieldName;
-      this.mapField(specTemp[fieldName], fieldName, object, callback, options, meta);
+      this.mapField({
+        spec: specTemp[fieldName], 
+        fieldName, 
+        container: object, 
+        callback, 
+        config, 
+        meta
+      });
     }
   }
   
   mapArrayElements(
-    spec: SchemaSpec, 
-    array: Array<any>, 
-    callback: SchemaMapperCallback, 
-    options?: SchemaMapperMappingConfig, 
-    meta: SchemaMapperMeta = {}
+    opts: {
+      spec: SchemaSpec, 
+      array: Array<any>, 
+      callback: SchemaMapperCallback, 
+      config?: SchemaMapperMappingConfig, 
+      meta?: SchemaMapperMeta
+    }
   )
   {
+    var {spec, array, callback, config, meta} = opts;
+
     this.init();
     meta.path = this.initPath(meta.path);
 
     var basePath = meta.path;
 
-    if (SchemaMapper.specIsTransient(spec) && options && options.skipTransients) return;
+    if (SchemaMapper.specIsTransient(spec) && config && config.skipTransients) return;
 
     // @ts-ignore - unused element
-    array.forEach((element, x) => {
-      meta.path = basePath.length ? basePath + '.' + x :  '' + x;
-      this.mapField(spec, x, array, callback, options, meta);
+    array.forEach((element, fieldName) => {
+      meta.path = basePath.length ? basePath + '.' + fieldName :  '' + fieldName;
+      this.mapField({
+        spec, 
+        fieldName, 
+        container: array, 
+        callback, 
+        config, 
+        meta
+      });
     });
   }
   
   mapField(
-    spec: SchemaSpec, 
-    fieldName: string | number, 
-    container: any, 
-    callback: SchemaMapperCallback, 
-    options: SchemaMapperMappingConfig, 
-    meta: SchemaMapperMeta = {}
+    opts: {
+      spec: SchemaSpec, 
+      fieldName: string | number, 
+      container: any, 
+      callback: SchemaMapperCallback, 
+      config: SchemaMapperMappingConfig, 
+      meta: SchemaMapperMeta
+    }
   )
   {
+    var {spec, fieldName, container, callback, config, meta} = opts;
+
     this.init();
     meta.path = this.initPath(meta.path);
 
-    if (SchemaMapper.specIsTransient(spec) && options && options.skipTransients) return;
+    if (SchemaMapper.specIsTransient(spec) && config && config.skipTransients) return;
 
     var fieldType = undefined;
     // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later).
@@ -305,17 +353,18 @@ export class SchemaMapper
       container[fieldName] = defaultValue;
     }
 
-    callback(spec, fieldName, container, meta.path, meta);
+    callback({spec, fieldName, container, path: meta.path, meta});
+
     switch (fieldType) {
       case Object:
         if (spec.$spec !== undefined) spec = spec.$spec;
-        this.mapRecursive(
+        this.mapRecursive({
           spec,
-          container ? container[fieldName] : undefined,
+          object: container ? container[fieldName] : undefined,
           callback,
-          options,
+          config,
           meta
-        );
+        });
       break;
       case Array:
         var arraySpec = undefined;
@@ -328,7 +377,13 @@ export class SchemaMapper
           arraySpec = spec.$spec;
         }
         if (container && arraySpec && container[fieldName]) {
-          this.mapArrayElements(arraySpec, container[fieldName], callback, options, meta);
+          this.mapArrayElements({
+            spec: arraySpec, 
+            array: container[fieldName], 
+            callback, 
+            config, 
+            meta
+          });
         }
       break;
     }

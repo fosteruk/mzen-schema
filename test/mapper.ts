@@ -9,11 +9,11 @@ describe('SchemaMapper', function(){
       var schemaIterator = new SchemaMapper(spec);
 
       var results = [];
-      schemaIterator.map({name: 'Kevin'}, function(fieldSpec){
-        results.push({fieldSpec});
+      schemaIterator.map({name: 'Kevin'}, function(opts){
+        results.push({spec: opts.spec});
       });
-      should(results[0].fieldSpec).eql(spec);
-      should(results[1].fieldSpec).eql(spec.name);
+      should(results[0].spec).eql(spec);
+      should(results[1].spec).eql(spec.name);
     });
     it('should callback with field name', function(){
       var spec = {name: String};
@@ -21,8 +21,8 @@ describe('SchemaMapper', function(){
 
       var results = [];
       // @ts-ignore - unused fieldSpec
-      schemaIterator.map({name: 'Kevin'}, function(fieldSpec, fieldName){
-        results.push({fieldName});
+      schemaIterator.map({name: 'Kevin'}, function(opts){
+        results.push({fieldName: opts.fieldName});
       });
 
       should(results[0].fieldName).eql('root');
@@ -34,8 +34,8 @@ describe('SchemaMapper', function(){
 
       var results = [];
       // @ts-ignore - unused fieldSpec
-      schemaIterator.map({names: ['Kevin']}, function(fieldSpec, fieldName){
-        results.push({fieldName});
+      schemaIterator.map({names: ['Kevin']}, function(opts){
+        results.push({fieldName: opts.fieldName});
       });
 
       should(results[0].fieldName).eql('root');
@@ -49,12 +49,12 @@ describe('SchemaMapper', function(){
 
       var results = [];
       // @ts-ignore - unused fieldSpec and fieldName
-      schemaIterator.map(value, function(fieldSpec, fieldName, fieldContainer){
-        results.push({fieldContainer});
+      schemaIterator.map(value, function(opts){
+        results.push({container: opts.container});
       });
 
-      should(results[1].fieldContainer).eql(value);
-      should(results[2].fieldContainer).eql(value[0]);
+      should(results[1].container).eql(value);
+      should(results[2].container).eql(value[0]);
     });
     it('should callback with field container array', function(){
       var spec = {names: [String]};
@@ -63,13 +63,13 @@ describe('SchemaMapper', function(){
 
       var results = [];
       // @ts-ignore - unused fieldSpec and fieldName
-      schemaIterator.map(value, function(fieldSpec, fieldName, fieldContainer){
-        results.push({fieldContainer});
+      schemaIterator.map(value, function(opts){
+        results.push({container: opts.container});
       });
 
-      should(results[1].fieldContainer).eql(value);
-      should(results[2].fieldContainer).eql(value[0]);
-      should(results[3].fieldContainer).eql(value[0].names);
+      should(results[1].container).eql(value);
+      should(results[2].container).eql(value[0]);
+      should(results[3].container).eql(value[0].names);
     });
     it('should callback with field path', function(){
       var spec = {name: String};
@@ -77,8 +77,8 @@ describe('SchemaMapper', function(){
 
       var results = [];
       // @ts-ignore - unused fieldSpec and fieldName and fieldContainer
-      schemaIterator.map({name: 'Kevin'}, function(fieldSpec, fieldName, fieldContainer, path){
-        results.push({path});
+      schemaIterator.map({name: 'Kevin'}, function(opts){
+        results.push({path: opts.path});
       });
 
       should(results[0].path).eql('');
@@ -103,8 +103,8 @@ describe('SchemaMapper', function(){
 
       var results = [];
       // @ts-ignore - unused fieldSpec and fieldName and fieldContainer
-      schemaIterator.map(data, function(fieldSpec, fieldName, fieldContainer, path){
-        results.push({path});
+      schemaIterator.map(data, function(opts){
+        results.push({path: opts.path});
       });
 
       should(results[0].path).eql('');
@@ -137,26 +137,26 @@ describe('SchemaMapper', function(){
     });
 
     var results = [];
-    schemaIterator.map({name: 'Kevin'}, function(fieldSpec){
-      results.push({fieldSpec});
+    schemaIterator.map({name: 'Kevin'}, function(opts){
+      results.push({spec: opts.spec});
     });
 
-    should(results[0].fieldSpec.address).eql(specAddress);
+    should(results[0].spec.address).eql(specAddress);
   });
   describe('mapPaths', function(){
     it('should callback with field spec', function(){
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
-      schemaIterator.mapPaths({'name': 'Kevin'}, function(fieldSpec){
-        should(fieldSpec).eql(String);
+      schemaIterator.mapPaths({'name': 'Kevin'}, function(opts){
+        should(opts.spec).eql(String);
       });
     });
     it('should callback with field name', function(){
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
       // @ts-ignore - unused fieldSpec
-      schemaIterator.mapPaths({'name': 'Kevin'}, function(fieldSpec, fieldName){
-        should(fieldName).eql('name');
+      schemaIterator.mapPaths({'name': 'Kevin'}, function(opts){
+        should(opts.fieldName).eql('name');
       });
     });
     it('should callback with field index of array value', function(){
@@ -165,8 +165,8 @@ describe('SchemaMapper', function(){
 
       var results = [];
       // @ts-ignore - unused fieldSpec
-      schemaIterator.mapPaths({'names': ['Kevin']}, function(fieldSpec, fieldName){
-        results.push({fieldName});
+      schemaIterator.mapPaths({'names': ['Kevin']}, function(opts){
+        results.push({fieldName: opts.fieldName});
       });
       should(results[0].fieldName).eql('names');
       should(results[1].fieldName).eql(0);
@@ -176,8 +176,8 @@ describe('SchemaMapper', function(){
       var schemaIterator = new SchemaMapper(spec);
       var object = {name: 'Kevin'};
       // @ts-ignore - unused fieldSpec and fieldName
-      schemaIterator.mapPaths({name: 'Kevin'}, function(fieldSpec, fieldName, fieldContainer){
-        should(fieldContainer).eql(object);
+      schemaIterator.mapPaths({name: 'Kevin'}, function(opts){
+        should(opts.container).eql(object);
       });
     });
     it('should callback with field container array', function(){
@@ -187,18 +187,18 @@ describe('SchemaMapper', function(){
 
       var results = [];
       // @ts-ignore - unused fieldSpec and fieldName
-      schemaIterator.mapPaths({names: ['Kevin']}, function(fieldSpec, fieldName, fieldContainer){
-        results.push({fieldContainer});
+      schemaIterator.mapPaths({names: ['Kevin']}, function(opts){
+        results.push({container: opts.container});
       });
-      should(results[0].fieldContainer).eql(value);
-      should(results[1].fieldContainer).eql(value.names);
+      should(results[0].container).eql(value);
+      should(results[1].container).eql(value.names);
     });
     it('should callback with field path', function(){
       var spec = {name: String};
       var schemaIterator = new SchemaMapper(spec);
       // @ts-ignore - unused fieldSpec and fieldName and fieldContainer
-      schemaIterator.mapPaths({name: 'Kevin'}, function(fieldSpec, fieldName, fieldContainer, path){
-        should(path).eql('name');
+      schemaIterator.mapPaths({name: 'Kevin'}, function(opts){
+        should(opts.path).eql('name');
       });
     });
   });
