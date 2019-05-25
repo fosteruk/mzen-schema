@@ -234,7 +234,7 @@ export class Schema
         config,
         meta,
         mapperMeta
-      }).then((value) => {
+      }).then(value => {
         if (container) container[fieldName] = value;
       });
       promises.push(promise);
@@ -274,7 +274,7 @@ export class Schema
           path,
           config,
           meta
-        }).then((value) => {
+        }).then(value => {
           if (queryPathContainer) queryPathContainer[queryPathFieldName] = value;
         });
         promises.push(promise);
@@ -312,12 +312,12 @@ export class Schema
       }
     });
 
-    valueReplaceRefs.forEach((ref) => {
+    valueReplaceRefs.forEach(ref => {
       if (ref.fieldContainer && ref.fieldContainer[ref.fieldName]) {
         ref.fieldContainer[ref.fieldName] = ref.fieldContainer[ref.fieldName] == undefined ? ref.fieldContainer[ref.fieldName] : true;
       }
     });
-    deleteRefs.forEach((ref) => {
+    deleteRefs.forEach(ref => {
       if (ref.fieldContainer && ref.fieldContainer[ref.fieldName]) delete ref.fieldContainer[ref.fieldName];
     });
   }
@@ -424,7 +424,7 @@ export class Schema
 
     var validateResults = await Validator.validate(value, validators, {name, root: mapperMeta.root});
     if (Array.isArray(validateResults)) {
-      validateResults.forEach((result) => {
+      validateResults.forEach(result => {
         Schema.appendError(meta, path, result);
       });
     }
@@ -490,7 +490,7 @@ export class Schema
   {
     results = Array.isArray(results) ? results : [];
     var finalResult = {errors: {}} as SchemaValidationResult;
-    results.forEach(function(result){
+    results.forEach(result => {
       if (result.errors) Object.assign(finalResult.errors, result.errors)
     });
     finalResult.isValid = (Object.keys(finalResult.errors).length == 0);
