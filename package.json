@@ -7,7 +7,7 @@
   "scripts": {
     "prepare": "npm run build",
     "prepublishOnly": "npm test",
-    "test": "mocha -r test/tests/ts-node-hooks.js $(find test/tests/ -name '*.test.ts')",
+    "test": "mocha -r test/ts-node-hooks.js $(find test/ -name '*.test.ts')",
     "build": "npm run clean && tsc",
     "clean": "rm -rf ./lib/*"
   },

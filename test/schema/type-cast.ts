@@ -1,6 +1,6 @@
 import should = require('should');
-import Schema from '../../../lib/schema';
-import SchemaTypes from '../../../lib/types';
+import Schema from '../../lib/schema';
+import SchemaTypes from '../../lib/types';
 
 describe('type cast', function(){
   it('should cast String to Number', async () => {

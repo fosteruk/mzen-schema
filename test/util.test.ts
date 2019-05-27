@@ -1,5 +1,5 @@
 import should = require('should');
-import SchemaUtil from '../../lib/util';
+import SchemaUtil from '../lib/util';
 
 describe('SchemaUtil', function(){
   describe('getSpec()', function(){

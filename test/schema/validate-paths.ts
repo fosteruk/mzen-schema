@@ -1,5 +1,5 @@
 import should = require('should');
-import Schema from '../../../lib/schema';
+import Schema from '../../lib/schema';
 
 describe('validatePaths', function(){
   it('should process field name', async () => {
