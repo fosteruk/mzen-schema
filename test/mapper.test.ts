@@ -10,10 +10,10 @@ describe('SchemaMapper', function(){
 
       var results = [];
       schemaIterator.map({name: 'Kevin'}, function(opts){
-        results.push({spec: opts.spec});
+        results.push(opts.spec);
       });
-      should(results[0].spec).eql(spec);
-      should(results[1].spec).eql(spec.name);
+      should(results[0]).eql(spec);
+      should(results[1]).eql(spec.name);
     });
     it('should callback with field name', function(){
       var spec = {name: String};
@@ -22,11 +22,11 @@ describe('SchemaMapper', function(){
       var results = [];
       // @ts-ignore - unused fieldSpec
       schemaIterator.map({name: 'Kevin'}, function(opts){
-        results.push({fieldName: opts.fieldName});
+        results.push(opts.fieldName);
       });
 
-      should(results[0].fieldName).eql('root');
-      should(results[1].fieldName).eql('name');
+      should(results[0]).eql('root');
+      should(results[1]).eql('name');
     });
     it('should callback with field index of array value', function(){
       var spec = {names: [String]};
@@ -35,12 +35,12 @@ describe('SchemaMapper', function(){
       var results = [];
       // @ts-ignore - unused fieldSpec
       schemaIterator.map({names: ['Kevin']}, function(opts){
-        results.push({fieldName: opts.fieldName});
+        results.push(opts.fieldName);
       });
 
-      should(results[0].fieldName).eql('root');
-      should(results[1].fieldName).eql('names');
-      should(results[2].fieldName).eql(0);
+      should(results[0]).eql('root');
+      should(results[1]).eql('names');
+      should(results[2]).eql(0);
     });
     it('should callback with field container object', function(){
       var spec = {name: String};
@@ -50,11 +50,11 @@ describe('SchemaMapper', function(){
       var results = [];
       // @ts-ignore - unused fieldSpec and fieldName
       schemaIterator.map(value, function(opts){
-        results.push({container: opts.container});
+        results.push(opts.container);
       });
 
-      should(results[1].container).eql(value);
-      should(results[2].container).eql(value[0]);
+      should(results[1]).eql(value);
+      should(results[2]).eql(value[0]);
     });
     it('should callback with field container array', function(){
       var spec = {names: [String]};
@@ -64,12 +64,12 @@ describe('SchemaMapper', function(){
       var results = [];
       // @ts-ignore - unused fieldSpec and fieldName
       schemaIterator.map(value, function(opts){
-        results.push({container: opts.container});
+        results.push(opts.container);
       });
 
-      should(results[1].container).eql(value);
-      should(results[2].container).eql(value[0]);
-      should(results[3].container).eql(value[0].names);
+      should(results[1]).eql(value);
+      should(results[2]).eql(value[0]);
+      should(results[3]).eql(value[0].names);
     });
     it('should callback with field path', function(){
       var spec = {name: String};
@@ -78,11 +78,11 @@ describe('SchemaMapper', function(){
       var results = [];
       // @ts-ignore - unused fieldSpec and fieldName and fieldContainer
       schemaIterator.map({name: 'Kevin'}, function(opts){
-        results.push({path: opts.path});
+        results.push(opts.path);
       });
 
-      should(results[0].path).eql('');
-      should(results[1].path).eql('name');
+      should(results[0]).eql('');
+      should(results[1]).eql('name');
     });
     it('should callback with field path of nested array', function(){
       var spec = {};
@@ -104,17 +104,17 @@ describe('SchemaMapper', function(){
       var results = [];
       // @ts-ignore - unused fieldSpec and fieldName and fieldContainer
       schemaIterator.map(data, function(opts){
-        results.push({path: opts.path});
+        results.push(opts.path);
       });
 
-      should(results[0].path).eql('');
-      should(results[1].path).eql('0');
-      should(results[2].path).eql('0.name');
-      should(results[3].path).eql('0.children');
-      should(results[4].path).eql('1');
-      should(results[5].path).eql('1.name');
-      should(results[6].path).eql('2');
-      should(results[7].path).eql('2.name');
+      should(results[0]).eql('');
+      should(results[1]).eql('0');
+      should(results[2]).eql('0.name');
+      should(results[3]).eql('0.children');
+      should(results[4]).eql('1');
+      should(results[5]).eql('1.name');
+      should(results[6]).eql('2');
+      should(results[7]).eql('2.name');
     });
   });
   it('should callback with field spec from embedded schema reference', function(){
@@ -138,10 +138,10 @@ describe('SchemaMapper', function(){
 
     var results = [];
     schemaIterator.map({name: 'Kevin'}, function(opts){
-      results.push({spec: opts.spec});
+      results.push(opts.spec);
     });
 
-    should(results[0].spec.address).eql(specAddress);
+    should(results[0].address).eql(specAddress);
   });
   describe('mapPaths', function(){
     it('should callback with field spec', function(){
@@ -166,10 +166,10 @@ describe('SchemaMapper', function(){
       var results = [];
       // @ts-ignore - unused fieldSpec
       schemaIterator.mapPaths({'names': ['Kevin']}, function(opts){
-        results.push({fieldName: opts.fieldName});
+        results.push(opts.fieldName);
       });
-      should(results[0].fieldName).eql('names');
-      should(results[1].fieldName).eql(0);
+      should(results[0]).eql('names');
+      should(results[1]).eql(0);
     });
     it('should callback with field container object', function(){
       var spec = {name: String};
@@ -188,10 +188,10 @@ describe('SchemaMapper', function(){
       var results = [];
       // @ts-ignore - unused fieldSpec and fieldName
       schemaIterator.mapPaths({names: ['Kevin']}, function(opts){
-        results.push({container: opts.container});
+        results.push(opts.container);
       });
-      should(results[0].container).eql(value);
-      should(results[1].container).eql(value.names);
+      should(results[0]).eql(value);
+      should(results[1]).eql(value.names);
     });
     it('should callback with field path', function(){
       var spec = {name: String};
