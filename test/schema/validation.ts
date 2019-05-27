@@ -547,57 +547,87 @@ describe('validation', function(){
     const result = await schema.validate(data);
     should(result.isValid).eql(false);
   });
-  it('should fail validation in strict mode if unspecified field exists', async () => {
-    var data = {age: '33', pi: '3.14159265359'};
+  describe('strict', function(){
+    it('should fail validation in strict mode if unspecified field exists', async () => {
+      var data = {age: '33', pi: '3.14159265359'};
 
-    var schema = new Schema({
-      $strict: true,
-      age: Number
+      var schema = new Schema({
+        $strict: true,
+        age: Number
+      });
+
+      const result = await schema.validate(data);
+      should(result.isValid).eql(false);
     });
+    it('should fail validation, strict mode propagates', async () => {
+      var data = {
+        name: 'Kevin',
+        address: {
+          street: 'London Road',
+          city: 'Liverpool'
+        }
+      };
 
-    const result = await schema.validate(data);
-    should(result.isValid).eql(false);
-  });
-  it('should fail validation, strict mode propagates', async () => {
-    var data = {
-      name: 'Kevin',
-      address: {
-        street: 'London Road',
-        city: 'Liverpool'
-      }
-    };
+      var schema = new Schema({
+        $strict: true,
+        name: 'string',
+        address: {
+          street: 'string',
+        }
+      });
 
-    var schema = new Schema({
-      $strict: true,
-      name: String,
-      address: {
-        street: String
-      }
+      const result = await schema.validate(data);
+      should(result.isValid).eql(false);
     });
+    it('should fail validation, strict mode propagates deep', async () => {
+      var data = {
+        a: {
+          b: {
+            name: 'Kevin',
+            address: {
+              street: 'London Road',
+              city: 'Liverpool'
+            }
+          }
+        }
+      };
 
-    const result = await schema.validate(data);
-    should(result.isValid).eql(false);
-  });
-  it('should allow strict mode propagation to be overriden', async () => {
-    var data = {
-      name: 'Kevin',
-      address: {
-        street: 'London Road',
-        city: 'Liverpool'
-      }
-    };
+      var schema = new Schema({
+        $strict: true,
+        a: {
+          b: {
+            name: String,
+            address: {
+              street: String
+            }
+          }
+        }
+      });
 
-    var schema = new Schema({
-      $strict: true,
-      name: String,
-      address: {
-        $strict: false,
-        street: String
-      }
+      const result = await schema.validate(data);
+      should(result.isValid).eql(false);
     });
+    it('should allow strict mode propagation to be overriden', async () => {
+      var data = {
+        name: 'Kevin',
+        address: {
+          street: 'London Road',
+          city: 'Liverpool'
+        }
+      };
 
-    const result = await schema.validate(data);
-    should(result.isValid).eql(true);
+      var schema = new Schema({
+        $strict: true,
+        name: String,
+        address: {
+          $strict: false,
+          street: String
+        }
+      });
+
+      const result = await schema.validate(data);
+      should(result.isValid).eql(true);
+    });
   });
   it('should honour defaultNotNull value', async () => {
     var data = {name: null};

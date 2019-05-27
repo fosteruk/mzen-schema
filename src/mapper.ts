@@ -11,6 +11,7 @@ export interface SchemaMapperCallback
   (
     opts: {
       spec: SchemaSpec, 
+      specParent: SchemaSpec,  
       fieldName: string | number, 
       container: object, 
       path: string, 
@@ -126,6 +127,7 @@ export class SchemaMapper
     // We have to pass the data in as a object property as that is the only way to reference data
     return this.mapField({
       spec, 
+      specParent: null,
       fieldName: 'root', 
       container: {root: data}, 
       path: '',
@@ -146,6 +148,7 @@ export class SchemaMapper
         var spec = SchemaUtil.getSpec(fieldName, this.specNormalised);
         this.mapField({
           spec, 
+          specParent: null,
           fieldName, 
           container, 
           path: fieldName,
@@ -227,10 +230,21 @@ export class SchemaMapper
 
     mapRecursiveQuery(query);
   }
+
+  specInheritFrom(parent: SchemaSpec, child: SchemaSpec)
+  {
+    // Some spec options (such as $strict) should propagate down the spec tree
+    // This method handles passing such options down to child specs
+    if (parent && TypeCaster.getType(parent) == Object && child && TypeCaster.getType(child) == Object) {
+      if (child.$strict === undefined) child.$strict = parent.$strict;
+    }
+    return child;
+  }
   
   mapRecursive(
     opts: {
       spec: SchemaSpec, 
+      specParent: SchemaSpec,
       object: any, 
       path: string,
       callback: SchemaMapperCallback, 
@@ -239,39 +253,41 @@ export class SchemaMapper
     }
   )
   {
-    var { spec, object, path, callback, config, meta } = opts;
+    var { spec, specParent, object, path, callback, config, meta } = opts;
 
     this.init();
     path = this.initPath(path);
 
     if (SchemaMapper.specIsTransient(spec) && config && config.skipTransients) return;
 
-    var specTemp = clone(spec);
-    // If match all spec is defined, newSpec defaults to an empty object since any spec rules should be replaced by
+    // If match all spec is defined, finalSpec defaults to an empty object since any spec rules should be replaced by
     // - the match-all spec (defaults to original spec)
     const matchAllSpec = (spec && spec['*'] != undefined) ? spec['*'] : undefined;
-    const newSpec = (matchAllSpec !== undefined) ? {} :  specTemp;
-    for (let fieldName in object) {
+    // We are going to modify the spec so we must clone it
+    const finalSpec = this.specInheritFrom(specParent, (matchAllSpec === undefined) ? clone(spec) : {});
+    for (var fieldName in object) {
       if (matchAllSpec !== undefined) {
         // If match all '*' field spec is set, we generate a new spec object using the match all spec for every field
-        newSpec[fieldName] = matchAllSpec;
+        finalSpec[fieldName] = matchAllSpec;
       } else if (spec === undefined || spec[fieldName] === undefined) {
         // Any properties of the object under validation, that are not defined defined in the spec
         // - are injected into the spec as "undefined" to allow default validations to be applied
         // If no spec is specified, all fields are set as undefined. This allows default validations to be applied.
-        newSpec[fieldName] = undefined;
+        // Since only fields that appear in the spec are tested
+        finalSpec[fieldName] = undefined;
       }
     }
-    specTemp = newSpec;
 
-    for (var fieldName in specTemp) {
+    for (let fieldName in finalSpec) {
       if (SchemaUtil.isQueryOperator(fieldName)) continue; // Descriptor proptery
-      meta.specParent = specTemp;
+      let fieldSpec = this.specInheritFrom(specParent, finalSpec[fieldName]);
+      let fieldPath = path ? path + '.' + fieldName : '' + fieldName;
       this.mapField({
-        spec: specTemp[fieldName], 
+        spec: fieldSpec, 
+        specParent: fieldSpec ? finalSpec : undefined,
         fieldName, 
         container: object, 
-        path: path ? path + '.' + fieldName : fieldName,
+        path: fieldPath,
         callback, 
         config, 
         meta
@@ -282,6 +298,7 @@ export class SchemaMapper
   mapArrayElements(
     opts: {
       spec: SchemaSpec, 
+      specParent: SchemaSpec,
       array: Array<any>, 
       path: string,
       callback: SchemaMapperCallback, 
@@ -290,7 +307,7 @@ export class SchemaMapper
     }
   )
   {
-    var { spec, array, path, callback, config, meta } = opts;
+    var { spec, specParent, array, path, callback, config, meta } = opts;
 
     this.init();
     path = this.initPath(path);
@@ -301,6 +318,7 @@ export class SchemaMapper
     array.forEach((element, fieldName) => {
       this.mapField({
         spec, 
+        specParent,
         fieldName, 
         container: array, 
         path: path ? path + '.' + fieldName :  '' + fieldName,
@@ -314,6 +332,7 @@ export class SchemaMapper
   mapField(
     opts: {
       spec: SchemaSpec, 
+      specParent: SchemaSpec,
       fieldName: string | number, 
       container: any, 
       path: string,
@@ -323,7 +342,7 @@ export class SchemaMapper
     }
   )
   {
-    var {spec, fieldName, container, path, callback, config, meta} = opts;
+    var { spec, specParent, fieldName, container, path, callback, config, meta } = opts;
 
     this.init();
     path = this.initPath(path);
@@ -351,13 +370,14 @@ export class SchemaMapper
       container[fieldName] = defaultValue;
     }
 
-    callback({spec, fieldName, container, path, meta});
+    callback({spec, specParent, fieldName, container, path, meta});
 
     switch (fieldType) {
       case Object:
         if (spec.$spec !== undefined) spec = spec.$spec;
         this.mapRecursive({
           spec,
+          specParent,
           object: container ? container[fieldName] : undefined,
           path,
           callback,
@@ -371,13 +391,14 @@ export class SchemaMapper
           // If the field is an array the specification for the array elements shoud be contained in the first element
           arraySpec = spec[0];
         } else if (TypeCaster.getType(spec) == Object && spec.$spec) {
-          // If the field type is an object which specifies type "Array"
+          // If the spec is an object which specifies type "Array"
           // - then the array elements spec should be specified using the "$spec" property
           arraySpec = spec.$spec;
         }
         if (container && arraySpec && container[fieldName]) {
           this.mapArrayElements({
             spec: arraySpec, 
+            specParent,
             array: container[fieldName], 
             path,
             callback, 

@@ -188,9 +188,10 @@ export class Schema
 
     var promises = [];
     this.schemaMapper.map(object, (opts) => {
-      let { spec, fieldName, container, path, meta: mapperMeta } = opts;
+      let { spec, specParent, fieldName, container, path, meta: mapperMeta } = opts;
       let promise = this.validateField({
         spec,
+        specParent,
         fieldName,
         value: container ? container[fieldName] : undefined,
         path,
@@ -224,10 +225,11 @@ export class Schema
 
     var promises = [];
     this.schemaMapper.mapPaths(objects, (opts) => {
-      let { spec, fieldName, container, path, meta: mapperMeta } = opts;
+      let { spec, specParent, fieldName, container, path, meta: mapperMeta } = opts;
       mapperMeta.root = container;
       let promise = this.validateField({
         spec,
+        specParent,
         fieldName,
         value: container ? container[fieldName] : undefined,
         path,
@@ -266,9 +268,10 @@ export class Schema
       var paths = {};
       paths[path] = queryPathContainer[queryPathFieldName];
       this.schemaMapper.mapPaths(paths, (opts) => {
-        let { spec, fieldName, container, path } = opts;
+        let { spec, specParent, fieldName, container, path } = opts;
         let promise = this.validateField({
           spec,
+          specParent,
           fieldName,
           value: container ? container[fieldName] : undefined,
           path,
@@ -353,6 +356,7 @@ export class Schema
   async validateField(
     opts: {
       spec: SchemaSpec, 
+      specParent: SchemaSpec, 
       fieldName: string | number, 
       value: any, 
       path: string | number, 
@@ -362,7 +366,7 @@ export class Schema
     }
   )
   {
-    var { spec, fieldName, value, path, config, meta, mapperMeta } = opts;
+    var { spec, specParent,fieldName, value, path, config, meta, mapperMeta } = opts;
 
     path = path ? path : fieldName;
     config = config ? config : {};
@@ -373,9 +377,8 @@ export class Schema
     const filters = spec && spec.$filter ? spec.$filter : {};
     const name = spec && spec.$displayName ? spec.$displayName : fieldName;
     const strict = spec && spec.$strict !== undefined ? spec.$strict : (
-      mapperMeta.specParent && mapperMeta.specParent.$strict !== undefined ? mapperMeta.specParent.$strict : undefined
+      specParent && specParent.$strict !== undefined ? specParent.$strict : undefined
     );
-
 
     if (!SchemaUtil.isValidFieldName(fieldName)) {
       Schema.appendError(meta, path, 'Invalid field name');
