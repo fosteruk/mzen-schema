@@ -1,6 +1,10 @@
 import should = require('should');
 import Schema from '../../lib/schema';
 
+class ConstructorTestUsers extends Array
+{
+}
+
 class ConstructorTestUser
 {
   _id?: string;
@@ -201,6 +205,33 @@ describe('applyTransients', function(){
     should(object.users[0].constructor).eql(ConstructorTestUser);
     should(object.users[0].getName()).eql('John Smith');
     should(object.users[1].constructor).eql(ConstructorTestUser);
+    should(object.users[1].getName()).eql('Tom Jones');
+  });
+  it('should apply $construct function to array value according to array spec object', function(){
+    var object = {
+      users: [
+        {nameFirst: 'John', nameLast: 'Smith'} as ConstructorTestUser,
+        {nameFirst: 'Tom', nameLast: 'Jones'} as ConstructorTestUser
+      ]
+    };
+
+    var schema = new Schema({
+      users: {
+        $type: Array,
+        $construct: 'ConstructorTestUsers',
+        $spec: {
+          $construct: 'ConstructorTestUser',
+          nameFirst: String,
+          nameLast: String
+        }
+      }
+    }, {
+      constructors: [ConstructorTestUsers, ConstructorTestUser]
+    });
+
+    object = schema.applyTransients(object);
+    should(object.users.constructor).eql(ConstructorTestUsers);
+    should(object.users[0].getName()).eql('John Smith');
     should(object.users[1].getName()).eql('Tom Jones');
   });
   it('should apply $construct function to schemaRelation', function(){

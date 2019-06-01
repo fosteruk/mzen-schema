@@ -137,17 +137,17 @@ export class Schema
   {
     this.init();
     return (object && this.constructors) ? this.schemaMapper.map(object, (opts) => {
-      var { spec, fieldName, container, path, meta: mapperMeta } = opts;
+      let { spec, fieldName, container, path, meta: mapperMeta } = opts;
 
       if (container) {
-        var pathRef = spec ? spec.$pathRef : null;
+        let pathRef = spec ? spec.$pathRef : null;
         if (pathRef){
           container[fieldName] = ObjectPathAccessor.getPath(pathRef, mapperMeta.root);
         }
 
-        var construct = spec ? spec.$construct : null;
+        let construct = spec ? spec.$construct : null;
         if (construct){
-          var constructorFunction = null;
+          let constructorFunction = null;
           if (typeof construct === 'string' && this.constructors[construct]) {
             constructorFunction = this.constructors[construct];
           } else if (typeof construct === 'function') {
@@ -156,8 +156,17 @@ export class Schema
             // constructor not found
             throw new Error('Constructor not found for ' + path);
           }
-          if (constructorFunction && !Array.isArray(container[fieldName])) {
-            container[fieldName] = Object.assign(Object.create(constructorFunction.prototype), container[fieldName]);
+          if (constructorFunction) {
+            if (Array.isPrototypeOf(constructorFunction)) {
+              let instance = Object.create(constructorFunction.prototype);
+              container[fieldName].forEach(value => instance.push(value));
+              container[fieldName] = instance;
+            } else {
+              container[fieldName] = Object.assign(
+                Object.create(constructorFunction.prototype), 
+                container[fieldName]
+              );
+            }
           }
         }
       }
@@ -450,7 +459,7 @@ export class Schema
       var valueTypeName = TypeCaster.getTypeName(value);
 
       // We compare type names rather than constructors
-      // - because sometimes we need to treat two different implentations as the same type
+      // - because sometimes we need to treat two different implementations as the same type
       // - An exmaple of this is ObjectID type. MongoDB has its own implementation which should
       // - be considered the same type as ObjectID implementation used by Schema (bson-objectid)
       if (requiredTypeName != valueTypeName) {
