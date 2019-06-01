@@ -159,7 +159,9 @@ export class Schema
           if (constructorFunction) {
             if (Array.isPrototypeOf(constructorFunction)) {
               let instance = Object.create(constructorFunction.prototype);
-              container[fieldName].forEach(value => instance.push(value));
+              if (Array.isArray(container[fieldName])) {
+                container[fieldName].forEach(value => instance.push(value));
+              }
               container[fieldName] = instance;
             } else {
               container[fieldName] = Object.assign(
