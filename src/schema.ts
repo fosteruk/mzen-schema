@@ -395,10 +395,10 @@ export class Schema
       Schema.appendError(meta, path, 'Invalid field name');
     }
 
-    var fieldType = this.specToFieldType(spec, value);
+    const fieldType = this.specToFieldType(spec, value);
 
     // Configure default value filter if not already set
-    var defaultValue = filters.defaultValue;
+    let defaultValue = filters.defaultValue;
     if (fieldType == Object) {
       defaultValue = {};
     } else if (fieldType == Array) {
@@ -409,7 +409,7 @@ export class Schema
       };
     }
     // Default value must be applied before type-casting - because the default value may need to be type-casted
-    // - for exmaple converting default value 'now' to type Date
+    // - for example converting default value 'now' to type Date
     if (defaultValue !== undefined) {
       value = await Filter.filter(value, {defaultValue});
     }
@@ -451,7 +451,7 @@ export class Schema
     // If the spec specifies the value should be an object and the value is already an object, we do not need to typecast
     // It is impossible for us to cast an object to any object type other than Object
     // When we specify a type as Object we only care that it is an Object we dont care about its
-    // specific type, we dont care if it is MyObject or YourObject
+    // specific constuctor type, we dont care if it is MyObject or YourObject
     var skip = (requiredType === Object && Array.isArray(value) == false && Object(value) === value);
     var result = value;
 
@@ -462,7 +462,7 @@ export class Schema
 
       // We compare type names rather than constructors
       // - because sometimes we need to treat two different implementations as the same type
-      // - An exmaple of this is ObjectID type. MongoDB has its own implementation which should
+      // - An exmaple of this is the ObjectID type. MongoDB has its own implementation which should
       // - be considered the same type as ObjectID implementation used by Schema (bson-objectid)
       if (requiredTypeName != valueTypeName) {
         result = TypeCaster.cast(requiredType, value);
@@ -471,7 +471,7 @@ export class Schema
         if (
           // We failed to convert to the specified type
           resultTypeName != requiredTypeName ||
-          // We converted to type 'number' but the result was NaN so its invalid
+          // We converted to type 'number' but the result was NaN so it is invalid
           (valueTypeName != 'Number' && resultTypeName == 'Number' && isNaN(result))
         ) {
           let origValue = (['String', 'Number', 'Boolean'].indexOf(valueTypeName) != -1) ? "'" + value + "'" : '';

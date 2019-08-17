@@ -170,7 +170,7 @@ export class SchemaMapper
     // - One example of this is the $near operator whos value is a specific structure unrelated to the schema
     // - As a temporary solution we simply dont attempt to validate operator values which dont fit the basic pattern ($and / $or)
     // - See SchemaUtil.canValidateQueryOperator()
-    // Whats needed is a more intelligent query validator that is aware of how to handle each operator value
+    // What is needed is a more intelligent query validator that is aware of how to handle each operator value
 
     const mapRecursiveQuery = (query) => {
       if (TypeCaster.getType(query) == Object) {
