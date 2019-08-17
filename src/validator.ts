@@ -47,7 +47,7 @@ export class Validator
   static required(value: any, options?)
   {
     var isValid = (value !== undefined);
-    var name = options && options.name ? options.name : 'field';
+    var name = options && options.label ? options.label : 'field';
     var message = options && options.message ? options.message : name + ' is required';
     var result = isValid ? isValid : message;
 
@@ -60,7 +60,7 @@ export class Validator
       // The string value NULL or null are treated as a literal null
       typeof value == 'string' && value.toLowerCase() == 'null'
     );
-    var name = options && options.name ? options.name : 'field';
+    var name = options && options.label ? options.label : 'field';
     var message = options && options.message ? options.message : name + ' cannot be null';
     var result = isValid ? isValid : message;
     return result;
@@ -83,7 +83,7 @@ export class Validator
 
   static notEmpty(value: any, options?)
   {
-    var name = options && options.name ? options.name : 'field';
+    var name = options && options.label ? options.label : 'field';
     var message = options && options.message ? options.message : name + ' cannot be empty';
     var result = !Validator.isEmpty(value) ? true : message;
     return result;
@@ -91,7 +91,7 @@ export class Validator
 
   static regex(value: any, options?)
   {
-    var name = options && options.name ? options.name : 'field';
+    var name = options && options.label ? options.label : 'field';
     var regex = options && options.pattern ? new RegExp(options.pattern) : new RegExp('');
     var message = options && options.message ? options.message : name + ' does not appear to be valid';
     var result = regex.test(value) ? true : message;
@@ -100,7 +100,7 @@ export class Validator
 
   static email(value: any, options?)
   {
-    var name = options && options.name ? options.name : 'email';
+    var name = options && options.label ? options.label : 'email';
     // We have a very loose regex pattern for validating email addresses since unicode email addresses
     // - have been supported by modern mail servers for several years
     // - https://tools.ietf.org/html/rfc6531
@@ -113,7 +113,7 @@ export class Validator
 
   static valueLength(value: any, options?)
   {
-    var name = options && options.name ? options.name : 'field';
+    var name = options && options.label ? options.label : 'field';
     var min = options && options.min ? options.min : null;
     var max = options && options.max ? options.max : null;
     var messageMin = options && options.message ? options.message : name + ' must be at least ' + min + ' characters long';
@@ -146,7 +146,7 @@ export class Validator
 
   static equality(value: any, options?)
   {
-    var name = options && options.name ? options.name : 'field';
+    var name = options && options.label ? options.label : 'field';
     var root = options && options.root ? options.root : {};
     var path = options && options.path ? options.path : null;
     var message = options && options.message ? options.message : name + ' does not match';
@@ -156,7 +156,7 @@ export class Validator
 
   static enumeration(value: any, options?)
   {
-    var name = options && options.name ? options.name : 'field';
+    var name = options && options.label ? options.label : 'field';
     var values = options && options.values ? options.values : [];
     var message = options && options.message ? options.message : name + ' is invalid';
     return (Array.isArray(values) && values.indexOf(value) !== -1) || message;

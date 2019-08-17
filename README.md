@@ -22,7 +22,7 @@ var schemaPerson = new Schema({
     $type: String,
     $validate: {
       required: true,
-      length: {min: 1, max: 50}
+      valueLength: {min: 1, max: 50}
     },
     $filter: {defaultValue: 'Unknown'}
   },

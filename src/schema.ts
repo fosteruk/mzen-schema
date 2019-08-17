@@ -436,7 +436,7 @@ export class Schema
     // notNull can be defaulted via global option
     validators.notNull = validators.notNull !== undefined ? validators.notNull : this.config.defaultNotNull;
 
-    var validateResults = await Validator.validate(value, validators, {name: label, root: mapperMeta.root});
+    var validateResults = await Validator.validate(value, validators, {label, root: mapperMeta.root});
     if (Array.isArray(validateResults)) {
       validateResults.forEach(result => {
         Schema.appendError(meta, path, result);
