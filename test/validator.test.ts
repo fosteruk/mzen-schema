@@ -1,7 +1,9 @@
 import should = require('should');
+import ValidatorCustom from '../src/validator/validator-custom';
 import ValidatorEmail from '../src/validator/validator-email';
 import ValidatorEnumeration from '../src/validator/validator-enumeration';
 import ValidatorEquality from '../src/validator/validator-equality';
+import ValidatorIsEmpty from '../src/validator/validator-is-empty';
 import ValidatorNotEmpty from '../src/validator/validator-not-empty';
 import ValidatorNotNull from '../src/validator/validator-not-null';
 import ValidatorRegex from '../src/validator/validator-regex';
@@ -9,6 +11,22 @@ import ValidatorRequired from '../src/validator/validator-required';
 import ValidatorValueLength from '../src/validator/validator-value-length';
 
 describe('SchemaValidator', function(){
+  describe('custom', function(){
+    it('should return boolean true on success', function(){
+      var value = 'Kevin';
+      var result = (new ValidatorCustom)
+                    .validate(value, {validator: (_value) => true});
+      
+      should(result).equal(true);
+    });
+    it('should return error message on failure', function(){
+      var value = undefined;
+      var result = (new ValidatorCustom)
+                    .validate(value, {validator: (_value) => 'error message'});
+
+      should(result).be.a.String();
+    });
+  });
   describe('required', function(){
     it('should return boolean true on success', function(){
       var value = 'Kevin';
@@ -52,6 +70,29 @@ describe('SchemaValidator', function(){
                     .validate(value, {message: 'Name can not be null'});
 
       should(result).equal('Name can not be null');
+    });
+  });
+  describe('isEmpty', function(){
+    it('should return boolean true on success', function(){
+      var value = '';
+      var result = (new ValidatorIsEmpty)
+                    .validate(value);
+
+      should(result).equal(true);
+    });
+    it('should return error message on failure', function(){
+      var value = 'not empty';
+      var result = (new ValidatorIsEmpty)
+                    .validate(value);
+
+      should(result).be.a.String();
+    });
+    it('should allow custom message', function(){
+      var value = 'not empty';
+      var result = (new ValidatorIsEmpty)
+                    .validate(value, {message: 'Name must be empty'});
+
+      should(result).equal('Name must be empty');
     });
   });
   describe('notEmpty', function(){

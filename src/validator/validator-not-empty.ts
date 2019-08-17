@@ -4,9 +4,9 @@ export class ValidatorNotEmpty
 {
   validate(value: any, options?)
   {
-    const name = options && options.label ? options.label : 'field';
-    const message = options && options.message ? options.message : name + ' cannot be empty';
-    const result = !(new ValidatorIsEmpty).validate(value) ? true : message;
+    const label = options && options.label ? options.label : 'field';
+    const message = options && options.message ? options.message : label + ' cannot be empty';
+    const result = (new ValidatorIsEmpty).validate(value) !== true ? true : message;
     return result;
   }
 

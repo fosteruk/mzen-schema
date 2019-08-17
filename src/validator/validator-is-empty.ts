@@ -2,10 +2,12 @@ import TypeCaster from '../type-caster';
 
 export class ValidatorIsEmpty
 {
-  validate(value: any, _options?)
+  validate(value: any, options?)
   {
-    var valueType = value ? TypeCaster.getType(value) : undefined;
-    var result = (
+    const label = options && options.label ? options.label : 'field';
+    const message = options && options.message ? options.message : label + ' must be empty';
+    const valueType = value ? TypeCaster.getType(value) : undefined;
+    const result = (
       value == undefined ||
       // In Javascript [[]] evalulates to false - we dont want this
       // - an array is only considered empty if it has zero elements
@@ -13,7 +15,8 @@ export class ValidatorIsEmpty
       (valueType == Number && isNaN(value)) ||
       (valueType == Object && Object.keys(value).length == 0) ||
       (valueType == Array && value.length == 0)
-    );
+    ) ? true : message;
+
     return result;
   }
 
