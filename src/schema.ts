@@ -386,7 +386,7 @@ export class Schema
 
     const validators = spec && spec.$validate ? spec.$validate : {};
     const filters = spec && spec.$filter ? spec.$filter : {};
-    const name = spec && spec.$displayName ? spec.$displayName : fieldName;
+    const label = spec && spec.$label ? spec.$label : fieldName;
     const strict = spec && spec.$strict !== undefined ? spec.$strict : (
       specParent && specParent.$strict !== undefined ? specParent.$strict : undefined
     );
@@ -436,7 +436,7 @@ export class Schema
     // notNull can be defaulted via global option
     validators.notNull = validators.notNull !== undefined ? validators.notNull : this.config.defaultNotNull;
 
-    var validateResults = await Validator.validate(value, validators, {name, root: mapperMeta.root});
+    var validateResults = await Validator.validate(value, validators, {name: label, root: mapperMeta.root});
     if (Array.isArray(validateResults)) {
       validateResults.forEach(result => {
         Schema.appendError(meta, path, result);

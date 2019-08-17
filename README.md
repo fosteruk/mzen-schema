@@ -17,9 +17,8 @@ var schemaPerson = new Schema({
   $strict: true, // in strict mode any undefined fields will produce an error on validation
   _id: 'ObjectID',
   name: {
-    // $displayName specifies the name that will be used in any validation error message
-    // - defaults to the field name
-    $displayName: 'Name',
+    // $label used in validation error message - defaults to the field name
+    $label: 'Name',
     $type: String,
     $validate: {
       required: true,
@@ -32,9 +31,9 @@ var schemaPerson = new Schema({
     address: String,
     tel: {$type: String, $validate: {
       required: true,
-      // You can use the same validator multiple times
-      // - just specify an array of options rather than an object
-      // - The validator will be executed once per options object
+      // Use a single validator multiple times
+      // - Specify an array of options rather than an object
+      // - Validator will be executed once per options object
       regex: [
         {
           pattern: '[+0-9]+',
@@ -61,7 +60,7 @@ var paul = {
 // the data against the schema
 // The validate() method returns a result object with meta data
 // Two useful values returned are 'isValid' and 'errors'
-var result = schemaPerson.validate(paul).then((result) => {
+schemaPerson.validate(paul).then(result => {
   if (result.isValid) {
     // Do something with valid user
   } else {

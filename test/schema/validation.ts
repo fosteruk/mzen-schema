@@ -670,11 +670,11 @@ describe('validation', function(){
     // @ts-ignore - 'house' does not exist on type 'object'
     should(result.errors.house[0]).equal('house is required'); // Error messages are returned as an array of strings
   });
-  it('should use custom name in error message', async () => {
+  it('should use custom label in error message', async () => {
     var data = {other: 1};
 
     var schema = new Schema({
-      house: {$displayName: 'House number', $type: Number, $validate: {required: true}}
+      house: {$label: 'House number', $type: Number, $validate: {required: true}}
     });
 
     const result = await schema.validate(data);
