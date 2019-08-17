@@ -44,8 +44,6 @@ export class Filter
     return value;
   }
 
-  // Filter function
-  // - returns an error message string or an array of error messages on failure otherwise returns boolean true
   static trim(value)
   {
     if (typeof value == 'string') value = value.trim();
