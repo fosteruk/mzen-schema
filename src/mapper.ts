@@ -161,7 +161,7 @@ export class SchemaMapper
   }
   
   // @ts-ignore - unused options
-  mapQueryPaths(query, callback, config?: SchemaMapperMappingConfig)
+  mapQueryPaths(query, callback: Function, config?: SchemaMapperMappingConfig)
   {
     // When validating a query its assumed that all fields-names of the query object, other than operators, are data object paths
     // - operators are skipped and their values are passed to the validator for validation - ( {$and: [{path: value}, {path: value}] )

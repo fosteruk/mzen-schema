@@ -7,7 +7,7 @@ export interface SchemaSpec
   $construct?: any;
   $filter?: SchemaSpecFilter;
   $validate?: SchemaSpecValidate;
-  $displayName?: string;
+  $label?: string;
   $strict?: boolean;
   [key: string]: SchemaSpec | any;
 }
