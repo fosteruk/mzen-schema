@@ -15,10 +15,11 @@ export class Filter
     for (let x = 0; x < configKeys.length; x++) {
       let filterName = configKeys[x];
       let filter = this.filters[filterName];
-      if (!filter) throw new Error('Uknown filter "' + filterName + '"');
 
       const specialFilterNames = ['private', 'privateValue'];
       if (specialFilterNames.indexOf(filterName) !== -1) continue; // Ignore special filters
+
+      if (!filter) throw new Error('Uknown filter "' + filterName + '"');
 
       let filterConfig = filtersConfig[filterName];
       // If filtersConfig is an array we run the validator multiple times
