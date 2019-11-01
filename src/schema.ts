@@ -179,10 +179,11 @@ export class Schema
     }) : object;
   }
   
-  stripTransients(object: any)
+  stripTransients(object: any, mapperType?: string)
   {
     this.init();
-    return (object && this.constructors)  ? this.schemaMapper.map(object, (opts) => {
+    var mapperType = (mapperType == 'mapPaths') ? 'mapPaths' : 'map';
+    return (object && this.constructors)  ? this.schemaMapper[mapperType](object, (opts) => {
       var {spec, fieldName, container} = opts;
       if (spec && container) {
         if (
