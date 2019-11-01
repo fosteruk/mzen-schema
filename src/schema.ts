@@ -157,12 +157,16 @@ export class Schema
             throw new Error('Constructor not found for ' + path);
           }
           if (constructorFunction) {
-            if (Array.isPrototypeOf(constructorFunction)) {
-              let instance = Object.create(constructorFunction.prototype);
-              if (Array.isArray(container[fieldName])) {
-                container[fieldName].forEach(value => instance.push(value));
-              }
-              container[fieldName] = instance;
+            if (
+              Array.isPrototypeOf(constructorFunction)
+              && (
+                !container[fieldName] 
+                || Array.isArray(container[fieldName])
+              )
+            ) {
+              container[fieldName] = container[fieldName] 
+                ? new constructorFunction(...container[fieldName])
+                : Object.create(constructorFunction.prototype);
             } else {
               container[fieldName] = Object.assign(
                 Object.create(constructorFunction.prototype), 

@@ -231,6 +231,7 @@ describe('applyTransients', function(){
 
     object = schema.applyTransients(object);
     should(object.users.constructor).eql(ConstructorTestUsers);
+    should(Array.isArray(object.users)).eql(true);
     should(object.users[0].getName()).eql('John Smith');
     should(object.users[1].getName()).eql('Tom Jones');
   });
