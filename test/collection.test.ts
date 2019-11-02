@@ -61,38 +61,75 @@ describe.only('Collection', function(){
     });
   });
   describe('update()', function(){
-    it('should $set on objects targeted by find query', function(){
-      const people = new Collection(...clone(data.people));
-      const findResultA = people.findAll({name: 'Kevin'});
-      should(findResultA[0].name).eql('Kevin');
-      should(findResultA[0].age).eql(37);
-      people.update({name: 'Kevin'}, {
-        $set:{age: 38}
+    describe('$set', function(){
+      it('should $set on objects targeted by find query', function(){
+        const people = new Collection(...clone(data.people));
+        const findResultA = people.findAll({name: 'Kevin'});
+        should(findResultA[0].name).eql('Kevin');
+        should(findResultA[0].age).eql(37);
+        people.update({name: 'Kevin'}, {
+          $set:{age: 38}
+        });
+        should(findResultA[0].age).eql(38);
       });
-      should(findResultA[0].age).eql(38);
+      it('should $set on objects targeted by find query using dotted path', function(){
+        const people = new Collection(...clone(data.people));
+        const findResultA = people.findAll({'address.postcode': 'L15'});
+        should(findResultA[0].name).eql('Kevin');
+        should(findResultA[0].age).eql(37);
+        should(findResultA[1].name).eql('Fudge');
+        should(findResultA[1].age).eql(8);
+        people.update({'address.postcode': 'L15'}, {
+          $set:{age: 5}
+        });
+        should(findResultA[0].age).eql(5);
+        should(findResultA[1].age).eql(5);
+      });
+      it('should $set on objects dotted path targeted by find query', function(){
+        const people = new Collection(...clone(data.people));
+        const findResultA = people.findAll({name: 'Kevin'});
+        should(findResultA[0].name).eql('Kevin');
+        should(findResultA[0].address.postcode).eql('L15');
+        people.update({name: 'Kevin'}, {
+          $set:{'address.postcode': 'L15 1HL'}
+        });
+        should(findResultA[0].address.postcode).eql('L15 1HL');
+      });
     });
-    it('should $set on objects targeted by find query using dotted path', function(){
-      const people = new Collection(...clone(data.people));
-      const findResultA = people.findAll({'address.postcode': 'L15'});
-      should(findResultA[0].name).eql('Kevin');
-      should(findResultA[0].age).eql(37);
-      should(findResultA[1].name).eql('Fudge');
-      should(findResultA[1].age).eql(8);
-      people.update({'address.postcode': 'L15'}, {
-        $set:{age: 5}
+    describe('$unset', function(){
+      it('should $unset on objects targeted by find query', function(){
+        const people = new Collection(...clone(data.people));
+        const findResultA = people.findAll({name: 'Kevin'});
+        should(findResultA[0].name).eql('Kevin');
+        should(findResultA[0].age).eql(37);
+        people.update({name: 'Kevin'}, {
+          $unset:{age: true}
+        });
+        should(findResultA[0].age).eql(undefined);
       });
-      should(findResultA[0].age).eql(5);
-      should(findResultA[1].age).eql(5);
-    });
-    it('should $set on objects dotted path targeted by find query', function(){
-      const people = new Collection(...clone(data.people));
-      const findResultA = people.findAll({name: 'Kevin'});
-      should(findResultA[0].name).eql('Kevin');
-      should(findResultA[0].age).eql(37);
-      people.update({name: 'Kevin'}, {
-        $set:{'address.postcode': 'L15 1HL'}
+      it('should $unset on objects targeted by find query using dotted path', function(){
+        const people = new Collection(...clone(data.people));
+        const findResultA = people.findAll({'address.postcode': 'L15'});
+        should(findResultA[0].name).eql('Kevin');
+        should(findResultA[0].age).eql(37);
+        should(findResultA[1].name).eql('Fudge');
+        should(findResultA[1].age).eql(8);
+        people.update({'address.postcode': 'L15'}, {
+          $unset:{age: true}
+        });
+        should(findResultA[0].age).eql(undefined);
+        should(findResultA[1].age).eql(undefined);
       });
-      should(findResultA[0].address.postcode).eql('L15 1HL');
+      it('should $unset on objects dotted path targeted by find query', function(){
+        const people = new Collection(...clone(data.people));
+        const findResultA = people.findAll({name: 'Kevin'});
+        should(findResultA[0].name).eql('Kevin');
+        should(findResultA[0].address.postcode).eql('L15');
+        people.update({name: 'Kevin'}, {
+          $unset:{'address.postcode': true}
+        });
+        should(findResultA[0].address.postcode).eql(undefined);
+      });
     });
   });
 });
