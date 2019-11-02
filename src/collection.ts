@@ -9,10 +9,13 @@ export class Collection extends Array
     super(...args);
   }
 
-  findAll(query:any):Array<any>
+  findAll(query:any):Collection
   {
     // https://github.com/protobi/query
-    return Query.query(this, query, Query.undot);
+    // @ts-ignore - hack to allow returning new collection of caller type
+    return new (this.constructor as { new(...args): typeof Collection })(
+      ...Query.query(this, query, Query.undot)
+    );
   }
 
   findOne(query:any):any

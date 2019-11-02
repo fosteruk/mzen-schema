@@ -1,6 +1,8 @@
 import should = require('should');
 import { Collection } from '../lib/collection';
 
+class People extends Collection {}
+
 const data = {
   people: [
     {name: 'Kevin', age: 37, nationality: 'British', address: {postcode: 'L15'}},
@@ -31,6 +33,12 @@ describe.only('Collection', function(){
       const people = new Collection();
       const result = people.findAll({nationality: 'Other'});
       should(result.length).eql(0);
+    });
+    it('should return collection of same type', function(){
+      const people = new People(...data.people);
+      const result = people.findAll({nationality: 'British'});
+      should(people.constructor.name).eql('People');
+      should(result.length).eql(3);
     });
   });
   describe('findOne()', function(){
