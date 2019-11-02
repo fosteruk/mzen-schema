@@ -1,5 +1,5 @@
 import should = require('should');
-import { Collection} from '../lib/collection';
+import { Collection } from '../lib/collection';
 
 const data = {
   people: [
