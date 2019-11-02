@@ -10,5 +10,6 @@ export * from './filter';
 export * from './util';
 export * from './object-path-accessor';
 export * from './type-caster';
+export * from './collection';
 
 export default Schema;

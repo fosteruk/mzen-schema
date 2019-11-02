@@ -9,10 +9,16 @@ export class Collection extends Array
     super(...args);
   }
 
-  query(q) 
-  { 
+  findAll(query:any):Array<any>
+  {
     // https://github.com/protobi/query
-    return Query.query(this, q, Query.undot); 
+    return Query.query(this, query, Query.undot);
+  }
+
+  findOne(query:any):any
+  {
+    const array = this.findAll(query);
+    return array ? array[0] : undefined;
   }
 }
 // We have to set a constructor name alias 
