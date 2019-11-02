@@ -1,3 +1,4 @@
+import clone = require('clone');
 import should = require('should');
 import { Collection } from '../lib/collection';
 
@@ -6,7 +7,7 @@ class People extends Collection {}
 const data = {
   people: [
     {name: 'Kevin', age: 37, nationality: 'British', address: {postcode: 'L15'}},
-    {name: 'Fudge', age: 37, nationality: 'British', address: {postcode: 'L15'}},
+    {name: 'Fudge', age: 8, nationality: 'British', address: {postcode: 'L15'}},
     {name: 'Kar Chun', age: 37, nationality: 'Malaysian', address: {postcode: '87MF'}},
     {name: 'Alison', age: 37, nationality: 'British', address: {postcode: 'L1'}},
   ],
@@ -37,6 +38,7 @@ describe.only('Collection', function(){
     it('should return collection of same type', function(){
       const people = new People(...data.people);
       const result = people.findAll({nationality: 'British'});
+      should(people.constructor).eql(People);
       should(people.constructor.name).eql('People');
       should(result.length).eql(3);
     });
@@ -56,6 +58,41 @@ describe.only('Collection', function(){
       const people = new Collection();
       const result = people.findOne({nationality: 'Other'});
       should(result).eql(undefined);
+    });
+  });
+  describe('update()', function(){
+    it('should $set on objects targeted by find query', function(){
+      const people = new Collection(...clone(data.people));
+      const findResultA = people.findAll({name: 'Kevin'});
+      should(findResultA[0].name).eql('Kevin');
+      should(findResultA[0].age).eql(37);
+      people.update({name: 'Kevin'}, {
+        $set:{age: 38}
+      });
+      should(findResultA[0].age).eql(38);
+    });
+    it('should $set on objects targeted by find query using dotted path', function(){
+      const people = new Collection(...clone(data.people));
+      const findResultA = people.findAll({'address.postcode': 'L15'});
+      should(findResultA[0].name).eql('Kevin');
+      should(findResultA[0].age).eql(37);
+      should(findResultA[1].name).eql('Fudge');
+      should(findResultA[1].age).eql(8);
+      people.update({'address.postcode': 'L15'}, {
+        $set:{age: 5}
+      });
+      should(findResultA[0].age).eql(5);
+      should(findResultA[1].age).eql(5);
+    });
+    it('should $set on objects dotted path targeted by find query', function(){
+      const people = new Collection(...clone(data.people));
+      const findResultA = people.findAll({name: 'Kevin'});
+      should(findResultA[0].name).eql('Kevin');
+      should(findResultA[0].age).eql(37);
+      people.update({name: 'Kevin'}, {
+        $set:{'address.postcode': 'L15 1HL'}
+      });
+      should(findResultA[0].address.postcode).eql('L15 1HL');
     });
   });
 });
