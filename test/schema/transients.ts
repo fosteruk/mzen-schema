@@ -398,4 +398,36 @@ describe('stripTransients', function(){
     user = schema.stripTransients(user);
     should(user.a.b.c).eql(undefined);
   });
+  it('should strip tranients from from paths using mapPaths', function(){
+    var user = {
+      a: {
+        b: {
+          c: {
+            userId: '123'
+          }
+        }
+      }
+    } as any;
+
+    var schema = new Schema({
+      _id: 'String',
+      address: {street: String, postcode: String},
+      accounts: {
+        $type: Array,
+        $relation: true
+      },
+      a: {
+        b: {
+          c:  {
+            $relation: true,
+            userId: 'String'
+          }
+        }
+      },
+    });
+
+    should(user.a.b.c.userId).eql('123');
+    user = schema.stripTransients(user, 'mapPaths');
+    should(user.a.b.c).eql(undefined);
+  });
 });

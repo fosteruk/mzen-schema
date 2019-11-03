@@ -158,6 +158,8 @@ export class SchemaMapper
         });
       }
     });
+
+    return paths;
   }
   
   // @ts-ignore - unused options

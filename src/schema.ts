@@ -183,17 +183,22 @@ export class Schema
   {
     this.init();
     var mapperType = (mapperType == 'mapPaths') ? 'mapPaths' : 'map';
-    return (object && this.constructors)  ? this.schemaMapper[mapperType](object, (opts) => {
+    var deleteRefs = [];
+    var result = object ? this.schemaMapper[mapperType](object, (opts) => {
       var {spec, fieldName, container} = opts;
       if (spec && container) {
         if (
           spec.$pathRef !== undefined ||
           spec.$relation
         ) {
-          delete container[fieldName];
+          deleteRefs.push({container, fieldName});
         }
       }
     }) : object;
+    deleteRefs.forEach(ref => {
+      if (ref.container && ref.container[ref.fieldName]) delete ref.container[ref.fieldName];
+    });
+    return result;
   }
   
   validate(object: any, config?: SchemaConfig): Promise<SchemaValidationResult>
@@ -322,22 +327,22 @@ export class Schema
         // We cant simply delete here because if we delete a parent of a structure we are already
         // - iterating we will get errors. Instead make a list of references to delete.
         // Once we have all the references we can safely delete them.
-        if (container) deleteRefs.push({fieldContainer: container, fieldName});
+        if (container) deleteRefs.push({container, fieldName});
       }
       if (filters.privateValue === true || filters.privateValue == mode) {
         // The privateValue replaces any non null values as true and otherwise false
         // - this allows the removal of the private value while still indicating if a value exists or not
-        if (container) valueReplaceRefs.push({fieldContainer: container, fieldName});
+        if (container) valueReplaceRefs.push({container, fieldName});
       }
     });
 
     valueReplaceRefs.forEach(ref => {
-      if (ref.fieldContainer && ref.fieldContainer[ref.fieldName]) {
-        ref.fieldContainer[ref.fieldName] = ref.fieldContainer[ref.fieldName] == undefined ? ref.fieldContainer[ref.fieldName] : true;
+      if (ref.container && ref.container[ref.fieldName]) {
+        ref.container[ref.fieldName] = ref.container[ref.fieldName] == undefined ? ref.container[ref.fieldName] : true;
       }
     });
     deleteRefs.forEach(ref => {
-      if (ref.fieldContainer && ref.fieldContainer[ref.fieldName]) delete ref.fieldContainer[ref.fieldName];
+      if (ref.container && ref.container[ref.fieldName]) delete ref.container[ref.fieldName];
     });
   }
   
