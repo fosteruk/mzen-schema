@@ -21,6 +21,12 @@ export class Collection extends Array
     super(...args);
   }
 
+  findOne(query:FindQuery):any
+  {
+    const array = this.findAll(query);
+    return array ? array[0] : undefined;
+  }
+
   findAll(query:FindQuery):Collection
   {
     // https://github.com/protobi/query
@@ -28,12 +34,6 @@ export class Collection extends Array
     return new (this.constructor as { new(...args): typeof Collection })(
       ...Query.query(this, query, Query.undot)
     );
-  }
-
-  findOne(query:FindQuery):any
-  {
-    const array = this.findAll(query);
-    return array ? array[0] : undefined;
   }
 
   update(findQuery:FindQuery|null, update:UpdateQuery)
@@ -66,6 +66,22 @@ export class Collection extends Array
     collection.forEach(item => {
       const index = this.indexOf(item);
       if (index != -1) this.splice(index, 1);
+    });
+  }
+
+  replace(findQuery:FindQuery|null, newValue:any|Function)
+  {
+    const collection = !findQuery || Object.keys(findQuery).length == 0 
+      ? this 
+      : this.findAll(findQuery);
+
+    collection.forEach(item => {
+      const index = this.indexOf(item);
+      if (index != -1) {
+        this[index] = (typeof newValue === 'function') 
+          ? newValue(this[index]) 
+          : newValue;
+      }
     });
   }
 }

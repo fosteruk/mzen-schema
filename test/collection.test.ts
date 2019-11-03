@@ -131,23 +131,49 @@ describe('Collection', function(){
         should(findResultA[0].address.postcode).eql(undefined);
       });
     });
-    describe('delete()', function(){
-      it('should delete items', function(){
-        const people = new Collection(...clone(data.people));
-        should(people.length).eql(4);
-        people.delete({name: 'Kevin'});
-        should(people.length).eql(3);
-        const kevins = people.findAll({name: 'Kevin'});
-        should(kevins.length).eql(0);
+  });
+  describe('delete()', function(){
+    it('should delete items', function(){
+      const people = new Collection(...clone(data.people));
+      should(people.length).eql(4);
+      people.delete({name: 'Kevin'});
+      should(people.length).eql(3);
+      const kevins = people.findAll({name: 'Kevin'});
+      should(kevins.length).eql(0);
+    });
+    it('should delete items using dotted path', function(){
+      const people = new Collection(...clone(data.people));
+      should(people.length).eql(4);
+      people.delete({'address.postcode': 'L1'});
+      should(people.length).eql(3);
+      const l1s = people.findAll({'address.postcode': 'L1'});
+      should(l1s.length).eql(0);
+    });
+  });
+  describe('replace()', function(){
+    it('should replace matched items with given value', function(){
+      const people = new Collection(...clone(data.people));
+      people.replace({name: 'Kevin'}, {
+        name: 'Tom',
+        nationality: 'German', 
+        address: {postcode: 'ABC'}
       });
-      it('should delete items using dotted path', function(){
-        const people = new Collection(...clone(data.people));
-        should(people.length).eql(4);
-        people.delete({'address.postcode': 'L1'});
-        should(people.length).eql(3);
-        const l1s = people.findAll({'address.postcode': 'L1'});
-        should(l1s.length).eql(0);
+      const kevins = people.findAll({name: 'Kevin'});
+      should(kevins.length).eql(0);
+      const toms = people.findAll({name: 'Tom'});
+      should(toms.length).eql(1);
+      should(toms[0].address.postcode).eql('ABC');
+    });
+    it('should replace matched items using replacer function', function(){
+      const people = new Collection(...clone(data.people));
+      people.replace({name: 'Kevin'}, oldValue => {
+        oldValue.name = oldValue.name + ' Updated';
+        return oldValue;
       });
+      const kevins = people.findAll({name: 'Kevin'});
+      should(kevins.length).eql(0);
+      const toms = people.findAll({name: 'Kevin Updated'});
+      should(toms.length).eql(1);
     });
   });
 });
