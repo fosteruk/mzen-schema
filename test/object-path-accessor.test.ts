@@ -366,6 +366,13 @@ describe('ObjectPathAccessor', function(){
       ]);
       should(data[0].planet.continent.country).eql(undefined);
     });
+    it('should splice array elements', function(){
+      var data = ['a','b','c','d','e'];
+
+      ObjectPathAccessor.unsetPath(2, data);
+
+      should(data).eql(['a','b','d','e']);
+    });
   });
   describe('mutatePath()', function(){
     it('should mutate value at given path', function(){

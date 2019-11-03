@@ -17,7 +17,7 @@ export class ObjectPathAccessor
    *
    * Returns all elements matching 'path' in 'subject'.
    */
-  static getPath(path: string, subject: any)
+  static getPath(path:string|number, subject:any)
   {
     return ObjectPathAccessor.searchRescursive(path, subject);
   }
@@ -27,7 +27,7 @@ export class ObjectPathAccessor
   * Sets all elements matching 'path' in the given 'subject'.
   * Returns all matching elements with updated values.
   */
-  static setPath(path: string, value: any, subject: any)
+  static setPath(path:string|number, value:any, subject:any)
   {
     return ObjectPathAccessor.searchRescursive(path, subject, function(){
       return value;
@@ -38,7 +38,7 @@ export class ObjectPathAccessor
   *
   * Unsets all elements matching 'path' in the given 'subject'.
   */
-  static unsetPath(path: string, subject: any)
+  static unsetPath(path:string|number, subject:any)
   {
     return ObjectPathAccessor.searchRescursive(path, subject, function(){
       return undefined; // changing value to undefined causes the prop to be unset
@@ -50,7 +50,7 @@ export class ObjectPathAccessor
   * Mutates all elements matching 'path' in 'subject' using 'mutator' function.
   * Returns all matching elements with updated values.
   */
-  static mutatePath(path: string, subject: any, mutator: (value: any) => any)
+  static mutatePath(path:string|number, subject:any, mutator:(value: any) => any)
   {
     return ObjectPathAccessor.searchRescursive(path, subject, mutator);
   }
@@ -62,7 +62,7 @@ export class ObjectPathAccessor
    * Returns matched value(s).
    */
   static searchRescursive(
-    pattern: string, 
+    pattern: string | number, 
     subject: any, 
     mutatorFunc?: (value: any) => any, 
     meta?: {
@@ -77,7 +77,7 @@ export class ObjectPathAccessor
     const currentDepth = meta.currentDepth ? meta.currentDepth : 1;
     var matches = meta.matches ? meta.matches : [];
 
-
+    pattern = String(pattern);
     const patternParts = pattern.split('.');
     const currentParts = patternParts.slice(0, currentDepth); // Pattern parts up to current depth
     const currentNode = currentParts[currentParts.length - 1]; // Current node value
@@ -97,15 +97,19 @@ export class ObjectPathAccessor
       }
     }
 
-    function processElement(prop: string | number)
+    function processElement(prop:string|number)
     {
       // Element path is the full path to the current element
       let elementPath = currentPath ? currentPath + '.' + prop : String(prop);
 
-      if (ObjectPathAccessor.pathsMatch(pattern, elementPath)) {
+      if (ObjectPathAccessor.pathsMatch(pattern as string, elementPath)) {
         if (typeof mutatorFunc == 'function') subject[prop] = mutatorFunc(subject[prop]);
         if (subject[prop] == undefined) {
-          delete subject[prop];
+          if (Array.isArray(subject)) {
+            subject.splice(parseInt(prop as string), 1);
+          } else {
+            delete subject[prop];
+          }
         } else {
           // Full pattern matches current element path so add it to the list of matches
           matches.push(subject[prop]);
@@ -134,7 +138,7 @@ export class ObjectPathAccessor
    * The second path argument is assumed to be the real path and so wild cards are ignored
    * - the value '*' is treated a literal rather than a wild card
    */
-  static pathsMatch(path: string, realPath: string)
+  static pathsMatch(path:string, realPath:string)
   {
     var p1Parts = path.split('.');
     var p2Parts = realPath.split('.');
