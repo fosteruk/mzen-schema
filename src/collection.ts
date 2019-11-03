@@ -56,6 +56,18 @@ export class Collection extends Array
       }
     });
   }
+
+  delete(findQuery:FindQuery|null)
+  {
+    const collection = !findQuery || Object.keys(findQuery).length == 0 
+      ? this 
+      : this.findAll(findQuery);
+
+    collection.forEach(item => {
+      const index = this.indexOf(item);
+      if (index != -1) this.splice(index, 1);
+    });
+  }
 }
 // We have to set a constructor name alias 
 // - because this is lost when code is mangled

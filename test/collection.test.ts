@@ -131,5 +131,23 @@ describe('Collection', function(){
         should(findResultA[0].address.postcode).eql(undefined);
       });
     });
+    describe('delete()', function(){
+      it('should delete items', function(){
+        const people = new Collection(...clone(data.people));
+        should(people.length).eql(4);
+        people.delete({name: 'Kevin'});
+        should(people.length).eql(3);
+        const kevins = people.findAll({name: 'Kevin'});
+        should(kevins.length).eql(0);
+      });
+      it('should delete items using dotted path', function(){
+        const people = new Collection(...clone(data.people));
+        should(people.length).eql(4);
+        people.delete({'address.postcode': 'L1'});
+        should(people.length).eql(3);
+        const l1s = people.findAll({'address.postcode': 'L1'});
+        should(l1s.length).eql(0);
+      });
+    });
   });
 });
