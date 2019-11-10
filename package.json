@@ -21,7 +21,7 @@
   "dependencies": {
     "bson-objectid": "^1.2.4",
     "clone": "^1.0.4",
-    "query": "github:fosteruk/query"
+    "query": "github:fosteruk/query#mzen-query"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.6",

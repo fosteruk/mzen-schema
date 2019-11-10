@@ -32,7 +32,7 @@ export class Collection extends Array
     // https://github.com/protobi/query
     // @ts-ignore - hack to allow returning new collection of caller type
     return new (this.constructor as { new(...args): typeof Collection })(
-      ...Query.query(this, query, Query.undot)
+      ...Query.query(this, query, Query.undotArray)
     );
   }
 
