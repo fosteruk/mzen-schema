@@ -40,8 +40,8 @@ export class Collection extends Array
   {
     const { $set, $unset } = update;
     const collection = !findQuery || Object.keys(findQuery).length == 0 
-      ? this 
-      : this.findAll(findQuery);
+      ? new Collection(...this) 
+      : new Collection(...this.findAll(findQuery));
 
     collection.forEach(target => {
       if ($set) {
@@ -60,8 +60,8 @@ export class Collection extends Array
   delete(findQuery:FindQuery|null)
   {
     const collection = !findQuery || Object.keys(findQuery).length == 0 
-      ? this 
-      : this.findAll(findQuery);
+      ? new Collection(...this) 
+      : new Collection(...this.findAll(findQuery));
 
     collection.forEach(item => {
       const index = this.indexOf(item);
@@ -72,8 +72,8 @@ export class Collection extends Array
   replace(findQuery:FindQuery|null, newValue:any|Function)
   {
     const collection = !findQuery || Object.keys(findQuery).length == 0 
-      ? this 
-      : this.findAll(findQuery);
+      ? new Collection(...this) 
+      : new Collection(...this.findAll(findQuery));
 
     collection.forEach(item => {
       const index = this.indexOf(item);
