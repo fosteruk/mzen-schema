@@ -358,7 +358,7 @@ describe('stripTransients', function(){
       address: {
         postcode: 'L1'
       }
-    } as ConstructorTestUser;
+    } as any;
 
     var schema = new Schema({
       _id: 'String',

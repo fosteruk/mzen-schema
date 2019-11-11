@@ -179,7 +179,7 @@ export class Schema
     }) : object;
   }
   
-  stripTransients(object: any, mapperType?: string)
+  stripTransients(object: any, mapperType?: string):any
   {
     this.init();
     var mapperType = (mapperType == 'mapPaths') ? 'mapPaths' : 'map';
@@ -320,7 +320,7 @@ export class Schema
     var deleteRefs = [];
     var valueReplaceRefs = [];
     var mapperType = (mapperType == 'mapPaths') ? 'mapPaths' : 'map';
-    this.schemaMapper[mapperType](object, (opts) => {
+    var result = object ? this.schemaMapper[mapperType](object, (opts) => {
       let { spec, fieldName, container } = opts;
       const filters = spec && spec.$filter ? spec.$filter : {};
       if (filters.private === true || filters.private == mode){
@@ -334,7 +334,7 @@ export class Schema
         // - this allows the removal of the private value while still indicating if a value exists or not
         if (container) valueReplaceRefs.push({container, fieldName});
       }
-    });
+    }) : object;
 
     valueReplaceRefs.forEach(ref => {
       if (ref.container && ref.container[ref.fieldName]) {
@@ -344,6 +344,7 @@ export class Schema
     deleteRefs.forEach(ref => {
       if (ref.container && ref.container[ref.fieldName]) delete ref.container[ref.fieldName];
     });
+    return result;
   }
   
   specToFieldType(spec, value)
