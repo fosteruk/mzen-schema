@@ -91,7 +91,6 @@ export class ObjectPathAccessor
         });
       } else {
         for (let prop in subject) {
-          if (!subject.hasOwnProperty(prop)) continue;
           processElement(prop);
         }
       }
