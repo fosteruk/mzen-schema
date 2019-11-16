@@ -33,13 +33,7 @@ describe('validation', function(){
     const resultFail = await schema.validate({
       user: {
         name: 'Kevin',
-<<<<<<< HEAD
         address: null // missing required "street"
-=======
-        address: {
-          // missing street!
-        }
->>>>>>> 22a5db03986c053052242bcfdfb9b3a356e919eb
       }
     });
     should(resultFail.isValid).eql(false);
