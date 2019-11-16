@@ -201,7 +201,7 @@ export class Schema
     return result;
   }
   
-  validate(object: any, config?: SchemaConfig): Promise<SchemaValidationResult>
+  async validate(object: any, config?: SchemaConfig): Promise<SchemaValidationResult>
   {
     this.init();
     var meta: SchemaValidationMeta = {errors: {}};
@@ -209,35 +209,38 @@ export class Schema
 
     var promises = [];
     this.schemaMapper.map(object, (opts) => {
-      let { spec, specParent, fieldName, container, path, meta: mapperMeta } = opts;
-      let promise = this.validateField({
-        spec,
-        specParent,
-        fieldName,
-        value: container ? container[fieldName] : undefined,
-        path,
-        config,
-        meta,
-        mapperMeta
-      }).then((value) => {
-        if (container) container[fieldName] = value;
-      });
-      promises.push(promise);
+      promises.push(
+        (
+          async () => {
+            let { spec, specParent, fieldName, container, path, meta: mapperMeta } = opts;
+            let value = await this.validateField({
+              spec,
+              specParent,
+              fieldName,
+              value: container ? container[fieldName] : undefined,
+              path,
+              config,
+              meta,
+              mapperMeta
+            });
+            if (container) container[fieldName] = value;
+          }
+        )()
+      );
     }, {
       // If the spec is for related data we do not validate
       // - this data will be stripped before any insertion or updating to persistance
       skipTransients: true
     });
 
-    var promise = Promise.all(promises).then(() => {
-      meta.isValid = (Object.keys(meta.errors).length == 0);
-      return meta;
-    });
+    await Promise.all(promises);
 
-    return promise;
+    meta.isValid = (Object.keys(meta.errors).length == 0);
+    
+    return meta;
   }
   
-  validatePaths(paths: SchemaPaths | Array<SchemaPaths>, config?: SchemaConfig, meta?: SchemaValidationMeta): Promise<SchemaValidationResult>
+  async validatePaths(paths: SchemaPaths | Array<SchemaPaths>, config?: SchemaConfig, meta?: SchemaValidationMeta): Promise<SchemaValidationResult>
   {
     this.init();
     var meta = meta ? meta : {errors: {}};
@@ -246,36 +249,39 @@ export class Schema
 
     var promises = [];
     this.schemaMapper.mapPaths(objects, (opts) => {
-      let { spec, specParent, fieldName, container, path, meta: mapperMeta } = opts;
-      mapperMeta.root = container;
-      let promise = this.validateField({
-        spec,
-        specParent,
-        fieldName,
-        value: container ? container[fieldName] : undefined,
-        path,
-        config,
-        meta,
-        mapperMeta
-      }).then(value => {
-        if (container) container[fieldName] = value;
-      });
-      promises.push(promise);
+      promises.push(
+        (
+          async () => {
+            let { spec, specParent, fieldName, container, path, meta: mapperMeta } = opts;
+            mapperMeta.root = container;
+            let value = await this.validateField({
+              spec,
+              specParent,
+              fieldName,
+              value: container ? container[fieldName] : undefined,
+              path,
+              config,
+              meta,
+              mapperMeta
+            });
+            if (container) container[fieldName] = value;
+          }
+        )()
+      );
     }, {
       // If the spec is for related data we do not validate
       // - this data will be stripped before any insertion or updating to persistance
       skipTransients: true
     });
 
-    var promise = Promise.all(promises).then(() => {
-      meta.isValid = (Object.keys(meta.errors).length == 0);
-      return meta;
-    });
+    await Promise.all(promises);
+  
+    meta.isValid = (Object.keys(meta.errors).length == 0);
 
-    return promise;
+    return meta;
   }
   
-  validateQuery(query: any, config?: SchemaConfig): Promise<SchemaValidationResult>
+  async validateQuery(query: any, config?: SchemaConfig): Promise<SchemaValidationResult>
   {
     this.init();
     var meta = meta ? meta : {errors: {}};
@@ -289,28 +295,31 @@ export class Schema
       var paths = {};
       paths[path] = queryPathContainer[queryPathFieldName];
       this.schemaMapper.mapPaths(paths, (opts) => {
-        let { spec, specParent, fieldName, container, path } = opts;
-        let promise = this.validateField({
-          spec,
-          specParent,
-          fieldName,
-          value: container ? container[fieldName] : undefined,
-          path,
-          config,
-          meta
-        }).then(value => {
-          if (queryPathContainer) queryPathContainer[queryPathFieldName] = value;
-        });
-        promises.push(promise);
+        promises.push(
+          (
+            async () => {
+              let { spec, specParent, fieldName, container, path } = opts;
+              let value = await this.validateField({
+                spec,
+                specParent,
+                fieldName,
+                value: container ? container[fieldName] : undefined,
+                path,
+                config,
+                meta
+              });
+              if (queryPathContainer) queryPathContainer[queryPathFieldName] = value;
+            }
+          )()
+        );
       }, {skipTransients: true});
     }, {skipTransients: true});
 
-    var promise = Promise.all(promises).then(() => {
-      meta.isValid = (Object.keys(meta.errors).length == 0);
-      return meta;
-    });
+    await Promise.all(promises);
+    
+    meta.isValid = (Object.keys(meta.errors).length == 0);
 
-    return promise;
+    return meta;
   }
   
   filterPrivate(object: any, mode?: boolean | string, mapperType?: string)

@@ -114,6 +114,7 @@ export class SchemaMapper
     return spec;
   }
   
+  // Iterate over schema spec calling callack for each element
   map(data: Array<object>|any, callback: SchemaMapperCallback, config?: SchemaMapperMappingConfig)
   {
     this.init();
