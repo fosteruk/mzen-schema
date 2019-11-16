@@ -2,7 +2,6 @@ import should = require('should');
 import Schema from '../../lib/schema';
 import Types from '../../lib/types';
 
-
 describe('validation', function(){
   it('should ignore schema of relations', async () => {
     // An empty field is any falsy value: undefined, null, false, 0, '', [], {}
@@ -21,6 +20,46 @@ describe('validation', function(){
 
     const result = await schema.validate(data);
     should(result.isValid).eql(true);
+  });
+  it('should skip validation for null $nullable object', async () => {
+    var schema = new Schema({
+      user: {
+        name: String,
+        address: {
+          street: {$type: String, $validate: {required: true}}
+        }
+      }
+    });
+    const resultFail = await schema.validate({
+      user: {
+        name: 'Kevin',
+        address: {
+          // missing street!
+        }
+      }
+    });
+    should(resultFail.isValid).eql(false);
+
+    var data = {
+      user: {
+        name: 'Kevin',
+        address: null
+      }
+    };
+
+    var schema = new Schema({
+      user: {
+        name: String,
+        address: {
+          $nullable: true,
+          street: {$validate: {required: true}}
+        }
+      }
+    });
+
+    const result = await schema.validate(data);
+    should(result.isValid).eql(true);
+    should(data.user.address).eql(null);
   });
   describe('required', function(){
     describe('should validate required field', function(){

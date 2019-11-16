@@ -163,7 +163,7 @@ describe('default value', function(){
     should(data.user.address).be.type('object');
     should(data.user.address).eql({});
   });
-  it('should allow null for an object via $nullable flag', async () => {
+  it('should inject null for an object via $nullable flag', async () => {
     var data: {user?: {address?: {street?: string}}} = {};
 
     var schema = new Schema({

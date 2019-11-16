@@ -353,7 +353,7 @@ export class SchemaMapper
     if (SchemaMapper.specIsTransient(spec) && config && config.skipTransients) return;
 
     var fieldType = undefined;
-    var nullable = false
+    var nullable = false;
     // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later).
     // - Otherwise we need to find the constructor, if the value is not already a constructor ([] or {})
     if (spec) {
