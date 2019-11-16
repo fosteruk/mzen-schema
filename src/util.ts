@@ -5,7 +5,7 @@ export class SchemaUtil
 {
   static getSpec(path: string, spec: SchemaSpec)
   {
-    var spec = spec ? spec : {};
+    var spec = spec ? spec : {} as SchemaSpec;
     var pathParts = path && path ? path.split('.') : [];
 
     var currentPathPart = pathParts.shift();

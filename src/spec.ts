@@ -9,6 +9,10 @@ export interface SchemaSpec
   $validate?: SchemaSpecValidate;
   $label?: string;
   $strict?: boolean;
+  // The nullable flag indicates that an object can have a null value
+  // All other non array values can be null regardless 
+  // - unless specifically configured as notNull via $validate config
+  $nullable?: boolean;
   [key: string]: SchemaSpec | any;
 }
 

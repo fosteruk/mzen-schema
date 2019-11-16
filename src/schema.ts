@@ -397,7 +397,7 @@ export class Schema
     }
   )
   {
-    var { spec, specParent,fieldName, value, path, config, meta, mapperMeta } = opts;
+    var { spec, specParent, fieldName, value, path, config, meta, mapperMeta } = opts;
 
     path = path ? path : fieldName;
     config = config ? config : {};
@@ -405,6 +405,7 @@ export class Schema
     mapperMeta = mapperMeta ? mapperMeta : {};
 
     const validators = spec && spec.$validate ? spec.$validate : {};
+    const nullable = spec && spec.$nullable ? spec.$nullable : false;
     const filters = spec && spec.$filter ? spec.$filter : {};
     const label = spec && spec.$label ? spec.$label : fieldName;
     const strict = spec && spec.$strict !== undefined ? spec.$strict : (
@@ -420,7 +421,10 @@ export class Schema
     // Configure default value filter if not already set
     let defaultValue = filters.defaultValue;
     if (fieldType == Object) {
-      defaultValue = {};
+      // The $nullable flag indicates that an object can have a null value
+      // All other non array values can be null regardless 
+      // - unless specifically configured as notNull via $validate config
+      defaultValue = nullable ? null : {};
     } else if (fieldType == Array) {
       defaultValue = [];
     } else if (fieldName == '_id' && fieldType == SchemaTypes.ObjectID) {
@@ -428,6 +432,7 @@ export class Schema
         return new SchemaTypes.ObjectID;
       };
     }
+
     // Default value must be applied before type-casting - because the default value may need to be type-casted
     // - for example converting default value 'now' to type Date
     if (defaultValue !== undefined) {
@@ -449,6 +454,7 @@ export class Schema
         }
       }
     }
+
 
     // Apply filters
     value = await Filter.filter(value, filters);
