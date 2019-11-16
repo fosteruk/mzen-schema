@@ -455,7 +455,6 @@ export class Schema
       }
     }
 
-
     // Apply filters
     value = await Filter.filter(value, filters);
 
