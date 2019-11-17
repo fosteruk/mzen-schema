@@ -1,4 +1,3 @@
-import clone = require('clone');
 import SchemaUtil from './util';
 import SchemaTypes from './types';
 import TypeCaster from './type-caster';
@@ -56,7 +55,7 @@ export class SchemaMapper
   init()
   {
     if (!this.specNormalised) {
-      this.specNormalised = this.normalizeSpec(clone(this.spec));
+      this.specNormalised = this.normalizeSpec(this.spec);
     }
   }
   
@@ -100,7 +99,7 @@ export class SchemaMapper
         if (!this.schemas[name]) {
           throw new Error('Missing schema reference ' + spec.$schema);
         } else {
-          spec = Object.assign(clone(this.schemas[name].getSpec()), spec);
+          spec = {...this.schemas[name].getSpec(), ...spec};
         }
         delete spec.$schema;
       } else {
@@ -119,9 +118,8 @@ export class SchemaMapper
   {
     this.init();
     const meta = {errors: {}, root: data} as SchemaMapperMeta;
-    // Clone the spec as it may be temporarily modified in the process of validation
     // If the data is an array we must present the spec as an array also
-    var spec = Array.isArray(data) ? [clone(this.specNormalised)] : clone(this.specNormalised);
+    var spec = Array.isArray(data) ? [this.specNormalised] : this.specNormalised;
 
     if (SchemaMapper.specIsTransient(spec) && config && config.skipTransients) return;
 
@@ -266,8 +264,8 @@ export class SchemaMapper
     // If match all spec is defined, finalSpec defaults to an empty object since any spec rules should be replaced by
     // - the match-all spec (defaults to original spec)
     const matchAllSpec = (spec && spec['*'] != undefined) ? spec['*'] : undefined;
-    // We are going to modify the spec so we must clone it
-    const finalSpec = this.specInheritFrom(specParent, (matchAllSpec === undefined) ? clone(spec) : {});
+    // We are going to modify the spec (matchAll) so we must create a shallow copy
+    const finalSpec = this.specInheritFrom(specParent, (matchAllSpec === undefined) ? {...spec} : {});
     for (var fieldName in object) {
       if (matchAllSpec !== undefined) {
         // If match all '*' field spec is set, we generate a new spec object using the match all spec for every field
