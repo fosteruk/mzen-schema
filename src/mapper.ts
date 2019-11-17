@@ -379,18 +379,26 @@ export class SchemaMapper
 
     callback({spec, specParent, fieldName, container, path, meta});
 
+    var isNullNullable = (
+      defaultValue === null 
+      && container
+      && container[fieldName] === null
+    );
+
     switch (fieldType) {
       case Object:
-        if (spec.$spec !== undefined) spec = spec.$spec;
-        this.mapRecursive({
-          spec,
-          specParent,
-          object: container ? container[fieldName] : undefined,
-          path,
-          callback,
-          config,
-          meta
-        });
+        if (!isNullNullable) {
+          if (spec.$spec !== undefined) spec = spec.$spec;
+          this.mapRecursive({
+            spec,
+            specParent,
+            object: container ? container[fieldName] : undefined,
+            path,
+            callback,
+            config,
+            meta
+          });
+        }
       break;
       case Array:
         var arraySpec = undefined;

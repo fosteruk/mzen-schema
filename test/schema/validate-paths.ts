@@ -54,5 +54,104 @@ describe('validatePaths', function(){
     should(paths['names.*.first']).eql('1234');
     should(paths['names.*.first'].constructor).eql(String);
   });
+  it('should skip validation for null $nullable object', async () => {
+    var schema = new Schema({
+      user: {
+        name: String,
+        address: {
+          street: {$type: String, $validate: {required: true}}
+        }
+      }
+    });
+    const resultFail = await schema.validatePaths({
+      user: {
+        name: 'Kevin',
+        address: null // missing required "street"
+      }
+    });
+    should(resultFail.isValid).eql(false);
+
+    var data = {
+      user: {
+        name: 'Kevin',
+        address: null
+      }
+    };
+
+    var schema = new Schema({
+      user: {
+        name: String,
+        address: {
+          $nullable: true,
+          street: {$validate: {required: true}}
+        }
+      }
+    });
+
+    const result = await schema.validatePaths(data);
+    should(result.isValid).eql(true);
+    should(data.user.address).eql(null);
+  });
+  it('should skip validation for null $nullable within array', async () => {
+    var schema = new Schema({
+      user: {
+        name: String,
+        business: {
+          $type: Array,
+          $spec: {
+            businessId: {$type: String},
+            invite: {
+              userId: {$type: String, $validate: {required: true}}
+            }
+          }
+        }
+      }
+    });
+    const resultFail = await schema.validatePaths({
+      user: {
+        name: 'Kevin',
+        business: [
+          {
+            businessId: '1',
+            invite: null // missing "userId" - not nullable
+          }
+        ]
+      }
+    });
+    should(resultFail.isValid).eql(false);
+
+    var data = {
+      user: {
+        name: 'Kevin',
+        business: [
+          {
+            businessId: '1',
+            invite: null
+          }
+        ]
+      }
+    };
+
+    var schema = new Schema({
+      user: {
+        name: String,
+        business: {
+          $type: Array,
+          $spec: {
+            businessId: {$type: String},
+            invite: {
+              $nullable: true,
+              userId: {$type: String, $validate: {required: true}},
+              created: {$type: Date, $validate: {required: true}}
+            }
+          }
+        }
+      }
+    });
+
+    const result = await schema.validatePaths(data);
+    should(result.isValid).eql(true);
+    should(data.user.business[0].invite).eql(null);
+  });
 });
 
