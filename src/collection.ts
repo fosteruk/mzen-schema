@@ -21,6 +21,13 @@ export class Collection extends Array
     super(...args);
   }
 
+  _new(...args):Collection
+  {
+    // https://github.com/protobi/query
+    // @ts-ignore - hack to allow returning new collection of caller type
+    return new (this.constructor as { new(...args): typeof Collection })(...args);
+  }
+
   findOne(query:FindQuery):any
   {
     const array = this.findAll(query);
@@ -29,19 +36,17 @@ export class Collection extends Array
 
   findAll(query:FindQuery):Collection
   {
-    // https://github.com/protobi/query
-    // @ts-ignore - hack to allow returning new collection of caller type
-    return new (this.constructor as { new(...args): typeof Collection })(
+    return this._new(
       ...Query.query(this, query, Query.undotArray)
     );
   }
 
-  update(findQuery:FindQuery|null, update:UpdateQuery)
+  update(findQuery:FindQuery|null, update:UpdateQuery):Collection
   {
     const { $set, $unset } = update;
     const collection = !findQuery || Object.keys(findQuery).length == 0 
-      ? new Collection(...this) 
-      : new Collection(...this.findAll(findQuery));
+      ? this._new(...this) 
+      : this._new(...this.findAll(findQuery));
 
     collection.forEach(target => {
       if ($set) {
@@ -55,25 +60,29 @@ export class Collection extends Array
         });
       }
     });
+
+    return collection;
   }
 
-  delete(findQuery:FindQuery|null)
+  delete(findQuery:FindQuery|null):Collection
   {
     const collection = !findQuery || Object.keys(findQuery).length == 0 
-      ? new Collection(...this) 
-      : new Collection(...this.findAll(findQuery));
+      ? this._new(...this) 
+      : this._new(...this.findAll(findQuery));
 
     collection.forEach(item => {
       const index = this.indexOf(item);
       if (index != -1) this.splice(index, 1);
     });
+
+    return collection;
   }
 
-  replace(findQuery:FindQuery|null, newValue:any|Function)
+  replace(findQuery:FindQuery|null, newValue:any|Function):Collection
   {
     const collection = !findQuery || Object.keys(findQuery).length == 0 
-      ? new Collection(...this) 
-      : new Collection(...this.findAll(findQuery));
+      ? this._new(...this) 
+      : this._new(...this.findAll(findQuery));
 
     collection.forEach(item => {
       const index = this.indexOf(item);
@@ -83,6 +92,8 @@ export class Collection extends Array
           : newValue;
       }
     });
+
+    return collection;
   }
 }
 // We have to set a constructor name alias 
