@@ -30,11 +30,11 @@ export class Collection extends Array
 
   findOne(query:FindQuery):any
   {
-    const array = this.findAll(query);
+    const array = this.find(query);
     return array ? array[0] : undefined;
   }
 
-  findAll(query:FindQuery):Collection
+  find(query:FindQuery):Collection
   {
     return this._new(
       ...Query.query(this, query, Query.undotArray)
@@ -46,7 +46,7 @@ export class Collection extends Array
     const { $set, $unset } = update;
     const collection = !findQuery || Object.keys(findQuery).length == 0 
       ? this._new(...this) 
-      : this._new(...this.findAll(findQuery));
+      : this._new(...this.find(findQuery));
 
     collection.forEach(target => {
       if ($set) {
@@ -68,7 +68,7 @@ export class Collection extends Array
   {
     const collection = !findQuery || Object.keys(findQuery).length == 0 
       ? this._new(...this) 
-      : this._new(...this.findAll(findQuery));
+      : this._new(...this.find(findQuery));
 
     collection.forEach(item => {
       const index = this.indexOf(item);
@@ -82,7 +82,7 @@ export class Collection extends Array
   {
     const collection = !findQuery || Object.keys(findQuery).length == 0 
       ? this._new(...this) 
-      : this._new(...this.findAll(findQuery));
+      : this._new(...this.find(findQuery));
 
     collection.forEach(item => {
       const index = this.indexOf(item);
