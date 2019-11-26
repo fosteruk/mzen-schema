@@ -2,7 +2,7 @@ import clone = require('clone');
 import should = require('should');
 import { Collection } from '../lib/collection';
 
-class People extends Collection {}
+class People extends Collection<any> {}
 
 const data = {
   people: [
@@ -14,10 +14,10 @@ const data = {
 };
 
 describe('Collection', function(){
-  describe('find()', function(){
+  describe('findAll()', function(){
     it('should return array of objects matching query', function(){
       const people = new Collection(...data.people);
-      const result = people.find({nationality: 'British'});
+      const result = people.findAll({nationality: 'British'});
       should(result.length).eql(3);
       should(result[0].name).eql('Kevin');
       should(result[1].name).eql('Fudge');
@@ -25,19 +25,19 @@ describe('Collection', function(){
     });
     it('should return array of objects matching query using dotted paths', function(){
       const people = new Collection(...data.people);
-      const result = people.find({'address.postcode': 'L15'});
+      const result = people.findAll({'address.postcode': 'L15'});
       should(result.length).eql(2);
       should(result[0].name).eql('Kevin');
       should(result[1].name).eql('Fudge');
     });
     it('should return an empty array if nothing found', function(){
       const people = new Collection();
-      const result = people.find({nationality: 'Other'});
+      const result = people.findAll({nationality: 'Other'});
       should(result.length).eql(0);
     });
     it('should return collection of same type', function(){
       const people = new People(...data.people);
-      const result = people.find({nationality: 'British'});
+      const result = people.findAll({nationality: 'British'});
       should(people.constructor).eql(People);
       should(people.constructor.name).eql('People');
       should(result.length).eql(3);
@@ -64,7 +64,7 @@ describe('Collection', function(){
     describe('$set', function(){
       it('should $set on objects targeted by find query', function(){
         const people = new Collection(...clone(data.people));
-        const findResultA = people.find({name: 'Kevin'});
+        const findResultA = people.findAll({name: 'Kevin'});
         should(findResultA[0].name).eql('Kevin');
         should(findResultA[0].age).eql(37);
         people.update({name: 'Kevin'}, {
@@ -74,7 +74,7 @@ describe('Collection', function(){
       });
       it('should $set on objects targeted by find query using dotted path', function(){
         const people = new Collection(...clone(data.people));
-        const findResultA = people.find({'address.postcode': 'L15'});
+        const findResultA = people.findAll({'address.postcode': 'L15'});
         should(findResultA[0].name).eql('Kevin');
         should(findResultA[0].age).eql(37);
         should(findResultA[1].name).eql('Fudge');
@@ -87,7 +87,7 @@ describe('Collection', function(){
       });
       it('should $set on objects dotted path targeted by find query', function(){
         const people = new Collection(...clone(data.people));
-        const findResultA = people.find({name: 'Kevin'});
+        const findResultA = people.findAll({name: 'Kevin'});
         should(findResultA[0].name).eql('Kevin');
         should(findResultA[0].address.postcode).eql('L15');
         people.update({name: 'Kevin'}, {
@@ -99,7 +99,7 @@ describe('Collection', function(){
     describe('$unset', function(){
       it('should $unset on objects targeted by find query', function(){
         const people = new Collection(...clone(data.people));
-        const findResultA = people.find({name: 'Kevin'});
+        const findResultA = people.findAll({name: 'Kevin'});
         should(findResultA[0].name).eql('Kevin');
         should(findResultA[0].age).eql(37);
         people.update({name: 'Kevin'}, {
@@ -109,7 +109,7 @@ describe('Collection', function(){
       });
       it('should $unset on objects targeted by find query using dotted path', function(){
         const people = new Collection(...clone(data.people));
-        const findResultA = people.find({'address.postcode': 'L15'});
+        const findResultA = people.findAll({'address.postcode': 'L15'});
         should(findResultA[0].name).eql('Kevin');
         should(findResultA[0].age).eql(37);
         should(findResultA[1].name).eql('Fudge');
@@ -122,7 +122,7 @@ describe('Collection', function(){
       });
       it('should $unset on objects dotted path targeted by find query', function(){
         const people = new Collection(...clone(data.people));
-        const findResultA = people.find({name: 'Kevin'});
+        const findResultA = people.findAll({name: 'Kevin'});
         should(findResultA[0].name).eql('Kevin');
         should(findResultA[0].address.postcode).eql('L15');
         people.update({name: 'Kevin'}, {
@@ -138,7 +138,7 @@ describe('Collection', function(){
       should(people.length).eql(4);
       people.delete({name: 'Kevin'});
       should(people.length).eql(3);
-      const kevins = people.find({name: 'Kevin'});
+      const kevins = people.findAll({name: 'Kevin'});
       should(kevins.length).eql(0);
     });
     it('should delete items using dotted path', function(){
@@ -146,7 +146,7 @@ describe('Collection', function(){
       should(people.length).eql(4);
       people.delete({'address.postcode': 'L1'});
       should(people.length).eql(3);
-      const l1s = people.find({'address.postcode': 'L1'});
+      const l1s = people.findAll({'address.postcode': 'L1'});
       should(l1s.length).eql(0);
     });
   });
@@ -158,9 +158,9 @@ describe('Collection', function(){
         nationality: 'German', 
         address: {postcode: 'ABC'}
       });
-      const kevins = people.find({name: 'Kevin'});
+      const kevins = people.findAll({name: 'Kevin'});
       should(kevins.length).eql(0);
-      const toms = people.find({name: 'Tom'});
+      const toms = people.findAll({name: 'Tom'});
       should(toms.length).eql(1);
       should(toms[0].address.postcode).eql('ABC');
     });
@@ -170,9 +170,9 @@ describe('Collection', function(){
         oldValue.name = oldValue.name + ' Updated';
         return oldValue;
       });
-      const kevins = people.find({name: 'Kevin'});
+      const kevins = people.findAll({name: 'Kevin'});
       should(kevins.length).eql(0);
-      const toms = people.find({name: 'Kevin Updated'});
+      const toms = people.findAll({name: 'Kevin Updated'});
       should(toms.length).eql(1);
     });
   });

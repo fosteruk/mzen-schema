@@ -12,7 +12,14 @@ interface UpdateQuery
   $unset?:{[path:string]:boolean};
 }
 
-export class Collection extends Array
+// Extending Array doesnt really work in as you might expect
+// - becaused JavaScript uses prototypal inheritance
+// - the Array returned by mutator methods is always Array 
+// - rather than the extended object type.
+// - https://blog.simontest.net/extend-array-with-typescript-965cc1134b3
+// Understanding this we match this behaviour
+// - always returning Array type from mutators
+export class Collection<T> extends Array<T>
 {
   static alias:string;
 
@@ -21,32 +28,25 @@ export class Collection extends Array
     super(...args);
   }
 
-  _new(...args):Collection
-  {
-    // https://github.com/protobi/query
-    // @ts-ignore - hack to allow returning new collection of caller type
-    return new (this.constructor as { new(...args): typeof Collection })(...args);
-  }
-
   findOne(query:FindQuery):any
   {
-    const array = this.find(query);
+    const array = this.findAll(query);
     return array ? array[0] : undefined;
   }
 
-  find(query:FindQuery):Collection
+  // This is called findAll() and not find() as in mongodb
+  // -because we are extending array and array already provides find()
+  findAll(query:FindQuery):Array<any>
   {
-    return this._new(
-      ...Query.query(this, query, Query.undotArray)
-    );
+    return Query.query(this, query, Query.undotArray);
   }
 
-  update(findQuery:FindQuery|null, update:UpdateQuery):Collection
+  update(findQuery:FindQuery|null, update:UpdateQuery):Array<T>
   {
     const { $set, $unset } = update;
     const collection = !findQuery || Object.keys(findQuery).length == 0 
-      ? this._new(...this) 
-      : this._new(...this.find(findQuery));
+      ? this 
+      : this.findAll(findQuery);
 
     collection.forEach(target => {
       if ($set) {
@@ -64,11 +64,11 @@ export class Collection extends Array
     return collection;
   }
 
-  delete(findQuery:FindQuery|null):Collection
+  delete(findQuery:FindQuery|null):Array<T>
   {
     const collection = !findQuery || Object.keys(findQuery).length == 0 
-      ? this._new(...this) 
-      : this._new(...this.find(findQuery));
+      ? this 
+      : this.findAll(findQuery);
 
     collection.forEach(item => {
       const index = this.indexOf(item);
@@ -78,11 +78,11 @@ export class Collection extends Array
     return collection;
   }
 
-  replace(findQuery:FindQuery|null, newValue:any|Function):Collection
+  replace(findQuery:FindQuery|null, newValue:any|Function):Array<T>
   {
     const collection = !findQuery || Object.keys(findQuery).length == 0 
-      ? this._new(...this) 
-      : this._new(...this.find(findQuery));
+      ? this
+      : this.findAll(findQuery);
 
     collection.forEach(item => {
       const index = this.indexOf(item);
