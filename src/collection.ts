@@ -41,7 +41,7 @@ export class Collection<T> extends Array<T>
     return Query.query(this, query, Query.undotArray);
   }
 
-  update(findQuery:FindQuery|null, update:UpdateQuery):Array<T>
+  update(findQuery:FindQuery|null, update:UpdateQuery)
   {
     const { $set, $unset } = update;
     const collection = !findQuery || Object.keys(findQuery).length == 0 
@@ -60,11 +60,9 @@ export class Collection<T> extends Array<T>
         });
       }
     });
-
-    return collection;
   }
 
-  delete(findQuery:FindQuery|null):Array<T>
+  delete(findQuery:FindQuery|null)
   {
     const collection = !findQuery || Object.keys(findQuery).length == 0 
       ? this 
@@ -74,11 +72,9 @@ export class Collection<T> extends Array<T>
       const index = this.indexOf(item);
       if (index != -1) this.splice(index, 1);
     });
-
-    return collection;
   }
 
-  replace(findQuery:FindQuery|null, newValue:any|Function):Array<T>
+  replace(findQuery:FindQuery|null, newValue:any|Function)
   {
     const collection = !findQuery || Object.keys(findQuery).length == 0 
       ? this
@@ -92,8 +88,6 @@ export class Collection<T> extends Array<T>
           : newValue;
       }
     });
-
-    return collection;
   }
 }
 // We have to set a constructor name alias 

@@ -1,19 +1,20 @@
 import clone = require('clone');
 import should = require('should');
 import { Collection } from '../lib/collection';
+import ObjectId from 'bson-objectid';
 
 class People extends Collection<any> {}
 
 const data = {
   people: [
-    {name: 'Kevin', age: 37, nationality: 'British', address: {postcode: 'L15'}},
-    {name: 'Fudge', age: 8, nationality: 'British', address: {postcode: 'L15'}},
-    {name: 'Kar Chun', age: 37, nationality: 'Malaysian', address: {postcode: '87MF'}},
-    {name: 'Alison', age: 37, nationality: 'British', address: {postcode: 'L1'}},
+    {_id: new ObjectId('5932fce4aa1fe86c751fce30'), name: 'Kevin', age: 37, nationality: 'British', address: {postcode: 'L15'}},
+    {_id: new ObjectId('5932fce4aa1fe86c751fce31'), name: 'Fudge', age: 8, nationality: 'British', address: {postcode: 'L15'}},
+    {_id: new ObjectId('5932fce4aa1fe86c751fce32'), name: 'Kar Chun', age: 37, nationality: 'Malaysian', address: {postcode: '87MF'}},
+    {_id: new ObjectId('5932fce4aa1fe86c751fce33'), name: 'Alison', age: 37, nationality: 'British', address: {postcode: 'L1'}},
   ],
 };
 
-describe('Collection', function(){
+describe.only('Collection', function(){
   describe('findAll()', function(){
     it('should return array of objects matching query', function(){
       const people = new Collection(...data.people);
@@ -35,12 +36,23 @@ describe('Collection', function(){
       const result = people.findAll({nationality: 'Other'});
       should(result.length).eql(0);
     });
-    it('should return collection of same type', function(){
+    it('should return array of objects matching bson object id string', function(){
       const people = new People(...data.people);
-      const result = people.findAll({nationality: 'British'});
-      should(people.constructor).eql(People);
-      should(people.constructor.name).eql('People');
-      should(result.length).eql(3);
+
+      const resultFail = people.findAll({
+        _id: new ObjectId('5932fce4aa1fe86c751fce30')
+      });
+      should(resultFail.length).eql(0);
+
+      const resultA = people.findAll({
+        _id: String(new ObjectId('5932fce4aa1fe86c751fce30'))
+      });
+      should(resultA.length).eql(1);
+      should(resultA[0].name).eql('Kevin');
+
+      const resultB = people.findAll({_id: '5932fce4aa1fe86c751fce30'});
+      should(resultB.length).eql(1);
+      should(resultB[0].name).eql('Kevin');
     });
   });
   describe('findOne()', function(){
@@ -58,6 +70,22 @@ describe('Collection', function(){
       const people = new Collection();
       const result = people.findOne({nationality: 'Other'});
       should(result).eql(undefined);
+    });
+    it('should return object matching bson object id string', function(){
+      const people = new People(...data.people);
+
+      const resultFail = people.findOne({
+        _id: new ObjectId('5932fce4aa1fe86c751fce30')
+      });
+      should(resultFail).eql(undefined);
+
+      const resultA = people.findOne({
+        _id: String(new ObjectId('5932fce4aa1fe86c751fce30'))
+      });
+      should(resultA.name).eql('Kevin');
+
+      const resultB = people.findOne({_id: '5932fce4aa1fe86c751fce30'});
+      should(resultB.name).eql('Kevin');
     });
   });
   describe('update()', function(){
