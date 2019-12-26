@@ -213,17 +213,21 @@ export class Schema
         (
           async () => {
             let { spec, specParent, fieldName, container, path, meta: mapperMeta } = opts;
-            let value = await this.validateField({
-              spec,
-              specParent,
-              fieldName,
-              value: container ? container[fieldName] : undefined,
-              path,
-              config,
-              meta,
-              mapperMeta
-            });
-            if (container) container[fieldName] = value;
+            try {
+              let value = await this.validateField({
+                spec,
+                specParent,
+                fieldName,
+                value: container ? container[fieldName] : undefined,
+                path,
+                config,
+                meta,
+                mapperMeta
+              });
+              if (container) container[fieldName] = value;
+            } catch (e) {
+              throw new Error('Validate field failed at "' + path + '": ' + e.message);
+            }
           }
         )()
       );
@@ -253,18 +257,22 @@ export class Schema
         (
           async () => {
             let { spec, specParent, fieldName, container, path, meta: mapperMeta } = opts;
-            mapperMeta.root = container;
-            let value = await this.validateField({
-              spec,
-              specParent,
-              fieldName,
-              value: container ? container[fieldName] : undefined,
-              path,
-              config,
-              meta,
-              mapperMeta
-            });
-            if (container) container[fieldName] = value;
+            try {
+              mapperMeta.root = container;
+              let value = await this.validateField({
+                spec,
+                specParent,
+                fieldName,
+                value: container ? container[fieldName] : undefined,
+                path,
+                config,
+                meta,
+                mapperMeta
+              });
+              if (container) container[fieldName] = value;
+            } catch (e) {
+              throw new Error('Validate field failed at "' + path + '": ' + e.message);
+            }
           }
         )()
       );
@@ -474,10 +482,12 @@ export class Schema
   typeCast(requiredType: any, value, path?, meta: SchemaValidationMeta = {})
   {
     // If the spec specifies the value should be an object and the value is already an object, we do not need to typecast
-    // It is impossible for us to cast an object to any object type other than Object
     // When we specify a type as Object we only care that it is an Object we dont care about its
     // specific constuctor type, we dont care if it is MyObject or YourObject
-    var skip = (requiredType === Object && Array.isArray(value) == false && Object(value) === value);
+    var skip = (
+      requiredType === Object && Array.isArray(value) == false && Object(value) === value 
+      || requiredType === Array && value instanceof Array
+    );
     var result = value;
 
     if (!skip) {

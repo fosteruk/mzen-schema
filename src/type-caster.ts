@@ -14,31 +14,6 @@ export class SchemaTypeCaster
     return typeof value == 'function' ? value : ((value === null || value === undefined) ? value : (value).constructor);
   }
 
-  /** 
-   * Get Type Base
-   * 
-   * Get the base type when the specific type extends 
-   * a base type Array, String, Number, Boolean, Object
-   */
-  static getTypeBase(value: any)
-  {
-    const type = SchemaTypeCaster.getType(value);
-
-    var result = type;
-    if (Array.isPrototypeOf(type)) {
-      result = Array;
-    } else if (String.isPrototypeOf(type)) {
-      result = String;
-    } else if (Number.isPrototypeOf(type)) {
-      result = Number;
-    } else if (Boolean.isPrototypeOf(type)) {
-      result = Boolean;
-    } else if (Object.isPrototypeOf(type)) {
-      result = Object;
-    }
-    return result;
-  }
-
   static getTypeName(value: any)
   {
     return SchemaTypeCaster.getType(value).name;

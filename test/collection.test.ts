@@ -14,7 +14,7 @@ const data = {
   ],
 };
 
-describe.only('Collection', function(){
+describe('Collection', function(){
   describe('findAll()', function(){
     it('should return array of objects matching query', function(){
       const people = new Collection(...data.people);

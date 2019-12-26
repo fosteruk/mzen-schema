@@ -439,7 +439,7 @@ describe('type cast', function(){
     should(data.field2).eql([3.14159265359]);
     should(data.field3).eql([0, 3, 7]);
   });
-  it('should not attempt to cast specific Object type', async () => {
+  it('should not attempt to cast custom Object constructor', async () => {
     class TestType {name: string};
 
     var data = new TestType;
@@ -452,5 +452,24 @@ describe('type cast', function(){
     await schema.validate(data);
 
     should(data.name).eql('Kevin');
+  });
+  it('should not attempt to cast custom Array constructor', async () => {
+    class MyArray extends Array {};
+    const colors = new MyArray;
+    colors.push('red');
+    colors.push('yellow');
+
+    class TestType {colors:string[]};
+
+    var data = new TestType;
+    data.colors = colors;
+
+    var schema = new Schema({
+      colors: Array
+    });
+
+    await schema.validate(data);
+
+    should(data.colors[0]).eql('red');
   });
 });
