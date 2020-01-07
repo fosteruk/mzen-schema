@@ -1,5 +1,6 @@
 {
   "name": "mzen-schema",
+  "private": true,
   "version": "0.0.111",
   "description": "mZen Schema",
   "main": "./lib/index",
