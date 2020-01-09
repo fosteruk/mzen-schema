@@ -66,25 +66,40 @@ export class ObjectPathAccessor
     subject: any, 
     mutatorFunc?: (value: any) => any, 
     meta?: {
-      currentPath?: string,
-      currentDepth?: number,
-      matches?: Array<any>
+      currentPath?:string,
+      currentDepth?:number,
+      wilcardPath?:boolean,
+      matches?:Array<any>
     }
   )
   {
     meta = meta ? meta : {};
-    const currentPath = meta.currentPath ? meta.currentPath : null;
-    const currentDepth = meta.currentDepth ? meta.currentDepth : 1;
+    var currentPath = meta.currentPath ? meta.currentPath : null;
+    var currentDepth = meta.currentDepth ? meta.currentDepth : 1;
     var matches = meta.matches ? meta.matches : [];
 
     pattern = String(pattern);
-    const patternParts = pattern.split('.');
-    const currentParts = patternParts.slice(0, currentDepth); // Pattern parts up to current depth
-    const currentNode = currentParts[currentParts.length - 1]; // Current node value
-    const depth = currentDepth + 1;
+    var patternParts = pattern.split('.');
+    var currentParts = patternParts.slice(0, currentDepth); // Pattern parts up to current depth
+    var currentNode = currentParts[currentParts.length - 1]; // Current node value
+    var depth = currentDepth + 1;
 
     if (currentDepth <= patternParts.length) {
       if (Array.isArray(subject)) {
+        if (
+          currentNode != '*' 
+          && ['0','1','2','3','4','5','6','7','8','9'].indexOf(currentNode) == -1
+        ) {
+          // Subject node is an array but pattern node is not an array operator
+          // Expand pattern adding wildcard to rescurse
+          var nextNode = currentNode;
+          currentNode = '*';
+          currentParts.pop(); // remove current node
+          currentParts = currentParts.concat(['*']);
+          patternParts = currentParts.concat([nextNode]).concat(patternParts.slice(currentDepth));
+          pattern = patternParts.join('.');
+          meta.wilcardPath = true;
+        }
         // @ts-ignore - 'element' is declared but its value is never read
         subject.forEach(function(element, x){
           processElement(x);
@@ -115,19 +130,17 @@ export class ObjectPathAccessor
         }
       }
 
-      // Only recurse into objects - can be an array object but not a primitive
+      // Only recurse into objects - can be an array object but not a primitive 
       if ((currentNode == '*' || prop == currentNode) && subject[prop] === Object(subject[prop])) {
-        ObjectPathAccessor.searchRescursive(pattern, subject[prop], mutatorFunc, {
-          ...meta, 
-          currentPath: elementPath,
-          currentDepth: depth,
-          matches
-        });
+        meta.currentPath = elementPath;
+        meta.currentDepth = depth;
+        meta.matches = matches;
+        ObjectPathAccessor.searchRescursive(pattern, subject[prop], mutatorFunc, meta);
       }
     }
 
     // If the pattern contains a wild card the result should be an array. Otherwise it should be a single value
-    return pattern.indexOf('*') !== -1 ? matches : matches[0];
+    return pattern.indexOf('*') !== -1 || meta.wilcardPath ? matches : matches[0];
   }
 
   /**
@@ -148,6 +161,7 @@ export class ObjectPathAccessor
         if (p1Parts[x] == '*') continue;
         if (p1Parts[x] == '\*' && p2Parts[x] == '*') continue;
         if (p1Parts[x] != p2Parts[x]) {
+
           result = false;
           break;
         }
