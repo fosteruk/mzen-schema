@@ -54,6 +54,42 @@ describe('ObjectPathAccessor', function(){
 
       should(result).eql({name: 'UK', city: {name: 'London'}});
     });
+    it('should return values within array using mongodb style path (no wildcards)', function(){
+      var data = {
+        planet: [
+          {name: 'Earth'},
+          {name: 'Mars'}
+        ]
+      };
+
+      var result = ObjectPathAccessor.getPath('planet.name', data);
+
+      should(result).eql(['Earth', 'Mars']);
+    });
+    it('should return values within deep array using mongodb style path (no wildcards)', function(){
+      var data = {
+        planets: [
+          {
+            name: 'Earth',
+            countries: [
+              {name: 'USA'},
+              {name: 'UK'},
+            ]
+          },
+          {
+            name: 'Mars',
+            countries: [
+              {name: 'Zon'},
+              {name: 'Spla'},
+            ]
+          }
+        ]
+      };
+
+      var result = ObjectPathAccessor.getPath('planets.countries.name', data);
+
+      should(result).eql(['USA','UK', 'Zon', 'Spla']);
+    });
     it('should return value at given array index', function(){
       var data = [
         'Earth',
