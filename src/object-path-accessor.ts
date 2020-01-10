@@ -88,7 +88,7 @@ export class ObjectPathAccessor
       if (Array.isArray(subject)) {
         if (
           currentNode != '*' 
-          && ['0','1','2','3','4','5','6','7','8','9'].indexOf(currentNode) == -1
+          && !ObjectPathAccessor.isNumber(currentNode) 
         ) {
           // Subject node is an array but pattern node is not an array operator
           // Expand pattern adding wildcard to rescurse
@@ -131,7 +131,10 @@ export class ObjectPathAccessor
       }
 
       // Only recurse into objects - can be an array object but not a primitive 
-      if ((currentNode == '*' || prop == currentNode) && subject[prop] === Object(subject[prop])) {
+      if (
+        (currentNode == '*' || prop == currentNode) 
+        && subject[prop] === Object(subject[prop])
+      ) {
         meta.currentPath = elementPath;
         meta.currentDepth = depth;
         meta.matches = matches;
@@ -139,8 +142,23 @@ export class ObjectPathAccessor
       }
     }
 
-    // If the pattern contains a wild card the result should be an array. Otherwise it should be a single value
-    return pattern.indexOf('*') !== -1 || meta.wilcardPath ? matches : matches[0];
+    // If the pattern contains a wildcard the result should be an array. Otherwise it should be a single value
+    return patternParts.indexOf('*') !== -1 || meta.wilcardPath 
+      ? matches 
+      : matches[0];
+  }
+
+  static isNumber(value)
+  {
+    var result = false;
+    if (
+      value !== false 
+      && value !== undefined 
+      && value !== ''
+    ) {
+      result = !isNaN(value);
+    }
+    return result;
   }
 
   /**
