@@ -264,6 +264,35 @@ describe('applyTransients', function(){
     should(object.address.constructor).eql(ConstructorTestAddress);
     should(object.address.getStreet()).eql('Picton Road');
   });
+  it('should typecast date values', function(){
+    var object = {
+      created: '2018-01-01T00:00:00.000Z',
+      updated: '2018-01-01T00:00:00.000Z'
+    };
+
+    var schema = new Schema({
+      $name: 'record',
+      created: Date,
+      updated: Date
+    });
+
+    object = schema.applyTransients(object);
+    should(object.created.constructor).eql(Date);
+    should(object.updated.constructor).eql(Date);
+  });
+  it('should typecast number values', function(){
+    var object = {
+      age: '37'
+    };
+
+    var schema = new Schema({
+      $name: 'record',
+      age: Number
+    });
+
+    object = schema.applyTransients(object);
+    should(object.age.constructor).eql(Number);
+  });
   it('should apply $pathRef value', function(){
     var user = {
       _id: '123',
