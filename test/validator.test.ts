@@ -1,7 +1,7 @@
 import should = require('should');
 import ValidatorCustom from '../src/validator/validator-custom';
 import ValidatorEmail from '../src/validator/validator-email';
-import ValidatorEnumeration from '../src/validator/validator-enumeration';
+import ValidatorInArray from '../src/validator/validator-in-array';
 import ValidatorEquality from '../src/validator/validator-equality';
 import ValidatorIsEmpty from '../src/validator/validator-is-empty';
 import ValidatorNotEmpty from '../src/validator/validator-not-empty';
@@ -248,10 +248,10 @@ describe('SchemaValidator', function(){
       should(result).equal('Values do not match');
     });
   });
-  describe('enumeration', function(){
+  describe('inArray', function(){
     it('should return boolean true on success', function(){
       var value = 'Car';
-      var result = (new ValidatorEnumeration)
+      var result = (new ValidatorInArray)
                     .validate(value, {
                       name: 'Transport', 
                       values: ['Car', 'Bus', 'Train', 'Boat']
@@ -261,7 +261,7 @@ describe('SchemaValidator', function(){
     });
     it('should return error message on failure', function(){
       var value = 'Guitar';
-      var result = (new ValidatorEnumeration)
+      var result = (new ValidatorInArray)
                     .validate(value, {
                       name: 'Transport', 
                       values: ['Car', 'Bus', 'Train', 'Boat']
@@ -271,7 +271,7 @@ describe('SchemaValidator', function(){
     });
     it('should allow custom message', function(){
       var value = 'Guitar';
-      var result = (new ValidatorEnumeration)
+      var result = (new ValidatorInArray)
                     .validate(value, {
                       name: 'Transport', 
                       values: ['Car', 'Bus', 'Train', 'Boat'], 

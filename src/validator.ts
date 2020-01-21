@@ -1,7 +1,7 @@
 import ValidatorInterface from './validator/validator-interface';
 import ValidatorCustom from './validator/validator-custom';
 import ValidatorEmail from './validator/validator-email';
-import ValidatorEnumeration from './validator/validator-enumeration';
+import ValidatorInArray from './validator/validator-in-array';
 import ValidatorEquality from './validator/validator-equality';
 import ValidatorIsEmpty from './validator/validator-is-empty';
 import ValidatorNotEmpty from './validator/validator-not-empty';
@@ -64,7 +64,7 @@ export class Validator
 // Add default validators
 Validator.addValidator(new ValidatorCustom);
 Validator.addValidator(new ValidatorEmail);
-Validator.addValidator(new ValidatorEnumeration);
+Validator.addValidator(new ValidatorInArray);
 Validator.addValidator(new ValidatorEquality);
 Validator.addValidator(new ValidatorIsEmpty);
 Validator.addValidator(new ValidatorNotEmpty);

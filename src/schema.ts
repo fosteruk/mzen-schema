@@ -143,15 +143,15 @@ export class Schema
         let pathRef = spec ? spec.$pathRef : null;
         if (pathRef){
           container[fieldName] = ObjectPathAccessor.getPath(pathRef, mapperMeta.root);
-        }
-
-        const fieldType = this.specToFieldType(spec, container[fieldName]);
-        if (container[fieldName] != undefined) {
-          // We only attempt to type cast if the type was specified, the value is not null and not undefined
-          // - a type cast failure would result in an error which we do not want in the case of undefined or null
-          // - these indicate no-value, and so there is nothing to cast
-          if (fieldType && fieldType != SchemaTypes.Mixed) {
-            container[fieldName] = this.typeCast(fieldType, container[fieldName], path);
+        } else {
+          const fieldType = this.specToFieldType(spec, container[fieldName]);
+          if (container[fieldName] != undefined) {
+            // We only attempt to type cast if the type was specified, the value is not null and not undefined
+            // - a type cast failure would result in an error which we do not want in the case of undefined or null
+            // - these indicate no-value, and so there is nothing to cast
+            if (fieldType && fieldType != SchemaTypes.Mixed) {
+              container[fieldName] = this.typeCast(fieldType, container[fieldName], path);
+            }
           }
         }
 
