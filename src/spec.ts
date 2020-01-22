@@ -33,7 +33,7 @@ export interface SchemaSpecValidate
   required?: boolean | SchemaSpecValidateOptions
   notEmpty?: boolean | SchemaSpecValidateOptions,
   email?: boolean | SchemaSpecValidateOptions,
-  valueLength?: SchemaSpecValidateOptionsValueLength | Array<SchemaSpecValidateOptionsValueLength>,
+  valueLength?: SchemaSpecValidateOptionsValueLength,
   equality?: SchemaSpecValidateOptionsEquality | Array<SchemaSpecValidateOptionsEquality>,
   inArray?: SchemaSpecValidateOptionsInArray,
   regex?: SchemaSpecValidateOptionsRegex | Array<SchemaSpecValidateOptionsRegex>

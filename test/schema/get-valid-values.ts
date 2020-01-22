@@ -1,7 +1,7 @@
 import should = require('should');
 import Schema from '../../lib/schema';
 
-describe('getValidValuse', function(){
+describe('getValidValues', function(){
   it('should return array of valid inArray validate values for path', async () => {
     var schema = new Schema({
       model: {

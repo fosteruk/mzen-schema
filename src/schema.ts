@@ -377,9 +377,7 @@ export class Schema
   getValidValues(path:string)
   {
     this.init();
-
     let result = undefined;
-
     // This method inspects the schema validation options
     // - to file what are the valid values of any inArray validation
     const spec = this.schemaMapper.getSpecPath(path);
@@ -391,6 +389,46 @@ export class Schema
       && spec.$validate.inArray.values
     ) {
       result = spec.$validate.inArray.values;
+    }
+
+    return result;
+  }
+
+  getValidValueLengthMin(path:string)
+  {
+    this.init();
+    let result = undefined;
+    // This method inspects the schema validation options
+    // - to file what are the valid values of any inArray validation
+    const spec = this.schemaMapper.getSpecPath(path);
+
+    if (
+      spec 
+      && spec.$validate 
+      && spec.$validate.valueLength 
+      && spec.$validate.valueLength.min !== undefined
+    ) {
+      result = spec.$validate.valueLength.min;
+    }
+
+    return result;
+  }
+
+  getValidValueLengthMax(path:string)
+  {
+    this.init();
+    let result = undefined;
+    // This method inspects the schema validation options
+    // - to file what are the valid values of any inArray validation
+    const spec = this.schemaMapper.getSpecPath(path);
+
+    if (
+      spec 
+      && spec.$validate 
+      && spec.$validate.valueLength 
+      && spec.$validate.valueLength.max !== undefined
+    ) {
+      result = spec.$validate.valueLength.max;
     }
 
     return result;
