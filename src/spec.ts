@@ -35,7 +35,7 @@ export interface SchemaSpecValidate
   email?: boolean | SchemaSpecValidateOptions,
   valueLength?: SchemaSpecValidateOptionsValueLength | Array<SchemaSpecValidateOptionsValueLength>,
   equality?: SchemaSpecValidateOptionsEquality | Array<SchemaSpecValidateOptionsEquality>,
-  enumeration?: SchemaSpecValidateOptionsEnumeration,
+  inArray?: SchemaSpecValidateOptionsInArray,
   regex?: SchemaSpecValidateOptionsRegex | Array<SchemaSpecValidateOptionsRegex>
 }
 
@@ -57,7 +57,7 @@ export interface SchemaSpecValidateOptionsEquality extends SchemaSpecValidateOpt
   root: any;
 }
 
-export interface SchemaSpecValidateOptionsEnumeration extends SchemaSpecValidateOptions
+export interface SchemaSpecValidateOptionsInArray extends SchemaSpecValidateOptions
 {
   values?: Array<any>;
 }

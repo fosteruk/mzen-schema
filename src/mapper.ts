@@ -59,10 +59,15 @@ export class SchemaMapper
     }
   }
   
-  getSpec()
+  getSpec():SchemaSpec
   {
     this.init();
     return this.specNormalised;
+  }
+
+  getSpecPath(path: string):SchemaSpec
+  {
+    return SchemaUtil.getSpec(path, this.getSpec());
   }
   
   addSchema(schema: Schema)

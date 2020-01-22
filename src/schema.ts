@@ -373,6 +373,28 @@ export class Schema
     });
     return result;
   }
+
+  getValidValues(path:string)
+  {
+    this.init();
+
+    let result = undefined;
+
+    // This method inspects the schema validation options
+    // - to file what are the valid values of any inArray validation
+    const spec = this.schemaMapper.getSpecPath(path);
+
+    if (
+      spec 
+      && spec.$validate 
+      && spec.$validate.inArray 
+      && spec.$validate.inArray.values
+    ) {
+      result = spec.$validate.inArray.values;
+    }
+
+    return result;
+  }
   
   specToFieldType(spec, value)
   {
