@@ -104,14 +104,25 @@ export class SchemaMapper
         if (!this.schemas[name]) {
           throw new Error('Missing schema reference ' + spec.$schema);
         } else {
-          spec = {...this.schemas[name].getSpec(), ...spec};
+          spec = {
+            ...this.schemas[name].getSpec(), 
+            ...spec
+          };
         }
         delete spec.$schema;
       } else {
         // this spec does not contain a schema ref - recurse
         Object.keys(spec).forEach((key) => {
           // Dont recurse schema operators others than $spec
-          if (!SchemaUtil.isOperator(key) || key != '$spec') {
+          if (
+            (
+              !SchemaUtil.isOperator(key) 
+              || key == '$spec'
+            ) && (
+              Array.isArray(spec[key])
+              || typeof spec[key] == 'object'
+            )
+          ) {
             spec[key] = this.normalizeSpec(spec[key]);
           }
         });
