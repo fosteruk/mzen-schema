@@ -110,7 +110,10 @@ export class SchemaMapper
       } else {
         // this spec does not contain a schema ref - recurse
         Object.keys(spec).forEach((key) => {
-          spec[key] = this.normalizeSpec(spec[key]);
+          // Dont recurse schema operators others than $spec
+          if (!SchemaUtil.isOperator(key) || key != '$spec') {
+            spec[key] = this.normalizeSpec(spec[key]);
+          }
         });
       }
     }
@@ -182,7 +185,7 @@ export class SchemaMapper
       if (TypeCaster.getType(query) == Object) {
         for (let fieldName in query) {
           if (!query.hasOwnProperty(fieldName)) continue;
-          if (SchemaUtil.isQueryOperator(fieldName)) {
+          if (SchemaUtil.isOperator(fieldName)) {
             if (SchemaUtil.canValidateQueryOperator(fieldName)) {
               // If this element is an operator - we want to validate is values
               if (['$or', '$and'].indexOf(fieldName) != -1) {
@@ -201,7 +204,7 @@ export class SchemaMapper
             var hasOpertators = false;
             if (TypeCaster.getType(query[fieldName]) == Object) {
               for (let childFieldName in query[fieldName]) {
-                hasOpertators = hasOpertators || SchemaUtil.isQueryOperator(childFieldName);
+                hasOpertators = hasOpertators || SchemaUtil.isOperator(childFieldName);
                 if (hasOpertators && SchemaUtil.canValidateQueryOperator(childFieldName)) {
                   if (Array.isArray(query[fieldName][childFieldName])) {
                     // @ts-ignore - unused value
@@ -285,7 +288,7 @@ export class SchemaMapper
     }
 
     for (let fieldName in finalSpec) {
-      if (SchemaUtil.isQueryOperator(fieldName)) continue; // Descriptor proptery
+      if (SchemaUtil.isOperator(fieldName)) continue; // Descriptor proptery
       let fieldSpec = this.specInheritFrom(specParent, finalSpec[fieldName]);
       let fieldPath = path ? path + '.' + fieldName : '' + fieldName;
       this.mapField({

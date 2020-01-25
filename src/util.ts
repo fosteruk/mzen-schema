@@ -38,10 +38,10 @@ export class SchemaUtil
   
   static isValidFieldName(fieldName)
   {
-    return (Number.isInteger(fieldName) || !SchemaUtil.isQueryOperator(fieldName));
+    return (Number.isInteger(fieldName) || !SchemaUtil.isOperator(fieldName));
   }
   
-  static isQueryOperator(fieldName)
+  static isOperator(fieldName)
   {
     return (typeof fieldName == 'string' && fieldName.charAt(0) == '$');
   }
