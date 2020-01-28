@@ -7,6 +7,7 @@ import TypeCaster from './type-caster';
 import ObjectPathAccessor from './object-path-accessor';
 import SchemaConfig from './config';
 import SchemaSpec from './spec';
+import SchemaInquisitor from './inquisitor';
 
 export interface SchemaValidationMeta 
 {
@@ -84,16 +85,26 @@ export class Schema
   {
     this.name = name;
   }
+
+  getMapper(): SchemaMapper
+  {
+    this.init(); // we need the normalised spec so we must initialise the SchemaMapper
+    return this.schemaMapper;
+  }
   
   getSpec(): SchemaSpec
   {
-    this.init(); // we need the normalised spec so we must initialise the SchemaMapper
-    return this.schemaMapper.getSpec();
+    return this.getMapper().getSpec();
   }
   
   setSpec(spec: SchemaSpec)
   {
     this.spec = spec;
+  }
+
+  getInquisitor():SchemaInquisitor
+  {
+    return new SchemaInquisitor(this);
   }
   
   addConstructor(value)
@@ -374,66 +385,6 @@ export class Schema
     return result;
   }
 
-  getValidValues(path:string)
-  {
-    this.init();
-    let result = undefined;
-    // This method inspects the schema validation options
-    // - to file what are the valid values of any inArray validation
-    const spec = this.schemaMapper.getSpecPath(path);
-
-    if (
-      spec 
-      && spec.$validate 
-      && spec.$validate.inArray 
-      && spec.$validate.inArray.values
-    ) {
-      result = spec.$validate.inArray.values;
-    }
-
-    return result;
-  }
-
-  getValidValueLengthMin(path:string)
-  {
-    this.init();
-    let result = undefined;
-    // This method inspects the schema validation options
-    // - to file what are the valid values of any inArray validation
-    const spec = this.schemaMapper.getSpecPath(path);
-
-    if (
-      spec 
-      && spec.$validate 
-      && spec.$validate.valueLength 
-      && spec.$validate.valueLength.min !== undefined
-    ) {
-      result = spec.$validate.valueLength.min;
-    }
-
-    return result;
-  }
-
-  getValidValueLengthMax(path:string)
-  {
-    this.init();
-    let result = undefined;
-    // This method inspects the schema validation options
-    // - to file what are the valid values of any inArray validation
-    const spec = this.schemaMapper.getSpecPath(path);
-
-    if (
-      spec 
-      && spec.$validate 
-      && spec.$validate.valueLength 
-      && spec.$validate.valueLength.max !== undefined
-    ) {
-      result = spec.$validate.valueLength.max;
-    }
-
-    return result;
-  }
-  
   specToFieldType(spec, value)
   {
     var fieldType = undefined;
