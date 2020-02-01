@@ -16,7 +16,8 @@ export class SchemaTypeCaster
 
   static getTypeName(value: any)
   {
-    return SchemaTypeCaster.getType(value).name;
+    const { alias, name } = SchemaTypeCaster.getType(value);
+    return alias ? alias : name;
   }
 
   static cast(toType: any, value: any)
