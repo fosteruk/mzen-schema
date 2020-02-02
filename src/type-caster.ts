@@ -27,7 +27,7 @@ export class SchemaTypeCaster
     if (fromSchemaTypeCaster == undefined) throw new Error('Can not cast from unknown type "' + fromTypeName + '"');
 
     const toTypeName = SchemaTypeCaster.getTypeName(toType);
-    const toSchemaTypeCaster = SchemaTypeCaster.type[SchemaTypeCaster.getTypeName(toType)];
+    const toSchemaTypeCaster = SchemaTypeCaster.type[toTypeName];
     if (toSchemaTypeCaster == undefined) throw new Error('Can not cast to unknown type "' + toTypeName + '"');
 
     var result = value;
