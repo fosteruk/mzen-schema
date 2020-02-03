@@ -3,10 +3,13 @@ import Schema from '../../lib/schema';
 
 class ConstructorTestUsers extends Array
 {
+  static alias:string;
 }
+ConstructorTestUsers.alias = 'ConstructorTestUsers';
 
 class ConstructorTestUser
 {
+  static alias:string;
   _id?: string;
   nameFirst?: string;
   nameLast?: string;
@@ -17,9 +20,11 @@ class ConstructorTestUser
     return this.nameFirst + ' ' + this.nameLast;
   }
 }
+ConstructorTestUser.alias = 'ConstructorTestUser';
 
 class ConstructorTestAddress
 {
+  static alias:string;
   userId?: string;
   street?: string;
   postcode?: string;
@@ -29,12 +34,13 @@ class ConstructorTestAddress
     return this.street;
   }
 }
+ConstructorTestAddress.alias = 'ConstructorTestAddress';
 
 class ConstructorTestBike
 {
-  numWheels: number;
   static alias: string;
-    
+  numWheels: number;
+
   getNumWheels()
   {
     return this.numWheels;
