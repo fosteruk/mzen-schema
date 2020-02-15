@@ -28,7 +28,7 @@ export class FilterPostcode implements FilterInterface
     ) {
       // Insert space
       let chars = value.split('');
-      let spaceIndex = chars.length - 4;
+      let spaceIndex = chars.length - 3;
       if (chars[spaceIndex] != ' ') {
         chars.splice(spaceIndex, 0, ' ');
         value = chars.join('');

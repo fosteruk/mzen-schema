@@ -38,6 +38,18 @@ describe('filtering', function(){
       should(data.name).eql('kevin');
     });
   });
+  describe.only('postcode', function(){
+    it('should convert string to postcode', async () => {
+      var data = {postcode: 'L151HL'};
+
+      var schema = new Schema({
+        postcode: {$type: String, $filter: {postcode: true}}
+      });
+
+      await schema.validate(data);
+      should(data.postcode).eql('L15 1HL');
+    });
+  });
   describe('defaultValue', function(){
     it('should set default value when field undefined', async () => {
       var data = {name: undefined};
