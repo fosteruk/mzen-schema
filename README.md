@@ -1,4 +1,4 @@
-# mZen-schema
+# mzen-schema
 ## Data schema's in Javascript
 
 Features:
@@ -62,11 +62,11 @@ var paul = {
 // Two useful values returned are 'isValid' and 'errors'
 (async () => {
 
-  await validationResult = schemaPerson.validate(paul);
-  if (validationResult.isValid) {
+  const { isValid, errors } = await schemaPerson.validate(paul);
+  if (isValid) {
     // Do something with valid user
   } else {
-    console.log(result.errors);
+    console.log(errors);
   }
 
 })();
