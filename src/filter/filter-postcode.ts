@@ -24,13 +24,13 @@ export class FilterPostcode implements FilterInterface
     value = value.replace(/\s\s+/g, ' ');
     if (
       value.indexOf(' ') == -1 // Doesnt have a space
-      && value.length >= 5 && value.length == 7
+      && value.length >= 5 && value.length <= 7
     ) {
       // Insert space
       let chars = value.split('');
       let spaceIndex = chars.length - 4;
       if (chars[spaceIndex] != ' ') {
-        chars.splce(spaceIndex, 0, '');
+        chars.splice(spaceIndex, 0, ' ');
         value = chars.join('');
       }
     }
