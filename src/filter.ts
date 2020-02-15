@@ -4,6 +4,7 @@ import { FilterDefaultValue } from './filter/filter-default-value';
 import { FilterLowercase } from './filter/filter-lowercase';
 import { FilterTrim } from './filter/filter-trim';
 import { FilterUppercase } from './filter/filter-uppercase';
+import { FilterPostcode } from './filter/filter-postcode';
 
 export class Filter
 {
@@ -46,5 +47,6 @@ Filter.addFilter(new FilterDefaultValue);
 Filter.addFilter(new FilterLowercase);
 Filter.addFilter(new FilterTrim);
 Filter.addFilter(new FilterUppercase);
+Filter.addFilter(new FilterPostcode);
 
 export default Filter;
