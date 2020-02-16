@@ -38,16 +38,21 @@ describe('filtering', function(){
       should(data.name).eql('kevin');
     });
   });
-  describe.only('postcode', function(){
+  describe('postcode', function(){
     it('should convert string to postcode', async () => {
-      var data = {postcode: 'L151HL'};
-
+      var data = {postcode: 'L249HJ'};
       var schema = new Schema({
         postcode: {$type: String, $filter: {postcode: true}}
       });
-
       await schema.validate(data);
-      should(data.postcode).eql('L15 1HL');
+      should(data.postcode).eql('L24 9HJ');
+
+      var data = {postcode: 'L14LN'};
+      var schema = new Schema({
+        postcode: {$type: String, $filter: {postcode: true}}
+      });
+      await schema.validate(data);
+      should(data.postcode).eql('L1 4LN');
     });
   });
   describe('defaultValue', function(){
