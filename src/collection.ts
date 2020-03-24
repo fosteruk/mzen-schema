@@ -23,11 +23,6 @@ export class Collection<T> extends Array<T>
 {
   static alias:string;
 
-  constructor(...args)
-  {
-    super(...args);
-  }
-
   findOne(query:FindQuery):any
   {
     const array = this.findAll(query);
@@ -88,6 +83,36 @@ export class Collection<T> extends Array<T>
           : newValue;
       }
     });
+  }
+
+  indexFind(findQuery:FindQuery)
+  {
+    return this.indexOf(this.findOne(findQuery));
+  }
+
+  moveUp(index:number)
+  {
+    const indexLast = (this.length - 1);
+    const indexTo = index > 0
+      ? index - 1 
+      : indexLast; 
+    this.moveElement(index, indexTo);
+  }
+
+  moveDown(index:number)
+  {
+    const indexLast = (this.length - 1);
+    const indexTo = index < indexLast 
+      ? index + 1 
+      : 0; 
+    this.moveElement(index, indexTo);
+  }
+
+  moveElement(indexFrom:number, indexTo:number)
+  {
+    const element = this[indexFrom];
+    this.splice(indexFrom, 1);
+    this.splice(indexTo, 0, element);
   }
 }
 // We have to set a constructor name alias 

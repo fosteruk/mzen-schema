@@ -204,4 +204,35 @@ describe('Collection', function(){
       should(toms.length).eql(1);
     });
   });
+  describe('indexFind()', function() {
+    it('should return index of object element matching find query', function() {
+      const people = new Collection(...data.people);
+      should(people.indexFind({name: 'Kevin'})).eql(0);
+      should(people.indexFind({name: 'Fudge'})).eql(1);
+    });
+  });
+  describe('moveUp()', function() {
+    it('should move element up', function() {
+      const people = new Collection(...data.people);
+
+      should(people[0].name).eql('Kevin');
+      should(people[1].name).eql('Fudge');
+
+      people.moveUp(1);;
+      should(people[0].name).eql('Fudge');
+      should(people[1].name).eql('Kevin');
+    });
+  });
+  describe('moveDown()', function() {
+    it('should move element down', function() {
+      const people = new Collection(...data.people);
+
+      should(people[0].name).eql('Kevin');
+      should(people[1].name).eql('Fudge');
+
+      people.moveDown(0);;
+      should(people[0].name).eql('Fudge');
+      should(people[1].name).eql('Kevin');
+    });
+  });
 });
