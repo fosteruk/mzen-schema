@@ -229,10 +229,26 @@ describe('Collection', function(){
 
       should(people[0].name).eql('Kevin');
       should(people[1].name).eql('Fudge');
+      should(people[2].name).eql('Kar Chun');
+      should(people[3].name).eql('Alison');
 
-      people.moveDown(0);;
+      people.moveDown(0);
       should(people[0].name).eql('Fudge');
       should(people[1].name).eql('Kevin');
+      should(people[2].name).eql('Kar Chun');
+      should(people[3].name).eql('Alison');
+
+      people.moveDown(1);
+      should(people[0].name).eql('Fudge');
+      should(people[1].name).eql('Kar Chun');
+      should(people[2].name).eql('Kevin');
+      should(people[3].name).eql('Alison');
+
+      people.moveDown(2);
+      should(people[0].name).eql('Fudge');
+      should(people[1].name).eql('Kar Chun');
+      should(people[2].name).eql('Alison');
+      should(people[3].name).eql('Kevin');
     });
   });
 });
