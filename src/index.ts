@@ -1,5 +1,7 @@
 import { Schema } from './schema';
 
+export const clone = require('clone');
+
 export * from './schema';
 export * from './spec';
 export * from './manager';
