@@ -12,9 +12,9 @@ import Schema from 'mzen-schema';
 // var Schema = require('mzen-schema').default; // commonjs
 
 var schemaPerson = new Schema({
-  // field names with a $ prefix are used to specify options in the schema specification
+  // Field names with a $ prefix specify options in the schema specification
   $name: 'person', // A schema can be referenced in other schema's by name to allow composition
-  $strict: true, // in strict mode any undefined fields will produce an error on validation
+  $strict: true, // In strict mode any undefined fields will produce an error on validation
   _id: 'ObjectID',
   name: {
     // $label used in validation error message - defaults to the field name
