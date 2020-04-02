@@ -37,7 +37,7 @@ export class SchemaManager
   
   addConstructors(constructors)
   {
-    // could be an array of constructor functions or a object map 
+    // Could be an array of constructor functions or a object map 
     var constructorsArray = Array.isArray(constructors) ? constructors : Object.values(constructors);
     constructorsArray.forEach(construct =>  this.addConstructor(construct));
   }
@@ -49,7 +49,7 @@ export class SchemaManager
   
   addSchemas(schemas: Array<Schema> | {[key:string]: Schema})
   {
-    // could be an array of schema objects functions or a object map
+    // Could be an array of schema objects functions or a object map
     var schemasArray = Array.isArray(schemas) ? schemas : Object.values(schemas);
     schemasArray.forEach(schema => this.addSchema(schema));
   }

@@ -13,12 +13,12 @@ interface UpdateQuery
 }
 
 // Extending Array doesnt really work in as you might expect
-// - becaused JavaScript uses prototypal inheritance
-// - the Array returned by mutator methods is always Array 
-// - rather than the extended object type.
+// - because JavaScript uses prototypal inheritance
+// - the Array returned by mutator methods is always has constructor Array 
+// - rather than the extended constructor.
 // - https://blog.simontest.net/extend-array-with-typescript-965cc1134b3
-// Understanding this we match this behaviour
-// - always returning Array type from mutators
+// Understanding this, we match this behaviour
+// - always return Array type from mutators
 export class Collection<T> extends Array<T>
 {
   static alias:string;

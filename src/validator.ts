@@ -24,7 +24,13 @@ export class Validator
       let validator = this.validators[validatorName];
       if (!validator) throw new Error('Uknown validator "' + validatorName + '"');
 
-      if (validatorsConfig[validatorName] === false || validatorsConfig[validatorName] == undefined) continue; // Falsey value disables the validator
+      if (
+        validatorsConfig[validatorName] === false 
+        || validatorsConfig[validatorName] == undefined
+      ) {
+        // Falsey value disables the validator
+        continue; 
+      }
 
       let validatorConfig = !validatorsConfig[validatorName] || (typeof validatorsConfig[validatorName] == 'boolean')
                               ? {} : validatorsConfig[validatorName];

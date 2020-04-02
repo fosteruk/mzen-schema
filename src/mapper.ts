@@ -82,7 +82,7 @@ export class SchemaMapper
   addSchemas(schemas: {[key: string]: Schema} | Array<Schema>)
   {
     if (schemas) {
-      // could be an array of schema objects functions or a object map
+      // Could be an array of schema objects functions or a object map
       var schemasArray = Array.isArray(schemas) ? schemas : Object.keys(schemas).map(name => schemas[name]);
       schemasArray.forEach((schema) => {
         if (schema instanceof Schema) this.addSchema(schema);
@@ -92,7 +92,7 @@ export class SchemaMapper
   
   normalizeSpec(spec)
   {
-    // Resolve any embedded schema references
+    // Resolve embedded schema references
     if (Array.isArray(spec)) {
       spec.forEach((value, index) => {
         spec[index] = this.normalizeSpec(value);
@@ -100,7 +100,7 @@ export class SchemaMapper
     } else if (spec && typeof spec == 'object') {
       if (spec.$schema) {
         let name = spec.$schema;
-        // inject referenced schema spec
+        // Inject referenced schema spec
         if (!this.schemas[name]) {
           throw new Error('Missing schema reference ' + spec.$schema);
         } else {
@@ -111,7 +111,7 @@ export class SchemaMapper
         }
         delete spec.$schema;
       } else {
-        // this spec does not contain a schema ref - recurse
+        // This spec does not contain a schema ref - recurse
         Object.keys(spec).forEach((key) => {
           // Dont recurse schema operators others than $spec
           if (
@@ -371,7 +371,8 @@ export class SchemaMapper
 
     var fieldType = undefined;
     var nullable = false;
-    // If the field type is a string value then it should contain the string name of the required type (converted to a constructor later).
+    // If the field type is a string value then it should contain the string name of the 
+    // - required type (converted to a constructor later).
     // - Otherwise we need to find the constructor, if the value is not already a constructor ([] or {})
     if (spec) {
       fieldType = spec.constructor == String ? spec : TypeCaster.getType(spec);
@@ -420,7 +421,8 @@ export class SchemaMapper
       case Array:
         var arraySpec = undefined;
         if (Array.isArray(spec) && spec[0]) {
-          // If the field is an array the specification for the array elements shoud be contained in the first element
+          // If the field is an array the specification for the array elements 
+          // - shoud be contained in the first element
           arraySpec = spec[0];
         } else if (TypeCaster.getType(spec) == Object && spec.$spec) {
           // If the spec is an object which specifies type "Array"

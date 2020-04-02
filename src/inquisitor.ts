@@ -12,8 +12,6 @@ export class SchemaInquisitor
   getValidValues(path:string)
   {
     let result = undefined;
-    // This method inspects the schema validation options
-    // - to file what are the valid values of any inArray validation
     const spec = this.schema.getMapper().getSpecPath(path);
 
     if (
@@ -31,8 +29,6 @@ export class SchemaInquisitor
   getValidValueLengthMin(path:string)
   {
     let result = undefined;
-    // This method inspects the schema validation options
-    // - to file what are the valid values of any inArray validation
     const spec = this.schema.getMapper().getSpecPath(path);
 
     if (
@@ -50,8 +46,6 @@ export class SchemaInquisitor
   getValidValueLengthMax(path:string)
   {
     let result = undefined;
-    // This method inspects the schema validation options
-    // - to file what are the valid values of any inArray validation
     const spec = this.schema.getMapper().getSpecPath(path);
 
     if (

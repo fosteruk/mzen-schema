@@ -21,7 +21,7 @@ export class ObjectPathAccessor
   {
     return ObjectPathAccessor.searchRescursive(path, subject);
   }
-  /*
+ /*
   * Set path
   *
   * Sets all elements matching 'path' in the given 'subject'.
@@ -125,12 +125,14 @@ export class ObjectPathAccessor
             delete subject[prop];
           }
         } else {
-          // Full pattern matches current element path so add it to the list of matches
+          // Full pattern matches current element path 
+          // - so add it to the list of matches
           matches.push(subject[prop]);
         }
       }
 
-      // Only recurse into objects - can be an array object but not a primitive 
+      // Only recurse into objects
+      // - can be an array object but not a primitive 
       if (
         (currentNode == '*' || prop == currentNode) 
         && subject[prop] === Object(subject[prop])
@@ -142,7 +144,8 @@ export class ObjectPathAccessor
       }
     }
 
-    // If the pattern contains a wildcard the result should be an array. Otherwise it should be a single value
+    // If the pattern contains a wildcard the result should be an array. 
+    // - Otherwise it should be a single value
     return patternParts.indexOf('*') !== -1 || meta.wilcardPath 
       ? matches 
       : matches[0];

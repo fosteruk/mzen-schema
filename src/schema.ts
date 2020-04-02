@@ -88,7 +88,9 @@ export class Schema
 
   getMapper(): SchemaMapper
   {
-    this.init(); // we need the normalised spec so we must initialise the SchemaMapper
+    // We need the normalised spec 
+    // - so we must initialise the SchemaMapper
+    this.init(); 
     return this.schemaMapper;
   }
   
@@ -120,7 +122,7 @@ export class Schema
   addConstructors(constructors)
   {
     if (constructors) {
-      // could be an array of constructor functions or a object map 
+      // Could be an array of constructor functions or a object map 
       var constructorsArray = Array.isArray(constructors) ? constructors : Object.keys(constructors).map(name => constructors[name]);
       constructorsArray.forEach(construct => {
         if (typeof construct == 'function') this.addConstructor(construct);
@@ -136,7 +138,7 @@ export class Schema
   addSchemas(schemas: Array<Schema> | {[key:string]: Schema})
   {
     if (schemas) {
-      // could be an array of schema objects functions or a object map
+      // Could be an array of schema objects or a object map
       var schemasArray = Array.isArray(schemas) ? schemas : Object.keys(schemas).map(name => schemas[name]);
       schemasArray.forEach((schema) => {
         if (schema instanceof Schema) this.addSchema(schema);
@@ -406,7 +408,7 @@ export class Schema
 
     if (fieldType && fieldType.constructor == String) {
       // The fieldType was specified with a String value (not a string constructor)
-      // Attempt to covert the field type to a constructor
+      // Attempt to convert the field type to a constructor
       fieldType = SchemaTypes[fieldType];
     }
 
@@ -462,7 +464,8 @@ export class Schema
       };
     }
 
-    // Default value must be applied before type-casting - because the default value may need to be type-casted
+    // Default value must be applied before type-casting 
+    // - because the default value may need to be type-cast
     // - for example converting default value 'now' to type Date
     if (defaultValue !== undefined) {
       value = await Filter.filter(value, {defaultValue});
@@ -518,7 +521,7 @@ export class Schema
 
       // We compare type names rather than constructors
       // - because sometimes we need to treat two different implementations as the same type
-      // - An exmaple of this is the ObjectID type. MongoDB has its own implementation which should
+      // - An example of this is the ObjectID type. MongoDB has its own implementation which should
       // - be considered the same type as ObjectID implementation used by Schema (bson-objectid)
       if (requiredTypeName != valueTypeName) {
         result = TypeCaster.cast(requiredType, value);
