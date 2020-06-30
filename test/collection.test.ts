@@ -204,11 +204,11 @@ describe('Collection', function(){
       should(toms.length).eql(1);
     });
   });
-  describe('indexFind()', function() {
+  describe('findIndex()', function() {
     it('should return index of object element matching find query', function() {
       const people = new Collection(...data.people);
-      should(people.indexFind({name: 'Kevin'})).eql(0);
-      should(people.indexFind({name: 'Fudge'})).eql(1);
+      should(people.findOneIndex({name: 'Kevin'})).eql(0);
+      should(people.findOneIndex({name: 'Fudge'})).eql(1);
     });
   });
   describe('moveUp()', function() {

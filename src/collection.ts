@@ -85,7 +85,7 @@ export class Collection<T> extends Array<T>
     });
   }
 
-  indexFind(findQuery:FindQuery)
+  findOneIndex(findQuery:FindQuery)
   {
     return this.indexOf(this.findOne(findQuery));
   }
