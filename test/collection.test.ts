@@ -204,7 +204,7 @@ describe('Collection', function(){
       should(toms.length).eql(1);
     });
   });
-  describe('findIndex()', function() {
+  describe('findOneIndex()', function() {
     it('should return index of object element matching find query', function() {
       const people = new Collection(...data.people);
       should(people.findOneIndex({name: 'Kevin'})).eql(0);
