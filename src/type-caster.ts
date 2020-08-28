@@ -11,7 +11,33 @@ export class SchemaTypeCaster
    */
   static getType(value: any)
   {
-    return typeof value == 'function' ? value : ((value === null || value === undefined) ? value : (value).constructor);
+    let result = undefined;
+    if (
+      (typeof value == 'function') 
+      || (value === null || value === undefined)
+    ) {
+      result = value;
+    } else if (Array.isArray(value)) {
+      result = Array;
+    } else if (
+      typeof value === 'string' 
+      || value instanceof String
+    ) {
+      result = String;
+    } else if (
+      typeof value === 'number' 
+      || value instanceof Number
+    ) {
+      result = Number;
+    } else if (
+      typeof value === 'boolean' 
+      || value instanceof Boolean
+    ) {
+      result = Boolean;
+    } else {
+      result = (value).constructor;
+    }
+    return result;
   }
 
   static getTypeName(value: any)
