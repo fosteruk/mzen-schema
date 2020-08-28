@@ -432,7 +432,7 @@ export class Schema
 
     path = path ? path : fieldName;
     config = config ? config : {};
-    meta = meta ? meta : {};
+    meta = meta ? meta : {errors: []};
     mapperMeta = mapperMeta ? mapperMeta : {};
 
     const validators = spec && spec.$validate ? spec.$validate : {};
@@ -503,14 +503,22 @@ export class Schema
     return value;
   }
   
-  typeCast(requiredType: any, value, path?, meta: SchemaValidationMeta = {})
+  typeCast(requiredType: any, value, path?, meta?: SchemaValidationMeta)
   {
+    var meta = meta ? meta : {errors: {}};
     // If the spec specifies the value should be an object and the value is already an object, we do not need to typecast
     // When we specify a type as Object we only care that it is an Object we dont care about its
     // specific constuctor type, we dont care if it is MyObject or YourObject
     var skip = (
-      requiredType === Object && Array.isArray(value) == false && Object(value) === value 
-      || requiredType === Array && value instanceof Array
+      (
+        requiredType === Object 
+        && Array.isArray(value) == false 
+        && Object(value) === value
+      )
+      || (
+        requiredType === Array
+         && Array.isArray(value)
+      )
     );
     var result = value;
 
