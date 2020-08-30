@@ -12,28 +12,34 @@ export class SchemaTypeCaster
   static getType(value: any)
   {
     let result = undefined;
-    if (
-      (typeof value == 'function') 
-      || (value === null || value === undefined)
-    ) {
+    if (value === null || value === undefined) {
       result = value;
-    } else if (Array.isArray(value)) {
+    } else if (
+      value === Array
+      || Array.isArray(value)
+      || value.prototype instanceof Array
+    ) {
       result = Array;
     } else if (
       typeof value === 'string' 
       || value instanceof String
+      || value.prototype instanceof String
     ) {
       result = String;
     } else if (
       typeof value === 'number' 
       || value instanceof Number
+      || value.prototype instanceof Number
     ) {
       result = Number;
     } else if (
       typeof value === 'boolean' 
       || value instanceof Boolean
+      || value.prototype instanceof Boolean
     ) {
       result = Boolean;
+    } else if (typeof value == 'function') {
+      result = value;
     } else {
       result = (value).constructor;
     }

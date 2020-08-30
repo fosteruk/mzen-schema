@@ -517,7 +517,7 @@ export class Schema
       )
       || (
         requiredType === Array
-         && Array.isArray(value)
+        && Array.isArray(value)
       )
     );
     var result = value;
